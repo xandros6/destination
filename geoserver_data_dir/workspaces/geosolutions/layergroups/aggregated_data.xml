@@ -1,0 +1,36 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-257c0eea:13c00e3f680:-7ff2</id>
+  <name>aggregated_data</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl-257c0eea:13c00e3f680:-7ff5</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-257c0eea:13c00e3f680:-7ff9</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--3970ff67:13c00cf828a:-7fec</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--3439441b:13bb3230189:-7ffb</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--3439441b:13bb3230189:-7ffc</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--3439441b:13bb3230189:-7ffd</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>317643.71875</minx>
+    <maxx>516288.5625</maxx>
+    <miny>4881313.5</miny>
+    <maxy>5140984.5</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+</layerGroup>
