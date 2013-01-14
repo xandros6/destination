@@ -1,0 +1,16 @@
+<layer>
+  <name>siig_aggregation_grid</name>
+  <id>LayerInfoImpl-622cb809:13c295cc439:-7fef</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--570ae188:124761b8d78:-7fe0</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-622cb809:13c295cc439:-7ff0</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

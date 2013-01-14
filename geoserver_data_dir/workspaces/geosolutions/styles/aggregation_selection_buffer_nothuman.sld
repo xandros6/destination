@@ -17,7 +17,9 @@
             <Geometry>
               <ogc:Function name="buffer">
                 <ogc:PropertyName>geometria</ogc:PropertyName>
-                <ogc:PropertyName>distanza</ogc:PropertyName>
+                <ogc:Function name="env">
+                   <ogc:Literal>distance</ogc:Literal>
+                </ogc:Function>
               </ogc:Function>
             </Geometry>
             <Fill>

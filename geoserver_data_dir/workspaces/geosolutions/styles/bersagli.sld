@@ -18,38 +18,26 @@
           </ogc:Filter>
           <PolygonSymbolizer>
             <Fill>
-              <CssParameter name="fill">#FF7FFF</CssParameter>
-            </Fill>
-            
+              <GraphicFill>
+               <Graphic>
+                 <Mark>
+                   <WellKnownName>shape://times</WellKnownName>
+                   <Stroke>
+                     <CssParameter name="stroke">#FF7FFF</CssParameter>
+                     <CssParameter name="stroke-width">1</CssParameter>
+                   </Stroke>
+                 </Mark>
+                 <Size>8</Size>
+               </Graphic>
+               
+             </GraphicFill>
+          </Fill>
+            <Stroke>
+               <CssParameter name="stroke">#FF7FFF</CssParameter>
+               <CssParameter name="stroke-width">1</CssParameter>
+             </Stroke>
           </PolygonSymbolizer>
-          <TextSymbolizer>
-           <Label>
-             <ogc:PropertyName>superficie</ogc:PropertyName>             
-           </Label>
-           <Font>
-             <CssParameter name="font-family">Arial</CssParameter>
-             <CssParameter name="font-size">12</CssParameter>
-             <CssParameter name="font-style">normal</CssParameter>
-             <CssParameter name="font-weight">bold</CssParameter>
-           </Font>
-           <LabelPlacement>
-             <PointPlacement>
-               <AnchorPoint>
-                 <AnchorPointX>0.5</AnchorPointX>
-                 <AnchorPointY>0.0</AnchorPointY>
-               </AnchorPoint>
-               <Displacement>
-                 <DisplacementX>0</DisplacementX>
-                 <DisplacementY>0</DisplacementY>
-               </Displacement>
-               <Rotation>-45</Rotation>
-             </PointPlacement>
-           </LabelPlacement>
-           <Fill>
-             <CssParameter name="fill">#990099</CssParameter>
-           </Fill>
-            <VendorOption name="group">yes</VendorOption>
-         </TextSymbolizer>
+          
         </Rule>
         <Rule>
           <Title>Aree agricole</Title>
@@ -61,41 +49,27 @@
           </ogc:Filter>
           <PolygonSymbolizer>
             <Fill>
-              <CssParameter name="fill">#3993FA</CssParameter>
-            </Fill>
-            <!--Stroke>
-              <CssParameter name="stroke">#000000</CssParameter>
-              <CssParameter name="stroke-width">1</CssParameter>
-            </Stroke-->
+              <GraphicFill>
+               <Graphic>
+                 <Mark>
+                   <WellKnownName>shape://horline</WellKnownName>
+                   <Stroke>
+                     <CssParameter name="stroke">#FFAA7F</CssParameter>
+                     <CssParameter name="stroke-width">1</CssParameter>
+                   </Stroke>
+                 </Mark>
+                 <Size>6</Size>
+               </Graphic>
+               
+             </GraphicFill>
+          </Fill>
+            <Stroke>
+               <CssParameter name="stroke">#FFAA7F</CssParameter>
+               <CssParameter name="stroke-width">1</CssParameter>
+             </Stroke>
+            
           </PolygonSymbolizer>
-          <TextSymbolizer>
-           <Label>             
-             <ogc:PropertyName>superficie</ogc:PropertyName>             
-           </Label>
-           <Font>
-             <CssParameter name="font-family">Arial</CssParameter>
-             <CssParameter name="font-size">12</CssParameter>
-             <CssParameter name="font-style">normal</CssParameter>
-             <CssParameter name="font-weight">bold</CssParameter>
-           </Font>
-           <LabelPlacement>
-             <PointPlacement>
-               <AnchorPoint>
-                 <AnchorPointX>0.5</AnchorPointX>
-                 <AnchorPointY>0.0</AnchorPointY>
-               </AnchorPoint>
-               <Displacement>
-                 <DisplacementX>0</DisplacementX>
-                 <DisplacementY>25</DisplacementY>
-               </Displacement>
-               <Rotation>-45</Rotation>
-             </PointPlacement>
-           </LabelPlacement>
-           <Fill>
-             <CssParameter name="fill">#990099</CssParameter>
-           </Fill>
-            <VendorOption name="group">yes</VendorOption>
-         </TextSymbolizer>
+          
         </Rule>
         <Rule>
           <Title>Aree boscate</Title>
@@ -107,41 +81,27 @@
           </ogc:Filter>
           <PolygonSymbolizer>
             <Fill>
-              <CssParameter name="fill">#7FFF55</CssParameter>
-            </Fill>
-            <!--Stroke>
-              <CssParameter name="stroke">#000000</CssParameter>
-              <CssParameter name="stroke-width">1</CssParameter>
-            </Stroke-->
+              <GraphicFill>
+               <Graphic>
+                 <Mark>
+                   <WellKnownName>shape://vertline</WellKnownName>
+                   <Stroke>
+                     <CssParameter name="stroke">#7FFFD4</CssParameter>
+                     <CssParameter name="stroke-width">1</CssParameter>
+                   </Stroke>
+                 </Mark>
+                 <Size>6</Size>
+               </Graphic>
+               
+             </GraphicFill>
+          </Fill>
+            <Stroke>
+               <CssParameter name="stroke">#7FFFD4</CssParameter>
+               <CssParameter name="stroke-width">1</CssParameter>
+             </Stroke>
+           
           </PolygonSymbolizer>
-          <TextSymbolizer>
-           <Label>             
-             <ogc:PropertyName>superficie</ogc:PropertyName>             
-           </Label>
-           <Font>
-             <CssParameter name="font-family">Arial</CssParameter>
-             <CssParameter name="font-size">12</CssParameter>
-             <CssParameter name="font-style">normal</CssParameter>
-             <CssParameter name="font-weight">bold</CssParameter>
-           </Font>
-           <LabelPlacement>
-             <PointPlacement>
-               <AnchorPoint>
-                 <AnchorPointX>0.5</AnchorPointX>
-                 <AnchorPointY>0.0</AnchorPointY>
-               </AnchorPoint>
-               <Displacement>
-                 <DisplacementX>0</DisplacementX>
-                 <DisplacementY>25</DisplacementY>
-               </Displacement>
-               <Rotation>-45</Rotation>
-             </PointPlacement>
-           </LabelPlacement>
-           <Fill>
-             <CssParameter name="fill">#990099</CssParameter>
-           </Fill>
-            <VendorOption name="group">yes</VendorOption>
-         </TextSymbolizer>
+          
         </Rule>
 
       </FeatureTypeStyle>
