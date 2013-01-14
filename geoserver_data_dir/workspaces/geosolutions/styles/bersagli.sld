@@ -16,6 +16,7 @@
                 <ogc:Literal>Popolazione residente</ogc:Literal>
               </ogc:PropertyIsEqualTo>
           </ogc:Filter>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
           <PolygonSymbolizer>
             <Fill>
               <GraphicFill>
@@ -47,6 +48,7 @@
                 <ogc:Literal>Aree agricole</ogc:Literal>
               </ogc:PropertyIsEqualTo>
           </ogc:Filter>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
           <PolygonSymbolizer>
             <Fill>
               <GraphicFill>
@@ -79,6 +81,7 @@
                 <ogc:Literal>Aree boscate</ogc:Literal>
               </ogc:PropertyIsEqualTo>
           </ogc:Filter>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
           <PolygonSymbolizer>
             <Fill>
               <GraphicFill>

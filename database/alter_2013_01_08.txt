@@ -1,0 +1,37 @@
+----------------------------
+-- modifiche  08/01/2013   |
+----------------------------
+
+CREATE TABLE SIIG_D_TIPOLOGIA_DANNO (
+       ID_TIPOLOGIA_DANNO   numeric(2) NOT NULL,
+       TIPOLOGIA_DANNO      varchar(100) NOT NULL,
+       FLG_UMANO            varchar(1) NOT NULL
+                                   CONSTRAINT DOM_U_N
+                                          CHECK (FLG_UMANO IN ('U','N'))
+);
+
+ALTER TABLE SIIG_D_TIPOLOGIA_DANNO
+       ADD  CONSTRAINT PK_SIIG_D_TIPOLOGIA_DANNO PRIMARY KEY (
+              ID_TIPOLOGIA_DANNO) ;
+              
+              
+ALTER TABLE siig_r_dist_grav_scensost RENAME TO SIIG_R_AREA_DANNO ;
+
+ALTER TABLE siig_r_area_danno DROP CONSTRAINT pk_siig_r_dist_grav_scensost;
+
+insert into SIIG_D_TIPOLOGIA_DANNO values (0, 'Dato non presente', 'U') ;
+commit;
+
+ALTER TABLE siig_r_area_danno add  ID_TIPOLOGIA_DANNO numeric(2)  default 0 NOT NULL; 
+
+
+ALTER TABLE SIIG_R_AREA_DANNO
+       ADD  CONSTRAINT FK_SIIG_D_TIPOLOGIA_DANNO_01
+              FOREIGN KEY (ID_TIPOLOGIA_DANNO)
+                             REFERENCES SIIG_D_TIPOLOGIA_DANNO  ;
+
+
+ALTER TABLE SIIG_R_AREA_DANNO
+       ADD   CONSTRAINT PK_SIIG_R_AREA_DANNO PRIMARY KEY (ID_GRAVITA, 
+              ID_SCENARIO, ID_SOSTANZA, ID_TIPOLOGIA_DANNO, FLG_LIEVE)  ;
+

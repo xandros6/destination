@@ -12,7 +12,7 @@
         <Rule>
           <Title>Buffer</Title>
           <Abstract>Buffer per Rischio Incidentale</Abstract>
-          <MaxScaleDenominator>17061</MaxScaleDenominator>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
           <PolygonSymbolizer>
             <Geometry>
               <ogc:Function name="buffer">

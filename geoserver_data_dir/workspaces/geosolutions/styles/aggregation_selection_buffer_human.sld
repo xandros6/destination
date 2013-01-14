@@ -14,7 +14,7 @@
                     
                     <Title>Lesioni reversibili</Title>
                     <Abstract>Buffer per Rischio Incidentale</Abstract>
-                    <MaxScaleDenominator>17061</MaxScaleDenominator>
+                    <MaxScaleDenominator>50000</MaxScaleDenominator>
                     <PolygonSymbolizer>
                         <Geometry>
                             <ogc:Function name="difference">
@@ -51,7 +51,7 @@
                     
                     <Title>Lesioni irreversibili</Title>
                     <Abstract>Buffer per Rischio Incidentale</Abstract>
-                    <MaxScaleDenominator>17061</MaxScaleDenominator>
+                    <MaxScaleDenominator>50000</MaxScaleDenominator>
                     <PolygonSymbolizer>
                         <Geometry>
                             <ogc:Function name="difference">
@@ -86,7 +86,7 @@
                     
                     <Title>Inizio letalità</Title>
                     <Abstract>Buffer per Rischio Incidentale</Abstract>
-                    <MaxScaleDenominator>17061</MaxScaleDenominator>
+                    <MaxScaleDenominator>50000</MaxScaleDenominator>
                     <PolygonSymbolizer>
                         <Geometry>
                             <ogc:Function name="difference">
@@ -121,7 +121,7 @@
                     
                     <Title>Elevata letalità</Title>
                     <Abstract>Buffer per Rischio Incidentale</Abstract>
-                    <MaxScaleDenominator>17061</MaxScaleDenominator>
+                    <MaxScaleDenominator>50000</MaxScaleDenominator>
                     <PolygonSymbolizer>
                         <Geometry>
                             <ogc:Function name="buffer">
