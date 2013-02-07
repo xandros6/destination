@@ -1,0 +1,18 @@
+<wmsStore>
+  <id>WMSStoreInfoImpl--3508b0d7:13caa127a3e:-8000</id>
+  <name>LimitiAmministrativiTIC</name>
+  <description>LimitiAmministrativiTIC</description>
+  <type>WMS</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <metadata>
+    <entry key="useConnectionPooling">true</entry>
+  </metadata>
+  <__default>false</__default>
+  <capabilitiesURL>http://pta.dti.supsi.ch:8080/geoserver/TI_AmbitiAmministrativi/wms?service=WMS&amp;request=GetCapabilities</capabilitiesURL>
+  <maxConnections>6</maxConnections>
+  <readTimeout>60</readTimeout>
+  <connectTimeout>30</connectTimeout>
+</wmsStore>

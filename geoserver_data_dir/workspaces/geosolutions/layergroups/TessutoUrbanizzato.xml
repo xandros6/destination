@@ -1,0 +1,37 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--e78c94c:13cb5732574:-5027</id>
+  <name>TessutoUrbanizzato</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-5031</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-502e</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-502b</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-5028</id>
+    </layer>
+  </layers>
+  <styles>
+    <style/>
+    <style/>
+    <style/>
+    <style/>
+  </styles>
+  <bounds>
+    <minx>313327.0</minx>
+    <maxx>4988085.929428586</maxx>
+    <miny>1443410.9559716904</miny>
+    <maxy>5164155.8695</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">TessutoUrbanizzato</entry>
+  </metadata>
+</layerGroup>

@@ -27,7 +27,7 @@
           <LineSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
             <Stroke>
               <CssParameter name="stroke">#14F200</CssParameter>
-              <CssParameter name="stroke-width">2</CssParameter>
+              <CssParameter name="stroke-width">12</CssParameter>
             </Stroke>
           </LineSymbolizer>
           <PointSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
@@ -135,7 +135,7 @@
           <LineSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
             <Stroke>
               <CssParameter name="stroke">#FFFB00</CssParameter>
-              <CssParameter name="stroke-width">4</CssParameter>
+              <CssParameter name="stroke-width">14</CssParameter>
             </Stroke>
           </LineSymbolizer>
            <PointSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
@@ -232,7 +232,7 @@
           <LineSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
             <Stroke>
               <CssParameter name="stroke">#FF0000</CssParameter>
-              <CssParameter name="stroke-width">6</CssParameter>
+              <CssParameter name="stroke-width">16</CssParameter>
             </Stroke>
           </LineSymbolizer>
            <PointSymbolizer uom="http://www.opengeospatial.org/se/units/metre">
@@ -313,4 +313,4 @@
       </FeatureTypeStyle>
     </UserStyle>
   </NamedLayer>
-</StyledLayerDescriptor>
+</StyledLayerDescriptor> 
