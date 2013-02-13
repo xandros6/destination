@@ -10,7 +10,7 @@
 
       <FeatureTypeStyle>
         <Rule>
-          <Title>Buffer</Title>
+          <Title>Area di Danno</Title>
           <Abstract>Buffer per Rischio Incidentale</Abstract>
           <MaxScaleDenominator>17061</MaxScaleDenominator>
           <PolygonSymbolizer>

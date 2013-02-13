@@ -73,6 +73,111 @@
           </PolygonSymbolizer>
           
         </Rule>
+         <Rule>
+          <Title>Aree protette</Title>
+          <ogc:Filter>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>tipobersaglio</ogc:PropertyName>
+                <ogc:Literal>Aree protette</ogc:Literal>
+              </ogc:PropertyIsEqualTo>
+          </ogc:Filter>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+            <Fill>
+              <GraphicFill>
+               <Graphic>
+                 <Mark>
+                   <WellKnownName>shape://slash</WellKnownName>
+                   <Stroke>
+                     <CssParameter name="stroke">#C2AC9B</CssParameter>
+                     <CssParameter name="stroke-width">1</CssParameter>
+                   </Stroke>
+                   
+                 </Mark>
+                 <Size>6</Size>
+                
+               </Graphic>
+               
+             </GraphicFill>
+          </Fill>
+            <Stroke>
+               <CssParameter name="stroke">#C2AC9B</CssParameter>
+               <CssParameter name="stroke-width">1</CssParameter>
+             </Stroke>
+            
+          </PolygonSymbolizer>
+          
+        </Rule>
+        <Rule>
+          <Title>Acque superficiali</Title>
+          <ogc:Filter>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>tipobersaglio</ogc:PropertyName>
+                <ogc:Literal>Acque superficiali</ogc:Literal>
+              </ogc:PropertyIsEqualTo>
+          </ogc:Filter>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+            <Fill>
+              <GraphicFill>
+               <Graphic>
+                 <Mark>
+                   <WellKnownName>shape://backslash</WellKnownName>
+                   <Stroke>
+                     <CssParameter name="stroke">#9C8783</CssParameter>
+                     <CssParameter name="stroke-width">1</CssParameter>
+                   </Stroke>
+                   
+                 </Mark>
+                 <Size>6</Size>
+                
+               </Graphic>
+               
+             </GraphicFill>
+          </Fill>
+            <Stroke>
+               <CssParameter name="stroke">#9C8783</CssParameter>
+               <CssParameter name="stroke-width">1</CssParameter>
+             </Stroke>
+            
+          </PolygonSymbolizer>
+          
+        </Rule>
+        <Rule>
+          <Title>Acque sotterranee</Title>
+          <ogc:Filter>
+              <ogc:PropertyIsEqualTo>
+                <ogc:PropertyName>tipobersaglio</ogc:PropertyName>
+                <ogc:Literal>Acque sotterranee</ogc:Literal>
+              </ogc:PropertyIsEqualTo>
+          </ogc:Filter>
+          <MaxScaleDenominator>50000</MaxScaleDenominator>
+          <PolygonSymbolizer>
+            <Fill>
+              <GraphicFill>
+               <Graphic>
+                 <Mark>
+                   <WellKnownName>shape://backslash</WellKnownName>
+                   <Stroke>
+                     <CssParameter name="stroke">#32735C</CssParameter>
+                     <CssParameter name="stroke-width">1</CssParameter>
+                   </Stroke>
+                   
+                 </Mark>
+                 <Size>6</Size>
+                
+               </Graphic>
+               
+             </GraphicFill>
+          </Fill>
+            <Stroke>
+               <CssParameter name="stroke">#32735C</CssParameter>
+               <CssParameter name="stroke-width">1</CssParameter>
+             </Stroke>
+            
+          </PolygonSymbolizer>
+          
+        </Rule>
         <Rule>
           <Title>Aree boscate</Title>
           <ogc:Filter>
