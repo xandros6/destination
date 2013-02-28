@@ -69,6 +69,7 @@ from siig_p.siig_p_bersagli_acque_superficiali_pl as bersaglio2 &#xd;
      on st_dwithin(bersaglio2.the_geom, arco.geometria, arco.distanza)&#xd;
 where arco.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632) and arco.calc_formula_tot &gt; 0&#xd;
 and arco.tipologia = &apos;%tipologia%&apos;)</sql>
+        <keyColumn>gid</keyColumn>
         <geometry>
           <name>the_geom</name>
           <type>MultiPolygon</type>
