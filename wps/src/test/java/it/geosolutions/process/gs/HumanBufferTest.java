@@ -54,7 +54,7 @@ public class HumanBufferTest extends TestCase {
             b.add(i);
             features.add(b.buildFeature(i + ""));
         }
-        Double[] distance = new Double[] {500.0,400.0,300.0,200.0};
+        Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
         HumanBuffer process = new HumanBuffer();
         SimpleFeatureCollection output = process.execute(features, distance, new String[] {"distance1", "distance2", "distance3", "distance4"});
         assertEquals(1, output.size());
@@ -66,7 +66,7 @@ public class HumanBufferTest extends TestCase {
             assertNotNull(sf.getDefaultGeometry());
             assertNotNull(sf.getAttribute("geometry"));
             assertNotNull(sf.getAttribute("geometry2"));
-            assertEquals(500.0, sf.getAttribute("distance1"));
+            assertEquals(200.0, sf.getAttribute("distance1"));
         }
         
         assertEquals(new ReferencedEnvelope(-500, 501, -500, 501, null), output.getBounds());
@@ -94,7 +94,7 @@ public class HumanBufferTest extends TestCase {
             b.add(0);
             features.add(b.buildFeature(numFeatures + ""));
         }
-        Double[] distance = new Double[] {500.0,400.0,300.0,200.0};
+        Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
         HumanBuffer process = new HumanBuffer();
         SimpleFeatureCollection output = process.execute(features, distance, new String[] {"distance1", "distance2", "distance3", "distance4"});
         assertEquals(1, output.size());
@@ -106,7 +106,7 @@ public class HumanBufferTest extends TestCase {
             assertNotNull(sf.getDefaultGeometry());
             assertNotNull(sf.getAttribute("geometry"));            
             assertNotNull(sf.getAttribute("geometry2"));
-            assertEquals(500.0, sf.getAttribute("distance1"));
+            assertEquals(200.0, sf.getAttribute("distance1"));
         }
         
         assertEquals(new ReferencedEnvelope(-500, 507, -500, 507, null), output.getBounds());
@@ -136,7 +136,7 @@ public class HumanBufferTest extends TestCase {
             b.add(0);
             features.add(b.buildFeature(numFeatures + ""));
         }
-        Double[] distance = new Double[] {500.0,400.0,300.0,200.0};
+        Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
         HumanBuffer process = new HumanBuffer();
         SimpleFeatureCollection output = process.execute(features, distance, new String[] {"distance1", "distance2", "distance3", "distance4"});
         assertEquals(1, output.size());
@@ -148,7 +148,7 @@ public class HumanBufferTest extends TestCase {
             assertNotNull(sf.getDefaultGeometry());
             assertNotNull(sf.getAttribute("geometry"));
             assertNotNull(sf.getAttribute("geometry2"));
-            assertEquals(500.0, sf.getAttribute("distance1"));
+            assertEquals(200.0, sf.getAttribute("distance1"));
         }
         
         assertEquals(new ReferencedEnvelope(-500, 506, -500, 506, null), output.getBounds());

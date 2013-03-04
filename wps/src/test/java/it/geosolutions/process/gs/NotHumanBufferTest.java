@@ -19,9 +19,7 @@ package it.geosolutions.process.gs;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -59,19 +57,16 @@ public class NotHumanBufferTest extends TestCase {
         NotHumanBuffer process = new NotHumanBuffer();
         SimpleFeatureCollection output = process.execute(features, distance, "distance");
         assertEquals(1, output.size());
-
-        SimpleFeatureIterator iterator = output.features();
-        for (int numFeatures = 0; numFeatures < 1; numFeatures++) {            
-            SimpleFeature sf = iterator.next();
-            assertNotNull(sf);            
-            assertNotNull(sf.getDefaultGeometry());
-            assertEquals(500.0, sf.getAttribute("distance"));
-        }
         
-        assertEquals(new ReferencedEnvelope(-500, 501, -500, 501, null), output.getBounds());
-        assertEquals(1, output.size());
+        SimpleFeature sf = output.features().next();
+                            
+        assertNotNull(sf);            
+        assertNotNull(sf.getDefaultGeometry());
+        assertEquals(500.0, sf.getAttribute("distance"));        
+        
+        assertEquals(new ReferencedEnvelope(-500, 501, -500, 501, null), output.getBounds());        
     }
-
+        
     public void testExecuteLineString() throws Exception {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
         tb.setName("featureType");
@@ -98,17 +93,16 @@ public class NotHumanBufferTest extends TestCase {
         SimpleFeatureCollection output = process.execute(features, distance, "distance");
         assertEquals(1, output.size());
                 
-        SimpleFeatureIterator iterator = output.features();
-        for (int numFeatures = 0; numFeatures < 1; numFeatures++) {            
-            SimpleFeature sf = iterator.next();
-            assertNotNull(sf);            
-            assertNotNull(sf.getDefaultGeometry());
-            assertEquals(500.0, sf.getAttribute("distance"));
-        }
+        
+        SimpleFeature sf = output.features().next();
+        
+        assertNotNull(sf);            
+        assertNotNull(sf.getDefaultGeometry());
+        assertEquals(500.0, sf.getAttribute("distance")); 
         
         assertEquals(new ReferencedEnvelope(-500, 507, -500, 507, null), output.getBounds());
-        assertEquals(1, output.size());
-    }
+
+    }        
 
     public void testExecutePolygon() throws Exception {
         SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
@@ -138,17 +132,13 @@ public class NotHumanBufferTest extends TestCase {
         SimpleFeatureCollection output = process.execute(features, distance, "distance");
         assertEquals(1, output.size());
         
-        SimpleFeatureIterator iterator = output.features();
-        for (int numFeatures = 0; numFeatures < 1; numFeatures++) {            
-            SimpleFeature sf = iterator.next();
-            assertNotNull(sf);            
-            assertNotNull(sf.getDefaultGeometry());
-            assertEquals(500.0, sf.getAttribute("distance"));
-        }
+        SimpleFeature sf = output.features().next();
         
-        assertEquals(new ReferencedEnvelope(-500, 506, -500, 506, null), output.getBounds());
-        assertEquals(1, output.size());
+        assertNotNull(sf);            
+        assertNotNull(sf.getDefaultGeometry());
+        assertEquals(500.0, sf.getAttribute("distance")); 
+        assertEquals(new ReferencedEnvelope(-500, 506, -500, 506, null), output.getBounds());        
     }
-
-   
+    
+       
 }

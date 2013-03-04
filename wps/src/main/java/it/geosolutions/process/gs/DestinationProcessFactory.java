@@ -5,15 +5,14 @@ import org.geotools.process.factory.DescribeProcess;
 import org.geotools.text.Text;
 
 /**
- * Factory providing a number of processes for working with feature data.
+ * Factory providing some buffer creating operations.
  * <p>
  * Internally this factory makes use of the information provided by
  * the {@link DescribeProcess} annotations to produce the correct
  * process description.
  * 
- * @author Jody Garnett (LISAsoft)
+ * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
- * @source $URL$
  */
 public class DestinationProcessFactory extends AnnotatedBeanProcessFactory {
 

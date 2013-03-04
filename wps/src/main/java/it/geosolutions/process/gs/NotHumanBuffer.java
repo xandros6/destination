@@ -42,27 +42,24 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
 
 /**
- * Buffers a feature collection using a certain distance
+ * Buffers a feature collection using a fixed distance
  * 
- * @author Mauro Bartolomeoli - GeoSolutions
- *
- * @source $URL$
+ * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  */
-@DescribeProcess(title = "NotHumanBuffer", description = "Buffers features by a distance value supplied as a parameter.")
+@DescribeProcess(title = "NotHumanBuffer", description = "Buffers a feature, by a fixed distance value supplied as a parameter.")
 public class NotHumanBuffer implements GSProcess {
     @DescribeResult(description = "Buffered feature collection")
     public SimpleFeatureCollection execute(
             @DescribeParameter(name = "features", description = "Input feature collection") SimpleFeatureCollection features,
             @DescribeParameter(name = "distance", description = "Fixed value to use for the buffer distance") Double distance,
-            @DescribeParameter(name = "distanceName", description = "Name of the output attribute for distance", min=0, max=1) String distanceName) {
-
+            @DescribeParameter(name = "distanceName", description = "Name of the output attribute for distance", min = 0, max = 1) String distanceName) {
+    
         if (distance == null) {
             throw new IllegalArgumentException("Buffer distance was not specified");
-        } 
-        
+        }
+    
         return new BufferedFeatureCollection(features, distance, distanceName);
     }
 
@@ -75,14 +72,13 @@ public class NotHumanBuffer implements GSProcess {
         
         String distanceName;
         
-        SimpleFeatureCollection delegate;
+        SimpleFeatureCollection delegate;                
 
         public BufferedFeatureCollection(SimpleFeatureCollection delegate,
                 Double distance, String distanceName) {
             this.distance = distance;
             this.distanceName = distanceName;
-            this.delegate = delegate;
-            
+            this.delegate = delegate;            
         }
 
         @Override
@@ -101,10 +97,12 @@ public class NotHumanBuffer implements GSProcess {
         protected SimpleFeatureType buildTargetFeatureType() {
             // create schema
             SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+            // skips not geometry attributes
             for (AttributeDescriptor descriptor : delegate.getSchema().getAttributeDescriptors()) {
                 if (!(descriptor.getType() instanceof GeometryTypeImpl)
                         || (!delegate.getSchema().getGeometryDescriptor().equals(descriptor))) {                    
                 } else {
+                    // copies the geometry attribute, using MultiPolygon for the geometry buffer
                     AttributeTypeBuilder builder = new AttributeTypeBuilder();
                     builder.setBinding(MultiPolygon.class);
                     AttributeDescriptor attributeDescriptor = builder.buildDescriptor(descriptor
@@ -116,13 +114,16 @@ public class NotHumanBuffer implements GSProcess {
                 }
             }
             
-            // distance attribute
+            // adds an attribute for the supplied distance value
+            // the name of the attribute is "distance" if not overridden by the
+            // distanceName parameter
             AttributeTypeBuilder builder = new AttributeTypeBuilder();
             builder.setBinding(Double.class);
             String name = this.distanceName == null ? "distance" : this.distanceName;
             AttributeDescriptor attributeDescriptor = builder.buildDescriptor(name, builder.buildType());
             tb.add(attributeDescriptor);
             
+            // copies cfg from original feature (description, crs, name)
             tb.setDescription(delegate.getSchema().getDescription());
             tb.setCRS(delegate.getSchema().getCoordinateReferenceSystem());
             tb.setName(delegate.getSchema().getName());
@@ -131,6 +132,7 @@ public class NotHumanBuffer implements GSProcess {
         
         @Override
         public int size() {
+            // the output feature is aggregated, so it can have 0 or 1 items
             return delegate.size() > 0 ? 1 : 0;
         }
 
@@ -138,7 +140,7 @@ public class NotHumanBuffer implements GSProcess {
     }
 
     /**
-     * Buffers each feature as we scroll over the collection
+     * Creates the buffer as we scroll over the collection
      */
     static class BufferedFeatureIterator implements SimpleFeatureIterator {
         SimpleFeatureIterator delegate;
@@ -146,6 +148,8 @@ public class NotHumanBuffer implements GSProcess {
         SimpleFeatureCollection collection;
 
         Double distance;
+        
+        
         
         GeometryFactory geometryFactory = new GeometryFactory();
         
@@ -159,8 +163,7 @@ public class NotHumanBuffer implements GSProcess {
                 Double distance, SimpleFeatureType schema) {
             this.delegate = delegate.features();
             this.distance = distance;
-            this.collection = delegate;
-            
+            this.collection = delegate;            
             fb = new SimpleFeatureBuilder(schema);
         }
 
@@ -173,24 +176,25 @@ public class NotHumanBuffer implements GSProcess {
                 return true;
             }
             if(delegate.hasNext()) {
+                // build a GeometryCollection aggregating all the input geometry buffers
                 List<Geometry> geometries = new ArrayList<Geometry>();
                 while(delegate.hasNext()) {
                     SimpleFeature f = delegate.next();
                     Geometry geometry = (Geometry)f.getDefaultGeometry();
                     if(geometry != null) {
-                        geometries.add(geometry);
+                        geometries.add(geometry.buffer(distance));                                           
                     }                                       
-                }
+                }                
                 GeometryCollection aggregate = geometryFactory.createGeometryCollection(geometries.toArray(new Geometry[] {}));
+                                
                 for(AttributeDescriptor attr : fb.getFeatureType().getAttributeDescriptors()) {
-                    if(attr instanceof GeometryDescriptor) {
-                        TopologyPreservingSimplifier simplifier = new TopologyPreservingSimplifier(aggregate);
-                        simplifier.setDistanceTolerance(5);
-                        fb.add(simplifier.getResultGeometry().buffer(distance));
+                    if(attr instanceof GeometryDescriptor) {  
+                        fb.add(aggregate.buffer(0));                        
                     } else {
                         fb.add(distance);
                     }
                 }
+                                
                 next = fb.buildFeature("" + count);
                 count++;
                 fb.reset();

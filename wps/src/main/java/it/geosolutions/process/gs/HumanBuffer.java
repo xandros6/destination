@@ -36,7 +36,6 @@ import org.geotools.process.gs.GSProcess;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.GeometryDescriptor;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -47,17 +46,16 @@ import com.vividsolutions.jts.simplify.TopologyPreservingSimplifier;
 /**
  * Buffers a feature collection using a certain distance
  * 
- * @author Mauro Bartolomeoli - GeoSolutions
+ * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
- * @source $URL$
  */
-@DescribeProcess(title = "HumanBuffer", description = "Buffers features by 4 different distances value supplied as parameters.")
+@DescribeProcess(title = "HumanBuffer", description = "Buffers features by N different distances value supplied as parameters.")
 public class HumanBuffer implements GSProcess {
     @DescribeResult(description = "Buffered feature collection")
     public SimpleFeatureCollection execute(
             @DescribeParameter(name = "features", description = "Input feature collection") SimpleFeatureCollection features,
-            @DescribeParameter(name = "distance", description = "Fixed value to use for the buffer distance", min=4, max=4) Double[] distance,
-            @DescribeParameter(name = "distanceName", description = "Name of the output attribute for distance", min=0, max=4) String[] distanceName) {
+            @DescribeParameter(name = "distance", description = "Array of fixed values to use for the buffer distances", min=1) Double[] distance,
+            @DescribeParameter(name = "distanceName", description = "Names of the output attributes for distance", min=0) String[] distanceName) {
 
         if (distance == null) {
             throw new IllegalArgumentException("Buffer distance was not specified");
@@ -76,13 +74,13 @@ public class HumanBuffer implements GSProcess {
         String[] distanceName;
         
         SimpleFeatureCollection delegate;
+                
 
         public BufferedFeatureCollection(SimpleFeatureCollection delegate,
                 Double[] distance, String[] distanceName) {
             this.distance = distance;
             this.distanceName = distanceName;
-            this.delegate = delegate;
-            
+            this.delegate = delegate;            
         }
 
         @Override
@@ -108,9 +106,13 @@ public class HumanBuffer implements GSProcess {
             // create schema
             SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
             for (AttributeDescriptor descriptor : delegate.getSchema().getAttributeDescriptors()) {
+             // skips not geometry attributes
                 if (!(descriptor.getType() instanceof GeometryTypeImpl)
                         || (!delegate.getSchema().getGeometryDescriptor().equals(descriptor))) {                    
                 } else {
+                    // creates a geometry for each specified distance
+                    // the first one has the same name of the original feature
+                    // geometry; the other ones have a number postfix, starting from 2 (geometry, geometry2, ..., geometryN)                    
                     for(int i = 0; i<distance.length;i++) {                                                
                         String geometryName = descriptor.getLocalName();
                         if(i>0) {
@@ -123,8 +125,10 @@ public class HumanBuffer implements GSProcess {
                     }
                 }
             }
-            for(int i = 0; i<distance.length;i++) {
-                // distance attribute
+            // creates an attribute for each specified distance
+            // they are named distance1, ..., distanceN by default, if not overridden by
+            // distanceName parameter    
+            for(int i = 0; i<distance.length;i++) {                
                 AttributeTypeBuilder builder = new AttributeTypeBuilder();
                 builder.setBinding(Double.class);
                 if(this.distanceName == null) {
@@ -135,6 +139,7 @@ public class HumanBuffer implements GSProcess {
                 tb.add(attributeDescriptor);
             }
             
+            // copies cfg from original feature (description, crs, name)
             tb.setDescription(delegate.getSchema().getDescription());
             tb.setCRS(delegate.getSchema().getCoordinateReferenceSystem());
             tb.setName(delegate.getSchema().getName());
@@ -143,6 +148,7 @@ public class HumanBuffer implements GSProcess {
         
         @Override
         public int size() {
+            // the output feature is aggregated, so it can have 0 or 1 items
             return delegate.size() > 0 ? 1 : 0;
         }
 
@@ -150,7 +156,7 @@ public class HumanBuffer implements GSProcess {
     }
 
     /**
-     * Buffers each feature as we scroll over the collection
+     * Creates Buffers as we scroll over the collection
      */
     static class BufferedFeatureIterator implements SimpleFeatureIterator {
         SimpleFeatureIterator delegate;
@@ -158,6 +164,7 @@ public class HumanBuffer implements GSProcess {
         SimpleFeatureCollection collection;
 
         Double[] distance;
+        
         
         GeometryFactory geometryFactory = new GeometryFactory();
         
@@ -168,14 +175,10 @@ public class HumanBuffer implements GSProcess {
         SimpleFeature next;
 
         public BufferedFeatureIterator(SimpleFeatureCollection delegate, 
-                Double[] distance, SimpleFeatureType schema) {
-            try {
-                this.delegate = delegate.features();
-            } catch(Exception e) {
-                e.printStackTrace();
-            }
+                Double[] distance,  SimpleFeatureType schema) {
+            this.delegate = delegate.features();            
             this.distance = distance;
-            this.collection = delegate;
+            this.collection = delegate;            
             
             fb = new SimpleFeatureBuilder(schema);
         }
@@ -188,7 +191,7 @@ public class HumanBuffer implements GSProcess {
             if(next != null) {
                 return true;
             }
-            if(delegate.hasNext()) {
+            if(delegate.hasNext()) {                                
                 List<Geometry> geometries = new ArrayList<Geometry>();
                 while(delegate.hasNext()) {
                     SimpleFeature f = delegate.next();
@@ -201,12 +204,36 @@ public class HumanBuffer implements GSProcess {
                 TopologyPreservingSimplifier simplifier = new TopologyPreservingSimplifier(aggregate);
                 simplifier.setDistanceTolerance(5);
                 Geometry simplified = simplifier.getResultGeometry();
-                for(int i=0;i<distance.length;i++) {                                        
-                    fb.add(simplified.buffer(distance[i]));
+                Geometry buffered = null;
+                Geometry previous = null;
+                double previousDistance = 0.0;
+                                                       
+                for(int i=0;i<distance.length;i++) { 
+                    if(distance[i] == 0) {
+                        // no geometry for distance 0
+                        buffered = null;
+                    } else if(i==0) {                
+                        // first not 0 buffer: we need to calculate the buffer, using iterative approach 
+                        buffered = BufferUtils.iterativeBuffer(simplified, distance[i],50);
+                        previousDistance = distance[i];
+                    } else if(distance[i] == previousDistance) {
+                        // we can use previous buffer, since we have the same distance
+                        buffered = previous;                            
+                    } else {
+                        // we can grow the last calculated buffer (faster) by the distance difference
+                        buffered = BufferUtils.iterativeBuffer(previous, distance[i] - previousDistance, 50);
+                        previousDistance = distance[i];
+                    }                                
+                    if(buffered != null) {
+                        previous = buffered;
+                    }                        
+                    
+                    fb.add(buffered);
                 }
                 for(int i=0;i<distance.length;i++) {
                     fb.add(distance[i]);
                 }
+                
                 
                 next = fb.buildFeature("" + count);
                 count++;
@@ -215,7 +242,9 @@ public class HumanBuffer implements GSProcess {
             }
             next = null;
             return false;            
-        }
+        }       
+
+        
 
         public SimpleFeature next() throws NoSuchElementException {
             if (!hasNext()) {
