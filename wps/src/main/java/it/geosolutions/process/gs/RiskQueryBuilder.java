@@ -51,7 +51,7 @@ public class RiskQueryBuilder {
      */
     public static void main(String[] args) {
        
-       int level = 3;
+       int level = 2;
        StringBuilder builder = new StringBuilder();
        builder.append("select siig_geo_ln_arco_"+level+".id_geo_arco,coalesce(siig_geo_ln_arco_"+level+".nr_incidenti_elab * (\n");
        
@@ -76,7 +76,7 @@ public class RiskQueryBuilder {
        builder.append("),0) as rischio,siig_geo_ln_arco_"+level+".lunghezza,siig_geo_ln_arco_"+level+".geometria\n");
        builder.append("from siig_geo_ln_arco_"+level+"\n");
        builder.append("where siig_geo_ln_arco_"+level+".geometria && st_makeenvelope(%bounds%, 32632)\n");
-       builder.append("order by id_geo_arco\n");
+       //builder.append("order by id_geo_arco\n");
        System.out.println(builder.toString());
     
     }
@@ -87,7 +87,7 @@ public class RiskQueryBuilder {
             if(count > 0) {
                 builder.append("          +\n");
             }
-            builder.append("         (select coalesce("+bersaglio.eField+",1)\n");
+            builder.append("         (select coalesce((select coalesce("+bersaglio.eField+",1)\n");
             builder.append("          from siig_t_vulnerabilita_"+level+"\n");
             builder.append("          where id_geo_arco = siig_geo_ln_arco_"+level+".id_geo_arco\n");
             builder.append("          and id_distanza = (\n");
@@ -114,7 +114,7 @@ public class RiskQueryBuilder {
             builder.append("             where id_geo_arco = siig_geo_ln_arco_"+level+".id_geo_arco\n");
             builder.append("                 and id_scenario = siig_r_scenario_sostanza.id_scenario\n");
             builder.append("                 and id_bersaglio = "+bersaglio.id+"\n");
-            builder.append("         ),0.3)) * %"+bersaglio.name+"%\n");
+            builder.append("         ),0.3)) * %"+bersaglio.name+"%,0))\n");
             
             count++;
         }
@@ -127,11 +127,13 @@ public class RiskQueryBuilder {
             if(count > 0) {
                 builder.append("          +\n");
             }
+            builder.append("                coalesce(\n");
             builder.append("         (\n");      
             for(int i = 0; i<bersaglio.gravita.length; i++) {
                 if(i > 0) {
                     builder.append("             +\n");
                 }
+                
                 builder.append("                (\n");
                 
                 if(i == 0) {
@@ -148,7 +150,7 @@ public class RiskQueryBuilder {
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
                     builder.append("                  )\n");
                 } else {
-                    builder.append("                  (select coalesce("+bersaglio.eField+",1)\n");
+                    builder.append("                  coalesce((select coalesce("+bersaglio.eField+",1)\n");
                     builder.append("                  from siig_t_vulnerabilita_"+level+"\n");
                     builder.append("                  where id_geo_arco = siig_geo_ln_arco_"+level+".id_geo_arco\n");
                     builder.append("                  and id_distanza = (\n");
@@ -172,7 +174,7 @@ public class RiskQueryBuilder {
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
                     builder.append("                  )\n");
-                    builder.append("                  )\n");
+                    builder.append("                  ),0)\n");
                 }
                 
                 builder.append("                ) *\n");
@@ -195,8 +197,9 @@ public class RiskQueryBuilder {
             builder.append("              from siig_t_bersaglio\n");
             builder.append("              where id_bersaglio = "+bersaglio.id+"\n");                    
             builder.append("         ) * %"+bersaglio.name+"%\n");
-            
+            builder.append("                ,0)\n");
             count++;
+            
         }
         
     }

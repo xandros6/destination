@@ -17,9 +17,8 @@ import org.geotools.text.Text;
 public class DestinationProcessFactory extends AnnotatedBeanProcessFactory {
 
     public DestinationProcessFactory() {
-        super(Text.text("Destination Process Factory"), "ds",
-                NotHumanBuffer.class,
-                HumanBuffer.class);
+        super(Text.text("Destination Process Factory"), "ds",                
+                MultipleBuffer.class);
     }
 
 }
