@@ -1,0 +1,37 @@
+ALTER TABLE siig_geo_ln_arco_3 ADD COLUMN id_grid NUMERIC(9,0);
+
+ALTER TABLE siig_geo_ln_arco_3 ALTER COLUMN nr_incidenti_elab TYPE NUMERIC(10,0);
+
+update siig_geo_ln_arco_1 set nr_incidenti_elab=random()*1000;
+update siig_geo_ln_arco_2 set nr_incidenti_elab=random()*50000;
+update siig_geo_ln_arco_3 set nr_incidenti_elab=random()*1000;
+
+update siig_t_vulnerabilita_1 set id_distanza=1;
+
+INSERT INTO siig_t_vulnerabilita_2 (id_geo_arco, id_distanza, nr_pers_scuole, nr_pers_ospedali, nr_pers_distrib, nr_pers_residenti, nr_pers_servizi, nr_turisti_medi, nr_turisti_max, nr_pers_flusso_buffer, mq_aree_protette, mq_aree_agricole, mq_aree_boscate, mq_beni_culturali, mq_zone_urbanizzate, mq_acque_superficiali, mq_acque_sotterranee) 
+select id_geo_arco, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0
+from siig_geo_ln_arco_2;
+ 
+INSERT INTO siig_t_vulnerabilita_3 (id_geo_arco, id_distanza, nr_pers_scuole, nr_pers_ospedali, nr_pers_distrib, nr_pers_residenti, nr_pers_servizi, nr_turisti_medi, nr_turisti_max, nr_pers_flusso_buffer, mq_aree_protette, mq_aree_agricole, mq_aree_boscate, mq_beni_culturali, mq_zone_urbanizzate, mq_acque_superficiali, mq_acque_sotterranee) 
+select id_geo_arco, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0
+from siig_geo_ln_arco_3;
+
+INSERT INTO siig_r_arco_2_sostanza 
+select id_geo_arco, 9, 1.0
+from siig_geo_ln_arco_2;
+
+INSERT INTO siig_r_arco_3_sostanza 
+select id_geo_arco, 9, 1.0
+from siig_geo_ln_arco_3;
+
+--
+
+INSERT INTO siig_t_vulnerabilita_1 (id_geo_arco, id_distanza, nr_pers_scuole, nr_pers_ospedali, nr_pers_distrib, nr_pers_residenti, nr_pers_servizi, nr_turisti_medi, nr_turisti_max, nr_pers_flusso_buffer, mq_aree_protette, mq_aree_agricole, mq_aree_boscate, mq_beni_culturali, mq_zone_urbanizzate, mq_acque_superficiali, mq_acque_sotterranee) 
+select id_geo_arco, 17, nr_pers_scuole, nr_pers_ospedali, nr_pers_distrib, nr_pers_residenti, nr_pers_servizi, nr_turisti_medi, nr_turisti_max, nr_pers_flusso_buffer, mq_aree_protette, mq_aree_agricole, mq_aree_boscate, mq_beni_culturali, mq_zone_urbanizzate, mq_acque_superficiali, mq_acque_sotterranee
+from siig_t_vulnerabilita_1;
+
+INSERT INTO siig_t_vulnerabilita_2 (id_geo_arco, id_distanza, nr_pers_scuole, nr_pers_ospedali, nr_pers_distrib, nr_pers_residenti, nr_pers_servizi, nr_turisti_medi, nr_turisti_max, nr_pers_flusso_buffer, mq_aree_protette, mq_aree_agricole, mq_aree_boscate, mq_beni_culturali, mq_zone_urbanizzate, mq_acque_superficiali, mq_acque_sotterranee) 
+select id_geo_arco, 17, nr_pers_scuole, nr_pers_ospedali, nr_pers_distrib, nr_pers_residenti, nr_pers_servizi, nr_turisti_medi, nr_turisti_max, nr_pers_flusso_buffer, mq_aree_protette, mq_aree_agricole, mq_aree_boscate, mq_beni_culturali, mq_zone_urbanizzate, mq_acque_superficiali, mq_acque_sotterranee
+from siig_t_vulnerabilita_2;
+
+update siig_t_vulnerabilita_2 set nr_pers_residenti=random()*50000;

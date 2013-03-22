@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+	<entry>
+	  <!-- popolazione residente -->
+      <int>1</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- popolazione turistica -->
+      <int>2</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- addetti industria e servizi -->
+      <int>4</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- addetti strutture sanitarie -->
+      <int>5</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- addetti strutture scolastiche -->
+      <int>6</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- strutture commerciali -->
+      <int>7</int>
+      <map>
+     	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>insegna</string>
+      		<string>INSEGNA</string>
+      	</entry>
+      	<entry>      	
+      		<string>sup_vendita</string>
+      		<string>SUP_VEND</string>
+      	</entry>
+      	<entry>      	
+      		<string>utenti</string>
+      		<string>N_UTENTI</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_nr_utenti</string>
+      		<string>FLG_N_UTEN</string>
+      	</entry>
+      	<entry>      	
+      		<string>addetti</string>
+      		<string>N_ADDETTI</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_nr_addetti_comm</string>
+      		<string>FLG_N_ADD</string>
+      	</entry>
+      </map>
+      
+    </entry>
+    <entry>
+	  <!-- zone urbanizzate -->
+      <int>10</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- aree boscate -->
+      <int>11</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- aree protette -->
+      <int>12</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- aree agricole -->
+      <int>13</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- acque sotterranee -->
+      <int>14</int>
+      <map>
+     	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TIPO</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>profondita_max</string>
+      		<string>PROF_MAX</string>
+      	</entry>
+      	<entry>      	
+      		<string>quota_pdc</string>
+      		<string>QUOTA</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_tipo_captazione</string>
+      		<string>FK_TIPO_CP</string>
+      	</entry>
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
+      	
+      </map>      
+    </entry> 
+    <entry>
+	  <!-- acque superficiali -->
+      <int>15</int>
+      <map>
+      </map>
+    </entry>
+    <entry>
+	  <!-- beni culturali -->
+      <int>16</int>
+      <map>
+      </map>
+    </entry>
+</map>
