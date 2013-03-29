@@ -26,6 +26,11 @@
       <artifactId>gb-action-ds2ds</artifactId>
 	  <version>1.4-SNAPSHOT</version>
     </dependency>   
+	<dependency>      
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-cql</artifactId>
+	  <version>8.6</version>
+    </dependency>
 	<dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>

@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -50,6 +49,12 @@ import org.opengis.filter.expression.Function;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.expression.AccessException;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.PropertyAccessor;
+import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.thoughtworks.xstream.XStream;
 
@@ -97,13 +102,55 @@ public class VectorTarget {
 	
 	private boolean valid = false;
 	
+	private static SpelExpressionParser expressionParser = new SpelExpressionParser();
+	
+	private static StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+	
 	static {	
 		// load mappings from resources
 		try {
 			partners.load(VectorTarget.class.getResourceAsStream("/partners.properties"));
 			targetTypes.load(VectorTarget.class.getResourceAsStream("/targets.properties"));	
 			geometryTypes.load(VectorTarget.class.getResourceAsStream("/geometries.properties"));								
-			attributeMappings = (Map) xstream.fromXML(VectorTarget.class.getResourceAsStream("/targets.xml"));	
+			attributeMappings = (Map) xstream.fromXML(VectorTarget.class.getResourceAsStream("/targets.xml"));
+			
+			// add a property accessor to extract attributes from SimpleFeature objects
+			// to SpelExpressionParser EvaluationContext
+			evaluationContext.addPropertyAccessor(new PropertyAccessor() {
+				
+				@Override
+				public void write(EvaluationContext ctx, Object target, String name,
+						Object value) throws AccessException {					
+					
+				}
+				
+				@Override
+				public TypedValue read(EvaluationContext ctx, Object target, String name)
+						throws AccessException {
+					if(target instanceof SimpleFeature) {
+						SimpleFeature feature = (SimpleFeature) target;
+						return new TypedValue(feature.getAttribute(name));
+					}
+					return null;
+				}
+				
+				@Override
+				public Class[] getSpecificTargetClasses() {					
+					return new Class[] {SimpleFeature.class};
+				}
+				
+				@Override
+				public boolean canWrite(EvaluationContext ctx, Object target, String name)
+						throws AccessException {					
+					return false;
+				}
+				
+				@Override
+				public boolean canRead(EvaluationContext ctx, Object target, String name)
+						throws AccessException {
+					return target instanceof SimpleFeature;
+				}
+			});
 		} catch (IOException e) {
 			LOGGER.error("Unable to load configuration: "+e.getMessage(), e);
 		}
@@ -111,6 +158,8 @@ public class VectorTarget {
 	
 	
 	/**
+	 * Initializes a VectorTarget handler for the given input feature.
+	 * 
 	 * @param inputTypeName
 	 */
 	public VectorTarget(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
@@ -128,17 +177,28 @@ public class VectorTarget {
 	private void parseTypeName() {
 		Matcher m = typeNameParts.matcher(inputTypeName);
 		if(m.matches()) {
+			// partner alphanumerical abbreviation (from siig_t_partner)
 			codicePartner = m.group(1);
+			// partner numerical id (from siig_t_partner)
 			partner = Integer.parseInt(partners.get(codicePartner).toString());
+			// target macro type (bu or bnu)
 			targetMacroType = m.group(2);
+			// target detailed type id (from siig_t_bersaglio)
 			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());
+			// file date identifier
 			date = m.group(4);
+			// geometry type (pt, pl or ln)
 			geometryType = geometryTypes.get(m.group(5)).toString();			
 			
+			// final part of the target geo table name (siig_geo_<suffix>) 
 			geoSuffix = (targetMacroType.equals("BU") ? "bersaglio_umano" : "bers_non_umano") + "_" + geometryType;
+			// target geo table name (siig_geo_<suffix>)
 			geoTypeName = "siig_geo_" + geoSuffix;
+			// target geo id name (idgeo_<suffix>)
 			geoId = "idgeo_" + geoSuffix;
+			// target non-geo table name (siig_t_bersaglio_<non geo suffix>)
 			outTypeName = "siig_t_bersaglio_" + (targetMacroType.equals("BU") ? "umano" : "non_umano");
+			// target non-geo to geo foreign key name
 			fkGeoId = "fk_" + geoSuffix;
 			
 			// TODO: add other validity checks
@@ -149,7 +209,7 @@ public class VectorTarget {
 
 	/**
 	 * Imports the target feature from the original Feature to the SIIG
-	 * targets tables.
+	 * targets tables (in staging).
 	 * 
 	 * @param datastoreParams
 	 * @param crs
@@ -175,6 +235,10 @@ public class VectorTarget {
 			}
 			crs = defaultCrs;
 		}
+		int process = -1;
+		int trace = -1;
+		
+		int errors = 0;
 		
 		try {												
 			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);
@@ -183,8 +247,19 @@ public class VectorTarget {
 				throw new IOException("Cannot connect to database for: "+inputTypeName);
 			}
 			
-			// create a new process for the ingestion
-			int process = Ingestion.createProcess(dataStore);						
+			// create a new process record for the ingestion
+			process = Ingestion.createProcess(dataStore);			
+			
+			// is it an update (alternative geo shapefile for an already imported one)
+			boolean update =isAnUpdate(dataStore, transaction);
+			
+			// write log for the imported file
+			trace = Ingestion.logFile(dataStore,  process, targetType,
+					partner, codicePartner, inputTypeName, date, false);
+			
+			// is it an update with new records (currently acque superficiali supports this
+			// modality)
+			boolean hasMoreData = update && canHaveMoreData(targetType);
 			
 			transaction = new DefaultTransaction();
 			
@@ -220,13 +295,28 @@ public class VectorTarget {
 					filterFactory.property("id_partner"), filterFactory.literal(partner)
 				)
 			);
-			boolean update =isAnUpdate(dataStore, transaction);
+			
 			if(!update) {
+				// first shapefile of a series, we can remove all previous data for the
+				// target - partner couple
 				featureWriter.removeFeatures(removeFilter);
 			} else {
 				// on update we only reset the foreign key column
 				featureWriter.modifyFeatures(schema.getDescriptor(fkGeoId).getName(), null, removeFilter);
 			}
+			if(hasMoreData) {
+				// remove records with no more geometry bound
+				String otherGeo = geometryType.equals("pl") ? "ln" : "pl";
+				Filter extraRemoveFilter = filterFactory.and(
+					removeFilter,
+					filterFactory.isNull(
+						filterFactory.property("fk_bers_non_umano_" + otherGeo)
+					)
+					
+				); 
+				featureWriter.removeFeatures(extraRemoveFilter);
+			}
+			// remove geo records
 			geoFeatureWriter.removeFeatures(removeFilter);
 			
 			// TODO: should we avoid to calc total for performance?
@@ -241,24 +331,46 @@ public class VectorTarget {
 				maxId = new BigDecimal(0);
 			}
 			
+			transaction.commit();						
+			
+			
 			// iterate over input and import in geo and not-geo tables
 			FeatureIterator<SimpleFeature> iterator = features.features();				
-			
+						
+			featureWriter.setTransaction(null);
+			geoFeatureWriter.setTransaction(null);
 			try {
 				int count = 0;
+				
+				
 				while (iterator.hasNext()) {
 					SimpleFeature inputFeature = iterator.next();
 					
-					int id = maxId.intValue()+count+1;					
+					int id = maxId.intValue()+count+1;		
 					
-					addGeoFeature(geoSchema, geoFeatureBuilder,
-							geoFeatureWriter, inputFeature, id);										
-					if(update) {
-						updateFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
-								id, inputFeature);
-					} else {
-						addFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
-								id, inputFeature);
+					
+					
+					int idTematico = 0;
+					
+					try {
+						addGeoFeature(geoSchema, geoFeatureBuilder,
+								geoFeatureWriter, inputFeature, id);
+						if(hasMoreData) {
+							idTematico = addOrUpdateFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
+									id, inputFeature);
+						} else if(update) {
+							idTematico = updateFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
+									id, inputFeature);
+						} else {
+							idTematico = addFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
+									id, inputFeature);
+						}						
+						
+					} catch(Exception e) {						
+						errors++;
+						Ingestion.logError(dataStore, trace, errors,
+								"Error writing output feature", getError(e),
+								idTematico);
 					}
 
 					count++;
@@ -268,20 +380,15 @@ public class VectorTarget {
 				}
 				updateImportProgress(total, total,  "Data imported in "+ geoTypeName + " and "+outTypeName);				
 			
-			} finally {
+			} finally {									
 				iterator.close();
 			}
 			
-			// write log for the imported file
-			Ingestion.logFile(dataStore,  process, targetType,
-					partner, codicePartner, inputTypeName, date, total, update);
-			
-			// close current process phase
-			Ingestion.closeProcessPhase(dataStore, process, "A");
-			
-			transaction.commit();	
+			Ingestion.updateLogFile(dataStore, trace, total, errors);												
 		} catch (IOException e) {
-			transaction.rollback();			
+			errors++;	
+			Ingestion.logError(dataStore, trace, errors, "Error reading input feature", getError(e), 0);
+			transaction.rollback();						
 			throw e;
 		} finally {
 			listenerForwarder.setTask("Dropping table "+inputTypeName);
@@ -299,6 +406,10 @@ public class VectorTarget {
 				LOGGER.error("Error dropping table "+inputTypeName+": "+e.getMessage());
 			}
 			
+			if(process != -1) {
+				// close current process phase
+				Ingestion.closeProcessPhase(dataStore, process, "A");
+			}
 			
 			if(dataStore != null) {
 				dataStore.dispose();
@@ -308,6 +419,69 @@ public class VectorTarget {
 			}
 		}
 	}
+
+	/**
+	 * @param e
+	 * @return
+	 */
+	private String getError(Exception e) {		
+		// TODO: human readble error
+		Throwable t = e;
+		while(t.getCause() != null) {
+			t=t.getCause();
+		}
+		
+		return t.getMessage().substring(0,Math.min(t.getMessage().length(), 1000));
+	}
+
+	/**
+	 * Add a new record or update the existing one for non-geo table 
+	 *  
+	 * @param targetType
+	 * @param partner
+	 * @param geometryType
+	 * @param fkGeoId
+	 * @param schema
+	 * @param featureBuilder
+	 * @param featureWriter
+	 * @param id
+	 * @param inputFeature
+	 * @throws IOException
+	 */
+	private int addOrUpdateFeature(int targetType, int partner,
+			String geometryType, String fkGeoId, SimpleFeatureType schema,
+			SimpleFeatureBuilder featureBuilder,
+			FeatureStore<SimpleFeatureType, SimpleFeature> featureWriter,
+			int id, SimpleFeature inputFeature) throws IOException {
+		Map<String,String> mappings = (Map<String,String>)attributeMappings.get(targetType);
+		
+		// key filter
+		Filter filter = filterFactory.and(
+				filterFactory.and(
+					filterFactory.equals(
+						filterFactory.property("id_tematico"),
+						filterFactory.literal(getMapping(inputFeature, mappings, "id_tematico"))
+					),
+					filterFactory.equals(
+						filterFactory.property("id_bersaglio"),
+						filterFactory.literal(targetType)
+					)
+				),				
+				filterFactory.equals(
+					filterFactory.property("id_partner"),
+					filterFactory.literal(partner)
+				)
+		);
+		Query existing = new Query(schema.getName().getLocalPart(), filter);
+		if(featureWriter.getCount(existing) > 0) {
+			return updateFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
+					id, inputFeature);
+		} else {
+			return addFeature(targetType, partner, geometryType, fkGeoId, schema, featureBuilder, featureWriter,
+					id, inputFeature);
+		}		
+	}
+
 
 	/**
 	 * Update the non-geo table with foreign keys of the imported geos.
@@ -323,7 +497,7 @@ public class VectorTarget {
 	 * @param inputFeature
 	 * @throws IOException
 	 */
-	private void updateFeature(int targetType, int partner,
+	private int updateFeature(int targetType, int partner,
 			String geometryType, String fkGeoId, SimpleFeatureType schema,
 			SimpleFeatureBuilder featureBuilder,
 			FeatureStore<SimpleFeatureType, SimpleFeature> featureWriter,
@@ -335,7 +509,7 @@ public class VectorTarget {
 				filterFactory.and(
 					filterFactory.equals(
 						filterFactory.property("id_tematico"),
-						filterFactory.literal(inputFeature.getAttribute(mappings.get(("id_tematico"))))
+						filterFactory.literal(getMapping(inputFeature, mappings, "id_tematico"))
 					),
 					filterFactory.equals(
 						filterFactory.property("id_bersaglio"),
@@ -348,7 +522,32 @@ public class VectorTarget {
 				)
 		);
 		
-		featureWriter.modifyFeatures(schema.getDescriptor(fkGeoId).getName(), id, filter);		
+		featureWriter.modifyFeatures(schema.getDescriptor(fkGeoId).getName(), id, filter);	
+		
+		return normalizeIdTematico(getMapping(inputFeature, mappings, "id_tematico").toString());
+	}
+
+
+
+	/**
+	 * @param inputFeature
+	 * @param string
+	 * @return
+	 * @throws IOException 
+	 */
+	private Object getMapping(SimpleFeature inputFeature, Map<String,String> mappings, String attribute) throws IOException {
+		String expression = mappings.get(attribute);
+		// TODO: introduce some form of expression evaluation
+		if(expression.trim().startsWith("#{") && expression.trim().endsWith("}")) {
+			expression = expression.trim().substring(2,expression.length()-1);
+			org.springframework.expression.Expression spelExpression = expressionParser
+					.parseExpression(expression);
+			
+			return spelExpression
+					.getValue(evaluationContext, inputFeature);
+		} else {
+			return inputFeature.getAttribute(expression);
+		}
 	}
 
 
@@ -383,7 +582,7 @@ public class VectorTarget {
 			// check if an import for the other existing geo has already been executed
 			String alternativeTypeName = inputTypeName.substring(0, inputTypeName.lastIndexOf('_'))+"_"+alternativeGeo;
 			try {
-				return !DbUtils.executeScalar(dataStore, transaction, "SELECT COUNT(*) FROM siig_t_tracciamento where nome_file='"+alternativeTypeName+"'").equals(new Integer(0));
+				return !DbUtils.executeScalar(dataStore, transaction, "SELECT COUNT(*) FROM siig_t_tracciamento where nome_file='"+alternativeTypeName+"'").equals(new Long(0));
 			} catch (SQLException e) {
 				throw new IOException(e);
 			}
@@ -481,7 +680,7 @@ public class VectorTarget {
 	 * @param inputFeature
 	 * @throws IOException
 	 */
-	private void addFeature(int targetType, int partner, String geometryTypeName, String geoId, SimpleFeatureType schema,
+	private int addFeature(int targetType, int partner, String geometryTypeName, String geoId, SimpleFeatureType schema,
 			SimpleFeatureBuilder featureBuilder,
 			FeatureStore<SimpleFeatureType, SimpleFeature> featureWriter, int id, SimpleFeature inputFeature)
 			throws IOException {
@@ -497,7 +696,7 @@ public class VectorTarget {
 			} else if(attr.getLocalName().equals("id_partner")) {
 				featureBuilder.add(partner+"");
 			} else if(mappings.containsKey(attr.getLocalName())) {
-				featureBuilder.add(inputFeature.getAttribute(mappings.get(attr.getLocalName())));
+				featureBuilder.add(getMapping(inputFeature,mappings, attr.getLocalName()));
 			} else {
 				featureBuilder.add(null);
 			}
@@ -505,10 +704,28 @@ public class VectorTarget {
 		
 		// compiles the fid to be sure the feature is correctly inserted
 		// the fid should be "id_tematico.id_bersaglio.id_partner"
-		String featureid = inputFeature.getAttribute(mappings.get("id_tematico")) + "." + targetType + "." + partner;
+		String featureid = normalizeIdTematico(getMapping(inputFeature, mappings, "id_tematico")) + "." + targetType + "." + partner;
 		SimpleFeature feature = featureBuilder.buildFeature(featureid);
 		feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
 		featureWriter.addFeatures(DataUtilities
 				.collection(feature));
+		
+		return normalizeIdTematico(getMapping(inputFeature, mappings, "id_tematico"));
+	}
+
+
+
+	/**
+	 * @param attribute
+	 * @return
+	 */
+	private int normalizeIdTematico(Object attribute) {
+		if(attribute == null) {
+			return 0;
+		}
+		if(attribute instanceof Number) {
+			return ((Number)attribute).intValue();
+		}
+		return Integer.parseInt(attribute.toString());
 	}
 }

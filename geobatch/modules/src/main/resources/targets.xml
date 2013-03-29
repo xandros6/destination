@@ -4,30 +4,142 @@
 	  <!-- popolazione residente -->
       <int>1</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>residenti</string>
+      		<string>RESIDENTI</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- popolazione turistica -->
       <int>2</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>nat_code</string>
+      		<string>NAT_CODE</string>
+      	</entry>
+      	<entry>      	
+      		<string>pres_max</string>
+      		<string>N_PTUR_MAX</string>
+      	</entry>
+      	<entry>      	
+      		<string>pres_med</string>
+      		<string>N_PTUR_MED</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- addetti industria e servizi -->
       <int>4</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>cod_fisc</string>
+      		<string>COD_FISC</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_ateco</string>
+      		<string>FK_ATECO</string>
+      	</entry>
+      	<entry>      	
+      		<string>addetti</string>
+      		<string>N_ADDETTI</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- addetti strutture sanitarie -->
       <int>5</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_tipo_uso</string>
+      		<string>#{FK_USO == 0 ? null : FK_USO}</string>
+      	</entry>
+      	<entry>      	
+      		<string>letti_o</string>
+      		<string>N_LETTI_OR</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_letti_ordinari</string>
+      		<string>FLG_LT_OR</string>
+      	</entry>
+      	<entry>      	
+      		<string>letti_day</string>
+      		<string>N_LETTI_DH</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_letti_day_h</string>
+      		<string>FLG_LT_DH</string>
+      	</entry>
+      	<entry>      	
+      		<string>addetti</string>
+      		<string>N_ADDETTI</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_nr_addetti_h</string>
+      		<string>FLG_N_ADD</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- addetti strutture scolastiche -->
       <int>6</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_tipo_uso</string>
+      		<string>FK_GR_SCOL</string>
+      	</entry>
+      	<entry>      	
+      		<string>iscritti</string>
+      		<string>N_ISCRITTI</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_nr_iscritti</string>
+      		<string>FLG_N_ISCR</string>
+      	</entry>
+      	<entry>      	
+      		<string>addetti</string>
+      		<string>N_ADDETTI</string>
+      	</entry>
+      	<entry>      	
+      		<string>flg_nr_addetti_scuole</string>
+      		<string>FLG_N_ADD</string>
+      	</entry>
       </map>
     </entry>
     <entry>
@@ -66,31 +178,86 @@
       		<string>flg_nr_addetti_comm</string>
       		<string>FLG_N_ADD</string>
       	</entry>
-      </map>
-      
+      </map>      
     </entry>
     <entry>
 	  <!-- zone urbanizzate -->
       <int>10</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_classe_clc</string>
+      		<string>FK_CLC</string>
+      	</entry>
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- aree boscate -->
       <int>11</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_classe_clc</string>
+      		<string>FK_CLC</string>
+      	</entry>
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- aree protette -->
       <int>12</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_ente</string>
+      		<string>DENOM_ENTE</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_iucn</string>
+      		<string>FK_IUCN</string>
+      	</entry>
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- aree agricole -->
       <int>13</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_classe_clc</string>
+      		<string>#{FK_CLC == 0 ? null : FK_CLC}</string>
+      	</entry>
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
       </map>
     </entry>
     <entry>
@@ -128,12 +295,48 @@
 	  <!-- acque superficiali -->
       <int>15</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DENOM</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_classe_clc</string>
+      		<string>FK_CLC</string>
+      	</entry>
+      	<entry>      	
+      		<string>toponimo_completo</string>
+      		<string>TOPONIMO</string>
+      	</entry>
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
       </map>
     </entry>
     <entry>
 	  <!-- beni culturali -->
       <int>16</int>
       <map>
+      	<entry>      	
+      		<string>id_tematico</string>
+      		<string>ID_TEMA</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione</string>
+      		<string>DESC_</string>
+      	</entry>
+      	<entry>      	
+      		<string>fk_tipo_bene</string>
+      		<string>#{FK_BCULT == 0 ? null : FK_BCULT}</string>
+      	</entry>      	
+      	<entry>      	
+      		<string>superficie</string>
+      		<string>SUPERFICIE</string>
+      	</entry>
       </map>
     </entry>
 </map>
