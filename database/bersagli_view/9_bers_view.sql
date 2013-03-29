@@ -1,4 +1,3 @@
---DROP VIEW v_geo_acque_sotterranee_pl;
 CREATE OR REPLACE VIEW v_geo_acque_sotterranee_pt as
 	SELECT siig_d_partner.partner, 
 				 siig_t_bersaglio_non_umano.id_tematico, 

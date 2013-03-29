@@ -1,0 +1,17 @@
+CREATE INDEX idx_bers_non_umano_geo_ln ON siig_t_bersaglio_non_umano(fk_bers_non_umano_ln);
+CREATE INDEX idx_bers_non_umano_geo_pt ON siig_t_bersaglio_non_umano(fk_bers_non_umano_pt);
+CREATE INDEX idx_bers_non_umano_geo_pl ON siig_t_bersaglio_non_umano(fk_bers_non_umano_pl);
+
+CREATE INDEX idx_bersaglio_non_umano_bersaglio_partner ON siig_t_bersaglio_non_umano(id_bersaglio,id_partner);
+
+CREATE INDEX idx_bers_umano_geo_pl ON siig_t_bersaglio_umano(fk_bersaglio_umano_pl);
+CREATE INDEX idx_bers_umano_geo_pt ON siig_t_bersaglio_umano(fk_bersaglio_umano_pt);
+
+CREATE INDEX idx_bersaglio_umano_bersaglio_partner ON siig_t_bersaglio_umano(id_bersaglio,id_partner);
+
+CREATE INDEX idx_geo_bers_non_umano_ln_bersaglio_partner ON siig_geo_bers_non_umano_ln(id_bersaglio,id_partner);
+CREATE INDEX idx_geo_bers_non_umano_pt_bersaglio_partner ON siig_geo_bers_non_umano_pt(id_bersaglio,id_partner);
+CREATE INDEX idx_geo_bers_non_umano_pl_bersaglio_partner ON siig_geo_bers_non_umano_pl(id_bersaglio,id_partner);
+
+CREATE INDEX idx_geo_bersaglio_umano_pl_bersaglio_partner ON siig_geo_bersaglio_umano_pl(id_bersaglio,id_partner);
+CREATE INDEX idx_geo_bersaglio_umano_pt_bersaglio_partner ON siig_geo_bersaglio_umano_pt(id_bersaglio,id_partner);
