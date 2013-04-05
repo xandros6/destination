@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+	<entry>      	
+		<string>nr_incidenti</string>
+		<string>INCIDENT</string>
+	</entry>
+	<entry>      	
+		<string>nr_corsie</string>
+		<string>N_CORSIE</string>
+	</entry>
+	<entry>      	
+		<string>id_tematico_shape</string>
+		<string>ID_SEGM_01</string>
+	</entry>
+	<entry>      	
+		<string>lunghezza</string>
+		<string>LUNGHEZZA</string>
+	</entry>
+</map>

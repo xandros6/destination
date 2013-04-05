@@ -115,7 +115,7 @@ public class Ingestion {
 						
 			String sql = "INSERT INTO siig_t_tracciamento(id_tracciamento,fk_processo,fk_bersaglio,fk_partner,codice_partner,nome_file,data,";
 			sql       += "nr_rec_shape,nr_rec_storage,nr_rec_scartati,nr_rec_scartati_siig,data_imp_storage,data_elab,flg_tipo_imp)";
-			sql       += "values("+tracciamento+","+processo+","+bersaglio+",'"+partner+ "','"+codicePartner+"','"+typeName+"', to_date('"+date+"', 'YYYYMMDD'),0,0,0,0,now(),now(),'"+(update ? "I" : "C")+"')";
+			sql       += "values("+tracciamento+","+processo+","+(bersaglio == -1 ? "null" : (bersaglio+""))+",'"+partner+ "','"+codicePartner+"','"+typeName+"', to_date('"+date+"', 'YYYYMMDD'),0,0,0,0,now(),now(),'"+(update ? "I" : "C")+"')";
 			
 			DbUtils.executeSql(conn, transaction, sql, true);
 			return tracciamento;
