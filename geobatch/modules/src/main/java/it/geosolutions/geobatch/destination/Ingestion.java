@@ -21,8 +21,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.jdbc.JDBCDataStore;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * Handles the ingestion metadata structures on database.
@@ -33,6 +36,44 @@ import org.geotools.jdbc.JDBCDataStore;
  *
  */
 public class Ingestion {
+	
+	static class Process {
+		int id = 0;
+		int maxTrace = 0;
+		int maxError = 0;
+		
+		/**
+		 * @param id
+		 * @param maxTrace
+		 * @param maxError
+		 */
+		public Process(int id, int maxTrace, int maxError) {
+			super();
+			this.id = id;
+			this.maxTrace = maxTrace;
+			this.maxError = maxError;
+		}
+		/**
+		 * @return the id
+		 */
+		public int getId() {
+			return id;
+		}
+		/**
+		 * @return the maxTrace
+		 */
+		public int getMaxTrace() {
+			return maxTrace;
+		}
+		/**
+		 * @return the maxError
+		 */
+		public int getMaxError() {
+			return maxError;
+		}
+		
+		
+	}
 	
 	/**	
 	 * Creates a new process in the metadata table.
@@ -69,6 +110,43 @@ public class Ingestion {
 		
 		
 	}
+	
+	/**	
+	 * Gets an existing process in the metadata table.
+	 * 
+	 * @param dataStore
+	 * @return
+	 * @throws IOException
+	 */
+	public static Process getProcessData(JDBCDataStore dataStore, String inputTypeName) throws IOException {
+		Transaction transaction = null;	
+		
+		try {			
+			transaction = new DefaultTransaction();
+					
+			String sql = "SELECT fk_processo FROM siig_t_tracciamento where nome_file='"
+					+ inputTypeName + "'";
+			
+			int  process = ((Number)DbUtils.executeScalar(dataStore, transaction, sql)).intValue();
+			
+			sql = "SELECT id_tracciamento FROM siig_t_tracciamento where nome_file='"
+					+ inputTypeName + "'";
+			
+			int  trace = ((Number)DbUtils.executeScalar(dataStore, transaction, sql)).intValue();
+			
+			sql = "SELECT coalesce(max(progressivo),0) FROM siig_t_log where id_tracciamento=" + trace;
+			
+			int  errors = ((Number)DbUtils.executeScalar(dataStore, transaction, sql)).intValue();
+			
+			return new Process(process, trace, errors);
+		} catch (SQLException e) {
+			throw new IOException(e);
+		} finally {			
+			if(transaction != null) {
+				transaction.close();
+			}
+		}			
+	}		
 	
 	/**
 	 * Close the given phase of a process.
@@ -182,17 +260,23 @@ public class Ingestion {
 	 * @throws IOException 
 	 */
 	public static void updateLogFile(JDBCDataStore dataStore, int trace, int total,
-			int errors) throws IOException {
+			int errors, String phase) throws IOException {
 		Transaction transaction = null;	
 		Connection conn = null;
 		try {			
 			transaction = new DefaultTransaction();
 			conn = dataStore.getConnection(transaction);				
 		
-			String sql = "UPDATE siig_t_tracciamento SET nr_rec_shape=" + total
+			String sql;
+			if(phase.equalsIgnoreCase("A")) {
+				sql= "UPDATE siig_t_tracciamento SET nr_rec_shape=" + total			
 					+ ",nr_rec_storage=" + (total - errors)
 					+ ",nr_rec_scartati=" + errors + "WHERE id_tracciamento="
 					+ trace;
+			} else {
+				sql= "UPDATE siig_t_tracciamento SET nr_rec_scartati=nr_rec_scartati+" + errors + ",nr_rec_storage=nr_rec_storage-" + errors + " WHERE id_tracciamento="
+						+ trace;
+			}
 			
 			DbUtils.executeSql(conn, transaction, sql, true);
 			
@@ -210,5 +294,26 @@ public class Ingestion {
 				transaction.close();
 			}
 		}
+	}
+	
+	
+	
+	/**
+	 * Creates a FeatureSource for the given typeName on the given DataStore.
+	 * Optionally the source is bound to a transaction, if not null.
+	 * 
+	 * @param dataStore
+	 * @param transaction
+	 * @param typeName
+	 * @return
+	 * @throws IOException
+	 */
+	public static FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureSource(
+			JDBCDataStore dataStore, Transaction transaction, String typeName)
+			throws IOException {
+		FeatureStore<SimpleFeatureType, SimpleFeature> geoFeatureWriter = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
+				.getFeatureSource(typeName);
+		geoFeatureWriter.setTransaction(transaction);
+		return geoFeatureWriter;
 	}
 }
