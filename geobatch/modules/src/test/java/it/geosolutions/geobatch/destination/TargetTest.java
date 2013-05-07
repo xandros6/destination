@@ -52,7 +52,7 @@ public class TargetTest extends TestCase {
 			}
 		}));
 		
-		target.importTarget(cfg.getDataStore(), null);
+		//target.importTarget(cfg.getDataStore(), null);
 		
 	}
 }
