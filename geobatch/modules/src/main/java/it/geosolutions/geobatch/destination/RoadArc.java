@@ -19,53 +19,40 @@ package it.geosolutions.geobatch.destination;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.data.DataStoreFinder;
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.referencing.CRS;
-import org.opengis.feature.GeometryAttribute;
-import org.opengis.feature.IllegalAttributeException;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.identity.FeatureId;
-import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.expression.AccessException;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.PropertyAccessor;
-import org.springframework.expression.TypedValue;
 
-import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.basic.BigDecimalConverter;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -83,6 +70,7 @@ public class RoadArc extends IngestionObject {
 	private String date;
 	
 	public static Properties aggregation = new Properties();
+	public static Properties bersaglio = new Properties();
 		
 	private String gridTypeName = "siig_geo_grid";
 	
@@ -91,6 +79,10 @@ public class RoadArc extends IngestionObject {
 	
 	private String byVehicleTypeName = "siig_r_tipovei_geoarcoX";
 	private String dissestoTypeName = "siig_r_arco_X_dissesto";
+	private String tipobersTypeName = "siig_r_arco_X_scen_tipobers";
+	private String sostanzaTypeName = "siig_t_sostanza";
+	private String sostanzaArcoTypeName = "siig_r_arco_X_sostanza";
+	
 	
 	private static Map attributeMappings = null;		
 	
@@ -98,10 +90,30 @@ public class RoadArc extends IngestionObject {
 		// load mappings from resources				
 		attributeMappings = (Map) readResourceFromXML("/roadarcs.xml");	
 		
+		InputStream aggregationStream = null;
+                InputStream bersaglioStream = null;
 		try {
-			aggregation.load(RoadArc.class.getResourceAsStream("/aggregation.properties"));
+		        aggregationStream = RoadArc.class.getResourceAsStream("/aggregation.properties");
+		        bersaglioStream = RoadArc.class.getResourceAsStream("/bersaglio.properties");
+			aggregation.load(aggregationStream);
+			bersaglio.load(bersaglioStream);
 		} catch (IOException e) {
 			LOGGER.error("Unable to load configuration: "+e.getMessage(), e);
+		} finally{
+		    try {
+                        if(bersaglioStream != null){
+		            bersaglioStream.close();
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+		    try {
+		        if(aggregationStream != null){
+                            aggregationStream.close();
+		        }
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
 		}
 	}
 	
@@ -346,8 +358,16 @@ public class RoadArc extends IngestionObject {
 				String dissestoName = getTypeName(dissestoTypeName, aggregationLevel);
 				OutputObject dissestoObject = new OutputObject(dataStore, transaction, dissestoName, "");
 				
+	                        // setup CFF output object
+                                String tipobersName = getTypeName(tipobersTypeName, aggregationLevel);
+                                OutputObject tipobersObject = new OutputObject(dataStore, transaction, tipobersName, "");
+                                
+                                // setup  sostanza output object
+                                String tiposostName = getTypeName(sostanzaArcoTypeName, aggregationLevel);
+                                OutputObject tiposostObject = new OutputObject(dataStore, transaction, tiposostName, "");
+                                
 				OutputObject[] outputObjects = new OutputObject[] {vehicleObject,
-						dissestoObject, geoObject};
+						dissestoObject, geoObject, tipobersObject, tiposostObject};
 				
 				BigDecimal maxId = null;
 				
@@ -739,6 +759,8 @@ public class RoadArc extends IngestionObject {
 			addGeoFeature(outputObjects[2], id, inputFeature);						
 			addVehicleFeature(outputObjects[0], id, inputFeature);
 			addDissestoFeature(outputObjects[1], id, inputFeature);
+			addCFFFeature(outputObjects[3], id, inputFeature);
+			addSostanzaFeature(outputObjects[4], id, inputFeature, dataStore);
 			
 			rowTransaction.commit();
 			
@@ -813,6 +835,10 @@ public class RoadArc extends IngestionObject {
 					featureBuilder.add(velocita[type]);
 				} else if(attr.getLocalName().equals("fk_partner")) {
 					featureBuilder.add(partner+"");
+				} else if(attr.getLocalName().equals("flg_velocita")) {
+                                    featureBuilder.add(attributeMappings.get("flg_veloc"));
+				} else if(attr.getLocalName().equals("flg_densita_veicolare")) {
+                                    featureBuilder.add("");
 				} else {
 					featureBuilder.add(null);
 				}
@@ -884,6 +910,92 @@ public class RoadArc extends IngestionObject {
 		}
 				
 	}
+	
+	private void addCFFFeature(OutputObject cffObject,
+                int id, SimpleFeature inputFeature) throws IOException {
+	    
+	    SimpleFeatureBuilder featureBuilder = cffObject.getBuilder();
+	    Object cffAttribute = inputFeature.getAttribute("CFF");	    
+            String[] cffAttributeSplitted =  cffAttribute == null ? null : cffAttribute.toString().split("\\|");                                       
+            
+            for(int count=0; count < cffAttributeSplitted.length; count++) {
+                    try {
+                            String el = cffAttributeSplitted[count].replace(",", ".");
+                            double cffElement = Double.parseDouble(el);
+                            featureBuilder.reset();
+                            // compiles the attributes from target and read feature data, using mappings
+                            // to match input attributes with output ones
+                            for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
+                                    if(attr.getLocalName().equals(geoId)) {
+                                            featureBuilder.add(id);
+                                    } else if(attr.getLocalName().equals("cff")) {
+                                            featureBuilder.add(cffElement);
+                                    } else if(attr.getLocalName().equals("id_bersaglio")) {
+                                            featureBuilder.add(bersaglio.getProperty(Integer.toString(count)));
+                                    } else if(attr.getLocalName().equals("fk_partner")) {
+                                            featureBuilder.add(partner+"");
+                                    } else {
+                                            featureBuilder.add(null);
+                                    }
+                            }
+//                            String fid2 = el.replaceAll("\\,", "");
+//                            fid2 = el.replaceAll("\\.", "");
+                            String featureid = id + "." + count;
+                            SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                            feature.getUserData().put(Hints.USE_PROVIDED_FID, true);                        
+                            
+                            cffObject.getWriter().addFeatures(DataUtilities
+                                            .collection(feature));
+                    } catch(NumberFormatException e) {
+                            
+                    }
+            }
+	}
+	
+        private void addSostanzaFeature(OutputObject sostanzaObject, int id, SimpleFeature inputFeature, JDBCDataStore datastore)
+                throws IOException {
+    
+            SimpleFeatureBuilder featureBuilder = sostanzaObject.getBuilder();
+    
+            Transaction transaction = new DefaultTransaction();
+            OutputObject tipobersObject = new OutputObject(datastore, transaction, sostanzaTypeName,
+                    "");
+            FeatureCollection<SimpleFeatureType, SimpleFeature> bersaglioCollection = tipobersObject
+                    .getReader().getFeatures();
+            FeatureIterator iter = bersaglioCollection.features();
+            try{
+                while (iter.hasNext()) {
+                    SimpleFeature sf = (SimpleFeature) iter.next();
+                    BigDecimal bd = (BigDecimal)sf.getAttribute("id_sostanza");
+                    String id_sostanza = bd.toString();
+                    for (AttributeDescriptor attr : sostanzaObject.getSchema().getAttributeDescriptors()) {
+                        if (attr.getLocalName().equals(geoId)) {
+                            featureBuilder.add(id);
+                        } else if (attr.getLocalName().equals("id_sostanza")) {
+                            featureBuilder.add(id_sostanza);
+                        } else if (attr.getLocalName().equals("padr")) {
+                            featureBuilder.add(.5f);
+                        } else if(attr.getLocalName().equals("fk_partner")) {
+                            featureBuilder.add(partner+"");
+                        } else {
+                            featureBuilder.add(null);
+                        }
+                    }
+                    String featureid = id + "." + id_sostanza;
+                    SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                    feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
+    
+                    sostanzaObject.getWriter().addFeatures(DataUtilities.collection(feature));
+                }
+            }finally{
+                if(iter != null){
+                    iter.close();
+                }
+                if(transaction != null){
+                    transaction.close();
+                }
+            }
+        }
 	
 	
 	
