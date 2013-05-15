@@ -836,9 +836,9 @@ public class RoadArc extends IngestionObject {
 				} else if(attr.getLocalName().equals("fk_partner")) {
 					featureBuilder.add(partner+"");
 				} else if(attr.getLocalName().equals("flg_velocita")) {
-                                    featureBuilder.add(attributeMappings.get("flg_veloc"));
+                                    featureBuilder.add(inputFeature.getAttribute(""+attributeMappings.get("flg_veloc")));
 				} else if(attr.getLocalName().equals("flg_densita_veicolare")) {
-                                    featureBuilder.add("");
+                                    featureBuilder.add(null);
 				} else {
 					featureBuilder.add(null);
 				}
