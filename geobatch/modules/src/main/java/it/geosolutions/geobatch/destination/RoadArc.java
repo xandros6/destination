@@ -22,19 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
@@ -52,7 +47,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.converters.basic.BigDecimalConverter;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -83,6 +77,7 @@ public class RoadArc extends IngestionObject {
 	private String sostanzaTypeName = "siig_t_sostanza";
 	private String sostanzaArcoTypeName = "siig_r_arco_X_sostanza";
 	
+	private float PADDR_WORKAROUTD_VALUE = .5f;
 	
 	private static Map attributeMappings = null;		
 	
@@ -536,6 +531,7 @@ public class RoadArc extends IngestionObject {
 		int corsie = 0;
 		int[] tgm = new int[] {0, 0};
 		int[] velocita = new int[] {0, 0};
+		double[] cff = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		Set<Integer> pterr = new HashSet<Integer>();
 		
 		while( (inputFeature = readInput(iterator)) != null) {	
@@ -566,7 +562,6 @@ public class RoadArc extends IngestionObject {
 				
 				// dissesto
 				String[] pterrs = inputFeature.getAttribute("PTERR") == null ? null : inputFeature.getAttribute("PTERR").toString().split("\\|");					
-				
 				for(int j=0; j < pterrs.length; j++) {
 					try {
 						int dissesto = Integer.parseInt(pterrs[j]);
@@ -575,6 +570,13 @@ public class RoadArc extends IngestionObject {
 						
 					}
 				}
+				
+				// cff
+				double[] cffs = extractMultipleValuesDouble(inputFeature, "CFF",cff.length);
+                                for(int i=0; i<cff.length; i++) {
+                                        cff[i] += cffs[i];
+                                }
+				
 			} catch(Exception e) {						
 				errors++;
 				Ingestion.logError(dataStore, trace, errors,
@@ -593,7 +595,11 @@ public class RoadArc extends IngestionObject {
 						tgm, velocita, inputFeature);
 				addAggregateDissestoFeature(outputObjects[1], id, lunghezza,
 						pterr, inputFeature);
-				
+				addAggregateCFFFeature(outputObjects[3],
+			                id, cff, inputFeature);
+                                //no need for aggregation untill paddr will be a constant
+				addSostanzaFeature(outputObjects[4], id, inputFeature,
+                                        FeatureLoaderUtils.loadFeature(dataStore, sostanzaTypeName), dataStore);
 				rowTransaction.commit();
 				
 				updateImportProgress(total, "Importing data in " + outputName);
@@ -734,6 +740,43 @@ public class RoadArc extends IngestionObject {
 		outputObject.getWriter().addFeatures(DataUtilities
 				.collection(geoFeature));
 	}
+	
+	private void addAggregateCFFFeature(OutputObject cffObject,
+                int id, double cff[], SimpleFeature inputFeature) throws IOException {
+            
+            SimpleFeatureBuilder featureBuilder = cffObject.getBuilder();
+            for(int count=0; count < cff.length; count++) {
+                    try {
+                            double cffElement = cff[count];
+                            featureBuilder.reset();
+                            // compiles the attributes from target and read feature data, using mappings
+                            // to match input attributes with output ones
+                            for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
+                                    if(attr.getLocalName().equals(geoId)) {
+                                            featureBuilder.add(id);
+                                    } else if(attr.getLocalName().equals("cff")) {
+                                            // compute the aritmetic average
+                                            featureBuilder.add(cffElement/cff.length);
+                                    } else if(attr.getLocalName().equals("id_bersaglio")) {
+                                            featureBuilder.add(bersaglio.getProperty(Integer.toString(count)));
+                                    } else if(attr.getLocalName().equals("fk_partner")) {
+                                            featureBuilder.add(partner+"");
+                                    } else {
+                                            featureBuilder.add(null);
+                                    }
+                            }
+                            String featureid = id + "." + count;
+                            SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                            feature.getUserData().put(Hints.USE_PROVIDED_FID, true);                        
+                            
+                            cffObject.getWriter().addFeatures(DataUtilities
+                                            .collection(feature));
+                    } catch(NumberFormatException e) {
+                            
+                    }
+            }
+        }
+	
 
 	/**
 	 * @param trace
@@ -760,7 +803,7 @@ public class RoadArc extends IngestionObject {
 			addVehicleFeature(outputObjects[0], id, inputFeature);
 			addDissestoFeature(outputObjects[1], id, inputFeature);
 			addCFFFeature(outputObjects[3], id, inputFeature);
-			addSostanzaFeature(outputObjects[4], id, inputFeature, dataStore);
+			addSostanzaFeature(outputObjects[4], id, inputFeature, FeatureLoaderUtils.loadFeature(dataStore, sostanzaTypeName), dataStore);
 			
 			rowTransaction.commit();
 			
@@ -835,10 +878,8 @@ public class RoadArc extends IngestionObject {
 					featureBuilder.add(velocita[type]);
 				} else if(attr.getLocalName().equals("fk_partner")) {
 					featureBuilder.add(partner+"");
-				} else if(attr.getLocalName().equals("flg_velocita")) {
-                                    featureBuilder.add(inputFeature.getAttribute(""+attributeMappings.get("flg_veloc")));
-				} else if(attr.getLocalName().equals("flg_densita_veicolare")) {
-                                    featureBuilder.add(null);
+				}else if(attributeMappings.containsKey(attr.getLocalName())) {
+	                                featureBuilder.add(getMapping(inputFeature,attributeMappings, attr.getLocalName()));
 				} else {
 					featureBuilder.add(null);
 				}
@@ -869,6 +910,25 @@ public class RoadArc extends IngestionObject {
 		}
 		return values;
 	}
+	
+	/**
+         * @param inputFeature
+         * @return
+         */
+        private double[] extractMultipleValuesDouble(SimpleFeature inputFeature, String attributeName, int valueNumber) {
+                String[] svalues = inputFeature.getAttribute(attributeName).toString().split("\\|");                            
+                double[] values = new double[13];
+                
+                for(int count=0; count < svalues.length; count++) {
+                        try {
+                                String el = svalues[count].replace(",", ".");
+                                values[count] = Double.parseDouble(el);
+                        } catch(NumberFormatException e) {
+                                
+                        }
+                }
+                return values;
+        }
 	
 	/**
 	 * Adds arc - dissesto data feature.
@@ -952,52 +1012,33 @@ public class RoadArc extends IngestionObject {
             }
 	}
 	
-        private void addSostanzaFeature(OutputObject sostanzaObject, int id, SimpleFeature inputFeature, JDBCDataStore datastore)
+        private void addSostanzaFeature(OutputObject sostanzaObject, int id,
+                SimpleFeature inputFeature, List<String> sostanze, JDBCDataStore datastore)
                 throws IOException {
     
             SimpleFeatureBuilder featureBuilder = sostanzaObject.getBuilder();
     
-            Transaction transaction = new DefaultTransaction();
-            OutputObject tipobersObject = new OutputObject(datastore, transaction, sostanzaTypeName,
-                    "");
-            FeatureCollection<SimpleFeatureType, SimpleFeature> bersaglioCollection = tipobersObject
-                    .getReader().getFeatures();
-            FeatureIterator iter = bersaglioCollection.features();
-            try{
-                while (iter.hasNext()) {
-                    SimpleFeature sf = (SimpleFeature) iter.next();
-                    BigDecimal bd = (BigDecimal)sf.getAttribute("id_sostanza");
-                    String id_sostanza = bd.toString();
-                    for (AttributeDescriptor attr : sostanzaObject.getSchema().getAttributeDescriptors()) {
-                        if (attr.getLocalName().equals(geoId)) {
-                            featureBuilder.add(id);
-                        } else if (attr.getLocalName().equals("id_sostanza")) {
-                            featureBuilder.add(id_sostanza);
-                        } else if (attr.getLocalName().equals("padr")) {
-                            featureBuilder.add(.5f);
-                        } else if(attr.getLocalName().equals("fk_partner")) {
-                            featureBuilder.add(partner+"");
-                        } else {
-                            featureBuilder.add(null);
-                        }
+            for (String id_sostanza : sostanze) {
+                for (AttributeDescriptor attr : sostanzaObject.getSchema().getAttributeDescriptors()) {
+                    if (attr.getLocalName().equals(geoId)) {
+                        featureBuilder.add(id);
+                    } else if (attr.getLocalName().equals("id_sostanza")) {
+                        featureBuilder.add(id_sostanza);
+                    } else if (attr.getLocalName().equals("padr")) {
+                        featureBuilder.add(PADDR_WORKAROUTD_VALUE);
+                    } else if (attr.getLocalName().equals("fk_partner")) {
+                        featureBuilder.add(partner + "");
+                    } else {
+                        featureBuilder.add(null);
                     }
-                    String featureid = id + "." + id_sostanza;
-                    SimpleFeature feature = featureBuilder.buildFeature(featureid);
-                    feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
+                }
+                String featureid = id + "." + id_sostanza;
+                SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
     
-                    sostanzaObject.getWriter().addFeatures(DataUtilities.collection(feature));
-                }
-            }finally{
-                if(iter != null){
-                    iter.close();
-                }
-                if(transaction != null){
-                    transaction.close();
-                }
+                sostanzaObject.getWriter().addFeatures(DataUtilities.collection(feature));
             }
         }
-	
-	
 	
 	/**
 	 * @param e

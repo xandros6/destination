@@ -21,15 +21,15 @@
 		<string>FLG_N_CORS</string>
 	</entry>
 	<entry>      	
-		<string>flg_veloc</string>
+		<string>flg_velocita</string>
 		<string>FLG_VELOC</string>
 	</entry>
 	<entry>      	
-		<string>flg_tgm</string>
+		<string>flg_densita_veicolare</string>
 		<string>FLG_TGM</string>
 	</entry>
 	<entry>      	
-		<string>flg_id_orig</string>
+		<string>id_origine</string>
 		<string>ID_ORIG</string>
 	</entry>
 </map>

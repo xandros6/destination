@@ -1,0 +1,89 @@
+/*
+ *  fra2015
+ *  https://github.com/geosolutions-it/fra2015
+ *  Copyright (C) 2007-2012 GeoSolutions S.A.S.
+ *  http://www.geo-solutions.it
+ *
+ *  GPLv3 + Classpath exception
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package it.geosolutions.geobatch.destination;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.collections.ListUtils;
+import org.geotools.data.DefaultTransaction;
+import org.geotools.data.Transaction;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.jdbc.JDBCDataStore;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * @author DamianoG
+ * 
+ */
+public class FeatureLoaderUtils {
+
+    private final static Logger LOGGER = LoggerFactory.getLogger(RoadArc.class);
+
+    private static List<String> sostanze = null;
+
+    public static List<String> loadFeature(JDBCDataStore datastore, String featureTypeName) {
+
+        if(sostanze != null){
+            return ListUtils.unmodifiableList(sostanze);
+        }
+        sostanze = new ArrayList<String>();
+        FeatureIterator iter = null;
+        Transaction transaction = null;
+        try {
+            transaction = new DefaultTransaction();
+            OutputObject tipobersObject = new OutputObject(datastore, transaction, featureTypeName,
+                    "");
+            FeatureCollection<SimpleFeatureType, SimpleFeature> bersaglioCollection = tipobersObject
+                    .getReader().getFeatures();
+            iter = bersaglioCollection.features();
+
+            while (iter.hasNext()) {
+                SimpleFeature sf = (SimpleFeature) iter.next();
+                BigDecimal bd = (BigDecimal) sf.getAttribute("id_sostanza");
+                sostanze.add(bd.toString());
+            }
+        } catch (IOException e) {
+        } finally {
+            if (iter != null) {
+                iter.close();
+            }
+            if (transaction != null) {
+                try {
+                    transaction.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+        return ListUtils.unmodifiableList(sostanze);
+    }
+    
+    
+    
+}
