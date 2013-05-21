@@ -27,13 +27,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
+import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.filter.text.cql2.CQL;
+import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,15 +50,22 @@ import org.slf4j.LoggerFactory;
 public class FeatureLoaderUtils {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(RoadArc.class);
+    
+    public final static String ID_ORIGINE = "id_origine";
+    
+    public static FilterFactory2 filterFactory = CommonFactoryFinder.getFilterFactory2();
+    
+    private static MultiKeyMap featureAttributesMap = new MultiKeyMap();
 
-    private static List<String> sostanze = null;
+    public static List<String> loadFeatureAttributes(JDBCDataStore datastore, String featureTypeName,
+            String attribute, boolean forceLoading) {
 
-    public static List<String> loadFeature(JDBCDataStore datastore, String featureTypeName) {
-
-        if(sostanze != null){
-            return ListUtils.unmodifiableList(sostanze);
+        List<String> attributes = (List<String>) featureAttributesMap.get(featureTypeName,
+                attribute);
+        if (!forceLoading && attributes != null) {
+            return ListUtils.unmodifiableList(attributes);
         }
-        sostanze = new ArrayList<String>();
+        attributes = new ArrayList<String>();
         FeatureIterator iter = null;
         Transaction transaction = null;
         try {
@@ -65,9 +78,11 @@ public class FeatureLoaderUtils {
 
             while (iter.hasNext()) {
                 SimpleFeature sf = (SimpleFeature) iter.next();
-                BigDecimal bd = (BigDecimal) sf.getAttribute("id_sostanza");
-                sostanze.add(bd.toString());
+                // BigDecimal bd = (BigDecimal) sf.getAttribute("id_sostanza");
+                BigDecimal bd = (BigDecimal) sf.getAttribute(attribute);
+                attributes.add(bd.toString());
             }
+            featureAttributesMap.put(featureTypeName, attribute, attributes);
         } catch (IOException e) {
         } finally {
             if (iter != null) {
@@ -81,9 +96,33 @@ public class FeatureLoaderUtils {
                 }
             }
         }
-        return ListUtils.unmodifiableList(sostanze);
+        return ListUtils.unmodifiableList(attributes);
     }
-    
-    
-    
+
+    public static FeatureIterator loadByIdOrig(JDBCDataStore datastore, Transaction transaction,
+            String featureTypeName, int idOrig) {
+
+        FeatureIterator iter = null;
+        try {
+            OutputObject arcoX = new OutputObject(datastore, transaction, featureTypeName, "");
+            FeatureCollection<SimpleFeatureType, SimpleFeature> bersaglioCollection = null;
+
+            
+            Filter updateFilter = filterFactory.and(filterFactory.equals(
+                    filterFactory.property("fk_partner"), filterFactory.literal(1)
+            ),filterFactory.equals(
+                    filterFactory.property("id_tematico_shape"), filterFactory.literal(1))
+            );
+            
+            
+            bersaglioCollection = arcoX.getReader()
+                    .getFeatures(updateFilter);
+
+            iter = bersaglioCollection.features();
+        } catch (IOException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return iter;
+    }
+
 }

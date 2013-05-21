@@ -35,7 +35,6 @@ import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Transaction;
 import org.geotools.factory.Hints;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.jdbc.JDBCDataStore;
@@ -77,7 +76,9 @@ public class RoadArc extends IngestionObject {
 	private String sostanzaTypeName = "siig_t_sostanza";
 	private String sostanzaArcoTypeName = "siig_r_arco_X_sostanza";
 	
-	private float PADDR_WORKAROUTD_VALUE = .5f;
+	private static float PADDR_WORKAROUTD_VALUE = .5f;
+	private static String INCIDENTI = "nr_incidenti";
+	private static String LUNGHEZZA = "lunghezza";
 	
 	private static Map attributeMappings = null;		
 	
@@ -200,10 +201,10 @@ public class RoadArc extends IngestionObject {
 				Set<Integer> aggregationValues = getAggregationValues(aggregationAttribute);
 				
 				for(int aggregationValue : aggregationValues) {						
-					setInputFilter(filterFactory.equals(
-						filterFactory.property(aggregationAttribute),
-						filterFactory.literal(aggregationValue)
-					));
+//					setInputFilter(filterFactory.equals(
+//						filterFactory.property(aggregationAttribute),
+//						filterFactory.literal(aggregationValue)
+//					));
 					//int arcs = getImportCount();
 					Long incidenti = (Long)getSumOnInput("INCIDENT", new Long(0));
 					if(incidenti != 0) {
@@ -214,10 +215,16 @@ public class RoadArc extends IngestionObject {
 						int m = 0;
 						
 						SimpleFeature inputFeature;
+						Transaction transaction1 = new DefaultTransaction();
+						FeatureIterator iter = FeatureLoaderUtils.loadByIdOrig(dataStore, transaction1, geoName, aggregationLevel);
 						try {
-							while( (inputFeature = readInput()) != null) {
-								Integer nrIncidenti = (Integer)inputFeature.getAttribute("INCIDENT");
-								Integer lunghezza = (Integer)inputFeature.getAttribute("LUNGHEZZA");
+							while( iter.hasNext()) {
+							        inputFeature = (SimpleFeature)iter.next();
+							        int nrIncidenti = ((BigDecimal)inputFeature.getAttribute(INCIDENTI)).intValue();
+							        int lunghezza = ((BigDecimal)inputFeature.getAttribute(LUNGHEZZA)).intValue();
+							        
+//							        Integer nrIncidenti = (Integer)
+//								Integer lunghezza = (Integer)
 								if(nrIncidenti == 0) {
 									n += lunghezza;
 								} else {
@@ -228,7 +235,16 @@ public class RoadArc extends IngestionObject {
 							
 							
 						} finally {
-							closeInputReader();
+    						    if (iter != null) {
+    					                iter.close();
+    					            }
+    					            if (transaction1 != null) {
+    					                try {
+    					                    transaction1.close();
+    					                } catch (IOException e) {
+    					                    LOGGER.error(e.getMessage(), e);
+    					                }
+    					            }
 						}	
 						
 						Double avg = weightedSum / lunghezzaTotale;
@@ -237,9 +253,12 @@ public class RoadArc extends IngestionObject {
 						Double inc = kinc * avg;
 						Double dec = inc * n / m;
 						
+						Transaction transaction2 = new DefaultTransaction();
+                                                iter = FeatureLoaderUtils.loadByIdOrig(dataStore, transaction2, geoName, aggregationLevel);
 						try {
-							while( (inputFeature = readInput()) != null) {
-								Integer nrIncidenti = (Integer)inputFeature.getAttribute("INCIDENT");
+							while( iter.hasNext()) {
+							        inputFeature = (SimpleFeature)iter.next();
+							        int nrIncidenti = ((BigDecimal)inputFeature.getAttribute(INCIDENTI)).intValue();
 								
 								double newIncidenti = (double)nrIncidenti;
 								if(newIncidenti == 0) {
@@ -251,7 +270,16 @@ public class RoadArc extends IngestionObject {
 								updateIncidentalita(geoObject, inputFeature, newIncidenti);
 							}
 						} finally {
-							closeInputReader();
+    						    if (iter != null) {
+    					                iter.close();
+    					            }
+    					            if (transaction2 != null) {
+    					                try {
+    					                    transaction2.close();
+    					                } catch (IOException e) {
+    					                    LOGGER.error(e.getMessage(), e);
+    					                }
+    					            }
 						}	
 						
 						
@@ -599,7 +627,7 @@ public class RoadArc extends IngestionObject {
 			                id, cff, inputFeature);
                                 //no need for aggregation untill paddr will be a constant
 				addSostanzaFeature(outputObjects[4], id, inputFeature,
-                                        FeatureLoaderUtils.loadFeature(dataStore, sostanzaTypeName), dataStore);
+                                        FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
 				rowTransaction.commit();
 				
 				updateImportProgress(total, "Importing data in " + outputName);
@@ -803,7 +831,7 @@ public class RoadArc extends IngestionObject {
 			addVehicleFeature(outputObjects[0], id, inputFeature);
 			addDissestoFeature(outputObjects[1], id, inputFeature);
 			addCFFFeature(outputObjects[3], id, inputFeature);
-			addSostanzaFeature(outputObjects[4], id, inputFeature, FeatureLoaderUtils.loadFeature(dataStore, sostanzaTypeName), dataStore);
+			addSostanzaFeature(outputObjects[4], id, inputFeature, FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
 			
 			rowTransaction.commit();
 			
