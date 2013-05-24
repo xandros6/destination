@@ -19,7 +19,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.common;
+
+import it.geosolutions.geobatch.destination.OutputObject;
+import it.geosolutions.geobatch.destination.RoadArc;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -33,8 +36,6 @@ import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.filter.text.cql2.CQL;
-import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -58,14 +59,36 @@ public class FeatureLoaderUtils {
     private static MultiKeyMap featureAttributesMap = new MultiKeyMap();
 
     public static List<String> loadFeatureAttributes(JDBCDataStore datastore, String featureTypeName,
+            String attribute, boolean forceLoading){
+        List<BigDecimal> list = loadFeatureAttributesInternal(datastore, featureTypeName,
+                attribute, forceLoading);
+        List<String> resultList = new ArrayList<String>();
+        for(BigDecimal el : list){
+            resultList.add(el.toString());
+        }
+        return resultList;
+    }
+    
+    public static List<Double> loadFeatureAttributesInt(JDBCDataStore datastore, String featureTypeName,
+            String attribute, boolean forceLoading){
+        List<BigDecimal> list = loadFeatureAttributesInternal(datastore, featureTypeName,
+                attribute, forceLoading);
+        List<Double> resultList = new ArrayList<Double>();
+        for(BigDecimal el : list){
+            resultList.add(el.toBigInteger().doubleValue());
+        }
+        return resultList;
+    }
+    
+    private static List<BigDecimal> loadFeatureAttributesInternal(JDBCDataStore datastore, String featureTypeName,
             String attribute, boolean forceLoading) {
 
-        List<String> attributes = (List<String>) featureAttributesMap.get(featureTypeName,
+        List<BigDecimal> attributes = (List<BigDecimal>) featureAttributesMap.get(featureTypeName,
                 attribute);
         if (!forceLoading && attributes != null) {
             return ListUtils.unmodifiableList(attributes);
         }
-        attributes = new ArrayList<String>();
+        attributes = new ArrayList<BigDecimal>();
         FeatureIterator iter = null;
         Transaction transaction = null;
         try {
@@ -80,7 +103,7 @@ public class FeatureLoaderUtils {
                 SimpleFeature sf = (SimpleFeature) iter.next();
                 // BigDecimal bd = (BigDecimal) sf.getAttribute("id_sostanza");
                 BigDecimal bd = (BigDecimal) sf.getAttribute(attribute);
-                attributes.add(bd.toString());
+                attributes.add(bd);
             }
             featureAttributesMap.put(featureTypeName, attribute, attributes);
         } catch (IOException e) {

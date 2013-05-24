@@ -16,6 +16,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
