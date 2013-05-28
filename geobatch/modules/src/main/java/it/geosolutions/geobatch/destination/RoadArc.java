@@ -141,6 +141,10 @@ public class RoadArc extends IngestionObject {
 		}
 		return false;
 	}
+	
+	public int getPartner(){
+	    return partner;
+	}
 		
 	/**
 	 * @param geoTypeName2
