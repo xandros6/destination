@@ -246,6 +246,17 @@ public abstract class IngestionObject {
 				.getFeatures(new Query(inputTypeName, Filter.INCLUDE)));				
 	}
 	
+        protected Set<BigDecimal> getAggregationBigValues(String aggregateAttribute) throws IOException {
+            // get unique aggregation values
+            Function unique = filterFactory.function("Collection_Unique",
+                    filterFactory.property(aggregateAttribute));
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features = inputReader
+                    .getFeatures(inputQuery);
+    
+            return (Set<BigDecimal>) unique.evaluate(inputReader.getFeatures(new Query(inputTypeName,
+                    Filter.INCLUDE)));
+        }
+	
 	
 	/**
 	 * Create a new entry in the trace log for the given input file / feature.

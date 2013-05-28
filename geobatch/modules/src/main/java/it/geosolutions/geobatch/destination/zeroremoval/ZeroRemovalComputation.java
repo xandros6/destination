@@ -24,7 +24,6 @@ import it.geosolutions.geobatch.destination.Ingestion;
 import it.geosolutions.geobatch.destination.IngestionObject;
 import it.geosolutions.geobatch.destination.OutputObject;
 import it.geosolutions.geobatch.destination.RoadArc;
-import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -37,9 +36,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.data.DefaultTransaction;
-import org.geotools.data.Transaction;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
@@ -49,46 +45,54 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author DamianoG
- *
+ * 
  */
-public class ZeroRemovalComputation extends IngestionObject{
+public class ZeroRemovalComputation extends IngestionObject {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZeroRemovalComputation.class);
-    
-    private static Pattern TYPE_NAME_PARTS = Pattern.compile("^([a-z]{4})_([a-z]{3})_([a-z]{2})_([a-z]{4})_([1-3]{1})");
-    
+
+    private static Pattern TYPE_NAME_PARTS = Pattern
+            .compile("^([a-z]{4})_([a-z]{3})_([a-z]{2})_([a-z]{4})_([1-3]{1})");
+
     private static String GRID_TYPE_NAME = "siig_geo_grid";
+
     private static String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
-    private static String INCIDENTI = "nr_incidenti";
+
+    private static String NR_INCIDENTI = "nr_incidenti";
+
     private static String LUNGHEZZA = "lunghezza";
+
     private static String GEOID = "id_geo_arco";
-    
+
+    private static String ID_ORIGIN = "id_origine";
+
     public static Properties aggregation = new Properties();
+
     private static Map attributeMappings = null;
-    
+
     private int partner;
-    
-    static {        
-            // load mappings from resources                         
-            attributeMappings = (Map) readResourceFromXML("/roadarcs.xml"); 
-            
-            InputStream aggregationStream = null;
+
+    static {
+        // load mappings from resources
+        attributeMappings = (Map) readResourceFromXML("/roadarcs.xml");
+
+        InputStream aggregationStream = null;
+        try {
+            aggregationStream = RoadArc.class.getResourceAsStream("/aggregation.properties");
+            aggregation.load(aggregationStream);
+        } catch (IOException e) {
+            LOGGER.error("Unable to load configuration: " + e.getMessage(), e);
+        } finally {
             try {
-                    aggregationStream = RoadArc.class.getResourceAsStream("/aggregation.properties");
-                    aggregation.load(aggregationStream);
-            } catch (IOException e) {
-                    LOGGER.error("Unable to load configuration: "+e.getMessage(), e);
-            } finally{
-                try {
-                    if(aggregationStream != null){
-                        aggregationStream.close();
-                    }
-                } catch (IOException e) {
-                    LOGGER.error(e.getMessage(), e);
+                if (aggregationStream != null) {
+                    aggregationStream.close();
                 }
+            } catch (IOException e) {
+                LOGGER.error(e.getMessage(), e);
             }
+        }
     }
-    
+
     /**
      * @param inputTypeName
      * @param listenerForwarder
@@ -98,7 +102,7 @@ public class ZeroRemovalComputation extends IngestionObject{
         super(inputTypeName, listenerForwarder);
         this.partner = partner;
     }
-    
+
     @Override
     protected boolean parseTypeName(String typeName) {
         Matcher m = TYPE_NAME_PARTS.matcher(typeName);
@@ -107,200 +111,166 @@ public class ZeroRemovalComputation extends IngestionObject{
         }
         return false;
     }
-    
+
     /**
      * @param geoTypeName2
      * @param aggregationLevel
      * @return
      */
-    private String getTypeName(String typeName, int aggregationLevel) {             
-            return typeName.replace("X", aggregationLevel+"");
+    private String getTypeName(String typeName, int aggregationLevel) {
+        return typeName.replace("X", aggregationLevel + "");
     }
-    
+
     /**
-     * Imports the arcs feature from the original Feature to the SIIG
-     * arcs tables (in staging).
+     * Imports the arcs feature from the original Feature to the SIIG arcs tables (in staging).
      * 
      * @param datastoreParams
      * @param crs
      * @throws IOException
      */
     public void removeZeros(Map<String, Serializable> datastoreParams,
-                    CoordinateReferenceSystem crs, int aggregationLevel, boolean onGrid, boolean dropInput) throws IOException {
-            reset();
-            
-            double kinc = 1;
-            if(isValid()) {                         
-                    JDBCDataStore dataStore = null;                                 
-                    
-                    crs = checkCrs(crs);                    
-                    
-                    int process = -1;
-                    int trace = -1;
-                    
-                    int errors = 0;
-                    
-                    
-                    
-                    String processPhase = "C";
-                    
-                    try {                                                                                           
-                            dataStore = connectToDataStore(datastoreParams);
-                            
-                            Ingestion.Process importData = getProcessData(dataStore);
-                            process = importData.getId();
-                            trace = importData.getMaxTrace();
-                            errors = importData.getMaxError();
-                            
-                            // setup input reader                                                           
-                            createInputReader(dataStore, null, onGrid ? GRID_TYPE_NAME : null);
-                                                            
-                            
-                            // setup geo output object
-                            String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
-                            OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);     
-                            
-                            // now we aggregate on 3rd aggregation level, waiting for 
-                            String aggregationAttribute = aggregation.getProperty("3");
-                            // get unique aggregation values                
-                            Set<Integer> aggregationValues = getAggregationValues(aggregationAttribute);
-                            
-                            for(int aggregationValue : aggregationValues) {                                         
-//                                  setInputFilter(filterFactory.equals(
-//                                          filterFactory.property(aggregationAttribute),
-//                                          filterFactory.literal(aggregationValue)
-//                                  ));
-                                    //int arcs = getImportCount();
-                                    Long incidenti = (Long)getSumOnInput("INCIDENT", new Long(0));
-                                    if(incidenti != 0) {
-                                            Long lunghezzaTotale = (Long)getSumOnInput("LUNGHEZZA", new Long(0));
-                                            
-                                            Double weightedSum = 0.0;               
-                                            int n = 0;
-                                            int m = 0;
-                                            
-                                            SimpleFeature inputFeature;
-                                            Transaction transaction1 = new DefaultTransaction();
-                                            FeatureIterator iter = FeatureLoaderUtils.loadByIdOrig(dataStore, transaction1, geoName, aggregationLevel);
-                                            try {
-                                                    while( iter.hasNext()) {
-                                                            inputFeature = (SimpleFeature)iter.next();
-                                                            int nrIncidenti = ((BigDecimal)inputFeature.getAttribute(INCIDENTI)).intValue();
-                                                            int lunghezza = ((BigDecimal)inputFeature.getAttribute(LUNGHEZZA)).intValue();
-                                                            
-//                                                          Integer nrIncidenti = (Integer)
-//                                                          Integer lunghezza = (Integer)
-                                                            if(nrIncidenti == 0) {
-                                                                    n += lunghezza;
-                                                            } else {
-                                                                    m += lunghezza;
-                                                            }
-                                                            weightedSum += (double)(nrIncidenti * lunghezza);
-                                                    }
-                                                    
-                                                    
-                                            } finally {
-                                                if (iter != null) {
-                                                    iter.close();
-                                                }
-                                                if (transaction1 != null) {
-                                                    try {
-                                                        transaction1.close();
-                                                    } catch (IOException e) {
-                                                        LOGGER.error(e.getMessage(), e);
-                                                    }
-                                                }
-                                            }       
-                                            
-                                            Double avg = weightedSum / lunghezzaTotale;
-                                            
-                                            
-                                            Double inc = kinc * avg;
-                                            Double dec = inc * n / m;
-                                            
-                                            Transaction transaction2 = new DefaultTransaction();
-                                            iter = FeatureLoaderUtils.loadByIdOrig(dataStore, transaction2, geoName, aggregationLevel);
-                                            try {
-                                                    while( iter.hasNext()) {
-                                                            inputFeature = (SimpleFeature)iter.next();
-                                                            int nrIncidenti = ((BigDecimal)inputFeature.getAttribute(INCIDENTI)).intValue();
-                                                            
-                                                            double newIncidenti = (double)nrIncidenti;
-                                                            if(newIncidenti == 0) {
-                                                                    newIncidenti += inc;
-                                                            } else {
-                                                                    newIncidenti -= dec;
-                                                            }
-                                                            
-                                                            updateIncidentalita(geoObject, inputFeature, newIncidenti);
-                                                    }
-                                            } finally {
-                                                if (iter != null) {
-                                                    iter.close();
-                                                }
-                                                if (transaction2 != null) {
-                                                    try {
-                                                        transaction2.close();
-                                                    } catch (IOException e) {
-                                                        LOGGER.error(e.getMessage(), e);
-                                                    }
-                                                }
-                                            }       
-                                            
-                                            
-                                    }
-                                    
-                                    
+            CoordinateReferenceSystem crs, int aggregationLevel, boolean onGrid)
+            throws IOException {
+        reset();
+
+        double kinc = 1;
+        if (isValid()) {
+            JDBCDataStore dataStore = null;
+
+            crs = checkCrs(crs);
+
+            int process = -1;
+            int trace = -1;
+
+            int errors = 0;
+
+            String processPhase = "C";
+
+            try {
+                dataStore = connectToDataStore(datastoreParams);
+
+//                Ingestion.Process importData = getProcessData(dataStore);
+//                process = importData.getId();
+//                trace = importData.getMaxTrace();
+//                errors = importData.getMaxError();
+
+                // setup input reader
+                createInputReader(dataStore, null, onGrid ? GRID_TYPE_NAME : null);
+
+                // setup geo output object
+                String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
+                OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
+
+                // get unique aggregation values
+                Set<BigDecimal> aggregationValues = getAggregationBigValues(ID_ORIGIN);
+
+                for (BigDecimal aggregationValue : aggregationValues) {
+                    setInputFilter(filterFactory.equals(filterFactory.property(ID_ORIGIN),
+                            filterFactory.literal(aggregationValue)));
+                    int arcs = getImportCount();
+                    Long incidenti = (Long) getSumOnInput(NR_INCIDENTI, new Long(0)).longValue();
+                    if (incidenti != 0) {
+                        Long lunghezzaTotale = (Long) getSumOnInput(LUNGHEZZA, new Long(0)).longValue();
+
+                        Double weightedSum = 0.0;
+                        int n = 0;
+                        int m = 0;
+
+                        SimpleFeature inputFeature = null;
+                        try {
+                            while ((inputFeature = readInput()) != null) {
+                                int nrIncidenti = ((BigDecimal) inputFeature
+                                        .getAttribute(NR_INCIDENTI)).intValue();
+                                int lunghezza = ((BigDecimal) inputFeature.getAttribute(LUNGHEZZA))
+                                        .intValue();
+                                if (nrIncidenti == 0) {
+                                    n += lunghezza;
+                                } else {
+                                    m += lunghezza;
+                                }
+                                weightedSum += (double) (nrIncidenti * lunghezza);
                             }
                             
-                    } catch (IOException e) {
-                            errors++;       
-                            Ingestion.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);                           
-                            throw e;
-                    } finally {
-                            if(dropInput) {
-                                    dropInputFeature(datastoreParams);
+                        } catch(Exception e){
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                        finally {
+                            closeInputReader();
+                        }
+
+                        Double avg = weightedSum / lunghezzaTotale;
+
+                        Double inc = kinc * avg;
+                        Double dec = inc * n / m;
+
+                        try {
+                            while ((inputFeature = readInput()) != null) {
+                                int nrIncidenti = ((BigDecimal) inputFeature
+                                        .getAttribute(NR_INCIDENTI)).intValue();
+                                double newIncidenti = (double) nrIncidenti;
+                                if (newIncidenti == 0) {
+                                    newIncidenti += inc;
+                                } else {
+                                    newIncidenti -= dec;
+                                }
+
+                                updateIncidentalita(geoObject, inputFeature, newIncidenti);
                             }
-                            
-                            if(process != -1) {
-                                    // close current process phase
-                                    Ingestion.closeProcessPhase(dataStore, process, processPhase);
-                            }
-                            
-                            if(dataStore != null) {
-                                    dataStore.dispose();
-                            }                               
+                        } catch(Exception e){
+                            LOGGER.error(e.getMessage(), e);
+                        }
+                        finally {
+                            closeInputReader();
+                        }
+
                     }
+
+                }
+
+            } catch (IOException e) {
+                errors++;
+                Ingestion
+                        .logError(dataStore, trace, errors, "Error importing data", getError(e), 0);
+                throw new IOException();
+            } finally {
+                if (process != -1) {
+                    // close current process phase
+                    Ingestion.closeProcessPhase(dataStore, process, processPhase);
+                }
+
+                if (dataStore != null) {
+                    dataStore.dispose();
+                }
             }
+        }
     }
-    
+
     /**
      * @param e
      * @return
      */
-    private String getError(Exception e) {          
-            // TODO: human readble error
-            Throwable t = e;
-            while(t.getCause() != null) {
-                    t=t.getCause();
-            }
-            
-            return t.getMessage().substring(0,Math.min(t.getMessage().length(), 1000));
+    private String getError(Exception e) {
+        // TODO: human readble error
+        Throwable t = e;
+        while (t.getCause() != null) {
+            t = t.getCause();
+        }
+
+        return t.getMessage().substring(0, Math.min(t.getMessage().length(), 1000));
     }
-    
+
     /**
      * @param geoObject
      * @param inputFeature
      * @param newIncidenti
-     * @throws IOException 
+     * @throws IOException
      */
-    private void updateIncidentalita(OutputObject geoObject,
-                    SimpleFeature inputFeature, double newIncidenti) throws IOException {
-            Filter updateFilter = filterFactory.and(filterFactory.equals(
-                    filterFactory.property("fk_partner"), filterFactory.literal(partner)
-            ),filterFactory.equals(
-                    filterFactory.property("id_tematico_shape"), filterFactory.literal(getMapping(inputFeature, attributeMappings, "id_tematico_shape")))
-            );
-            geoObject.getWriter().modifyFeatures(geoObject.getSchema().getDescriptor("nr_incidenti_elab").getName(), newIncidenti, updateFilter);
+    private void updateIncidentalita(OutputObject geoObject, SimpleFeature inputFeature,
+            double newIncidenti) throws IOException {
+        Filter updateFilter = filterFactory.equals(filterFactory.property(GEOID),
+                filterFactory.literal(inputFeature.getAttribute(GEOID)));
+        geoObject.getWriter().modifyFeatures(
+                geoObject.getSchema().getDescriptor("nr_incidenti_elab").getName(), newIncidenti,
+                updateFilter);
     }
 }
