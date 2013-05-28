@@ -65,6 +65,8 @@ public class ZeroRemovalComputation extends IngestionObject {
     private static String GEOID = "id_geo_arco";
 
     private static String ID_ORIGIN = "id_origine";
+    
+    private static String PARTNER_FIELD = "fk_partner";
 
     public static Properties aggregation = new Properties();
 
@@ -129,7 +131,7 @@ public class ZeroRemovalComputation extends IngestionObject {
      * @throws IOException
      */
     public void removeZeros(Map<String, Serializable> datastoreParams,
-            CoordinateReferenceSystem crs, int aggregationLevel, boolean onGrid)
+            CoordinateReferenceSystem crs, int aggregationLevel, boolean onGrid, int partner_id)
             throws IOException {
         reset();
 
@@ -161,12 +163,17 @@ public class ZeroRemovalComputation extends IngestionObject {
                 String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
                 OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
 
+                setInputFilter(filterFactory.equals(filterFactory.property(PARTNER_FIELD),
+                        filterFactory.literal(partner_id)));
                 // get unique aggregation values
                 Set<BigDecimal> aggregationValues = getAggregationBigValues(ID_ORIGIN);
 
                 for (BigDecimal aggregationValue : aggregationValues) {
-                    setInputFilter(filterFactory.equals(filterFactory.property(ID_ORIGIN),
-                            filterFactory.literal(aggregationValue)));
+                    setInputFilter(filterFactory.and(filterFactory.equals(
+                            filterFactory.property(ID_ORIGIN),
+                            filterFactory.literal(aggregationValue)), filterFactory.equals(
+                            filterFactory.property(PARTNER_FIELD),
+                            filterFactory.literal(partner_id))));
                     int arcs = getImportCount();
                     Long incidenti = (Long) getSumOnInput(NR_INCIDENTI, new Long(0)).longValue();
                     if (incidenti != 0) {

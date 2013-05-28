@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -253,8 +254,11 @@ public abstract class IngestionObject {
             FeatureCollection<SimpleFeatureType, SimpleFeature> features = inputReader
                     .getFeatures(inputQuery);
     
-            return (Set<BigDecimal>) unique.evaluate(inputReader.getFeatures(new Query(inputTypeName,
-                    Filter.INCLUDE)));
+            Set<BigDecimal> set = (Set<BigDecimal>)unique.evaluate(features);
+            if(set == null){
+                set = new HashSet<BigDecimal>(); 
+            }
+            return set;
         }
 	
 	
