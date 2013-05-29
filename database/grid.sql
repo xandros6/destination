@@ -48,14 +48,22 @@ END;
 $body$
 LANGUAGE 'plpgsql';
 
-create view siig_aggregation_grid(gid,geometria,value) as
-select grid.gid,grid.geometry::geometry(Geometry, 32632) as geometria,avg(a3.calc_formula_tot/a3.lunghezza) as value
-from siig_aggregation_3 a3,
-(SELECT row_number() over (order by cell nulls last) as gid ,cell as geometry FROM 
-(SELECT (
-ST_Dump(makegrid_2d(ST_GeomFromText('Polygon((317643 4881313,516288 4881313,516288 5140984,317643 5140984,317643 4881313))',
- 32632), 
- 5000,32632) 
-)).geom AS cell) AS q_grid) as grid
-where ST_Intersects(a3.geometria,grid.geometry)
-group by grid.gid,grid.geometry;
+
+CREATE TABLE siig_geo_grid(gid NUMERIC(9,0) NOT NULL,geometria geometry('POLYGON',32632),CONSTRAINT siig_geo_griid_pk PRIMARY KEY (gid));
+    
+CREATE INDEX siig_geo_grid_gidx ON siig_geo_grid using GIST(geometria) ;
+
+INSERT INTO siig_geo_grid(gid,geometria)
+SELECT row_number() OVER (ORDER BY q_grid.cell) AS gid, q_grid.cell AS geometria
+FROM
+(
+  SELECT (
+        st_dump(
+                makegrid_2d(
+                        st_geomfromtext('Polygon((317643 4881313,516288 4881313,516288 5140984,317643 5140984,317643 4881313))'::text, 32632),
+                        5000, 
+                        32632
+                )
+        )
+   ).geom AS cell
+) q_grid;
