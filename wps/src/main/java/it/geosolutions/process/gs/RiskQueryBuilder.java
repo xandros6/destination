@@ -126,9 +126,9 @@ public class RiskQueryBuilder {
      */
     public static void main(String[] args) {
        
-       //buildSimple(3, true);
-       //buildCombined(3);
-       buildSimpleStyle(3);
+       //buildSimple(2, true);
+       buildCombined(1);
+       //buildSimpleStyle(3);
        //buildCombinedStyle(3);
     }
 
@@ -619,7 +619,7 @@ public class RiskQueryBuilder {
             builder.append("               select fk_distanza\n");
             builder.append("               from siig_r_area_danno\n");
             builder.append("               inner join siig_d_gravita on siig_r_area_danno.id_gravita = siig_d_gravita.id_gravita\n");
-            builder.append("               where siig_d_gravita.fk_bersaglio = "+bersaglio.id+"\n");
+            builder.append("               where siig_r_area_danno.id_bersaglio = "+bersaglio.id+"\n");
             builder.append("               and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
             builder.append("               and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
             builder.append("               and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
@@ -630,14 +630,14 @@ public class RiskQueryBuilder {
             builder.append("             from siig_r_scenario_gravita\n");
             builder.append("             inner join siig_d_gravita on siig_r_scenario_gravita.id_gravita = siig_d_gravita.id_gravita\n");
             builder.append("             where id_scenario = siig_r_scenario_sostanza.id_scenario\n");
-            builder.append("             and fk_bersaglio = "+bersaglio.id+"\n");
+            builder.append("             and id_bersaglio = "+bersaglio.id+"\n");
             builder.append("         ) * (1 - coalesce((\n");
             
             
             builder.append("             select cff\n");
             builder.append("             from siig_r_arco_"+level+"_scen_tipobers\n");
             builder.append("             where id_geo_arco = siig_geo_ln_arco_"+level+".id_geo_arco\n");
-            builder.append("                 and id_scenario = siig_r_scenario_sostanza.id_scenario\n");
+            //builder.append("                 and id_scenario = siig_r_scenario_sostanza.id_scenario\n");
             builder.append("                 and id_bersaglio = "+bersaglio.id+"\n");
             builder.append("         ),0.3)) * %"+bersaglio.name+"%,0))\n");
             
@@ -673,6 +673,7 @@ public class RiskQueryBuilder {
                     builder.append("                        and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+                    builder.append("                        and siig_r_area_danno.id_bersaglio = " + bersaglio.id + "\n");
                     builder.append("                  )\n");
                 } else {
                     builder.append("                  coalesce((select coalesce("+bersaglio.eField+",1)\n");
@@ -686,6 +687,7 @@ public class RiskQueryBuilder {
                     builder.append("                        and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+                    builder.append("                        and siig_r_area_danno.id_bersaglio = " + bersaglio.id + "\n");
                     builder.append("                  )) - (\n");
                     builder.append("                  select coalesce("+bersaglio.eField+",1)\n");
                     builder.append("                  from siig_t_vulnerabilita_"+level+"\n");
@@ -698,6 +700,7 @@ public class RiskQueryBuilder {
                     builder.append("                        and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+                    builder.append("                        and siig_r_area_danno.id_bersaglio = " + bersaglio.id + "\n");
                     builder.append("                  )\n");
                     builder.append("                  ),0)\n");
                 }
@@ -709,6 +712,7 @@ public class RiskQueryBuilder {
                 builder.append("                 inner join siig_d_gravita on siig_r_scenario_gravita.id_gravita = siig_d_gravita.id_gravita\n");
                 builder.append("                 where id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                 builder.append("                 and siig_d_gravita.id_gravita = "+bersaglio.gravita[i]+"\n");
+                builder.append("                 and siig_r_scenario_gravita.id_bersaglio = "+bersaglio.id+"\n");
                 builder.append("                )\n");
             }
             builder.append("         ) * (1 - coalesce((\n");                        

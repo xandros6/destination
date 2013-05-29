@@ -16,12 +16,13 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -30,42 +31,22 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.Query;
 import org.geotools.data.Transaction;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureImpl;
 import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.referencing.CRS;
-import org.opengis.feature.GeometryAttribute;
-import org.opengis.feature.IllegalAttributeException;
-import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
-import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Function;
-import org.opengis.filter.identity.FeatureId;
-import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.expression.AccessException;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.PropertyAccessor;
-import org.springframework.expression.TypedValue;
 
-import com.thoughtworks.xstream.XStream;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -83,6 +64,7 @@ public class RoadArc extends IngestionObject {
 	private String date;
 	
 	public static Properties aggregation = new Properties();
+	public static Properties bersaglio = new Properties();
 		
 	private String gridTypeName = "siig_geo_grid";
 	
@@ -91,6 +73,11 @@ public class RoadArc extends IngestionObject {
 	
 	private String byVehicleTypeName = "siig_r_tipovei_geoarcoX";
 	private String dissestoTypeName = "siig_r_arco_X_dissesto";
+	private String tipobersTypeName = "siig_r_arco_X_scen_tipobers";
+	private String sostanzaTypeName = "siig_t_sostanza";
+	private String sostanzaArcoTypeName = "siig_r_arco_X_sostanza";
+	
+	private static float PADDR_WORKAROUTD_VALUE = .5f;
 	
 	private static Map attributeMappings = null;		
 	
@@ -98,10 +85,30 @@ public class RoadArc extends IngestionObject {
 		// load mappings from resources				
 		attributeMappings = (Map) readResourceFromXML("/roadarcs.xml");	
 		
+		InputStream aggregationStream = null;
+                InputStream bersaglioStream = null;
 		try {
-			aggregation.load(RoadArc.class.getResourceAsStream("/aggregation.properties"));
+		        aggregationStream = RoadArc.class.getResourceAsStream("/aggregation.properties");
+		        bersaglioStream = RoadArc.class.getResourceAsStream("/bersaglio.properties");
+			aggregation.load(aggregationStream);
+			bersaglio.load(bersaglioStream);
 		} catch (IOException e) {
 			LOGGER.error("Unable to load configuration: "+e.getMessage(), e);
+		} finally{
+		    try {
+                        if(bersaglioStream != null){
+		            bersaglioStream.close();
+                        }
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
+		    try {
+		        if(aggregationStream != null){
+                            aggregationStream.close();
+		        }
+                    } catch (IOException e) {
+                        LOGGER.error(e.getMessage(), e);
+                    }
 		}
 	}
 	
@@ -134,6 +141,10 @@ public class RoadArc extends IngestionObject {
 		}
 		return false;
 	}
+	
+	public int getPartner(){
+	    return partner;
+	}
 		
 	/**
 	 * @param geoTypeName2
@@ -142,152 +153,6 @@ public class RoadArc extends IngestionObject {
 	 */
 	private String getTypeName(String typeName, int aggregationLevel) {		
 		return typeName.replace("X", aggregationLevel+"");
-	}
-
-	/**
-	 * Imports the arcs feature from the original Feature to the SIIG
-	 * arcs tables (in staging).
-	 * 
-	 * @param datastoreParams
-	 * @param crs
-	 * @throws IOException
-	 */
-	public void removeZeros(Map<String, Serializable> datastoreParams,
-			CoordinateReferenceSystem crs, int aggregationLevel, boolean onGrid, boolean dropInput) throws IOException {
-		reset();
-		
-		double kinc = 1;
-		if(isValid()) {				
-			JDBCDataStore dataStore = null;					
-			
-			crs = checkCrs(crs);			
-			
-			int process = -1;
-			int trace = -1;
-			
-			int errors = 0;
-			
-			
-			
-			String processPhase = "C";
-			
-			try {												
-				dataStore = connectToDataStore(datastoreParams);
-				
-				Ingestion.Process importData = getProcessData(dataStore);
-				process = importData.getId();
-				trace = importData.getMaxTrace();
-				errors = importData.getMaxError();
-				
-				// setup input reader								
-				createInputReader(dataStore, null, onGrid ? gridTypeName : null);
-								
-				
-				// setup geo output object
-				String geoName = getTypeName(geoTypeName, aggregationLevel);
-				OutputObject geoObject = new OutputObject(dataStore, null, geoName, geoId);	
-				
-				// now we aggregate on 3rd aggregation level, waiting for 
-				String aggregationAttribute = aggregation.getProperty("3");
-				// get unique aggregation values		
-				Set<Integer> aggregationValues = getAggregationValues(aggregationAttribute);
-				
-				for(int aggregationValue : aggregationValues) {						
-					setInputFilter(filterFactory.equals(
-						filterFactory.property(aggregationAttribute),
-						filterFactory.literal(aggregationValue)
-					));
-					//int arcs = getImportCount();
-					Long incidenti = (Long)getSumOnInput("INCIDENT", new Long(0));
-					if(incidenti != 0) {
-						Long lunghezzaTotale = (Long)getSumOnInput("LUNGHEZZA", new Long(0));
-						
-						Double weightedSum = 0.0;		
-						int n = 0;
-						int m = 0;
-						
-						SimpleFeature inputFeature;
-						try {
-							while( (inputFeature = readInput()) != null) {
-								Integer nrIncidenti = (Integer)inputFeature.getAttribute("INCIDENT");
-								Integer lunghezza = (Integer)inputFeature.getAttribute("LUNGHEZZA");
-								if(nrIncidenti == 0) {
-									n += lunghezza;
-								} else {
-									m += lunghezza;
-								}
-								weightedSum += (double)(nrIncidenti * lunghezza);
-							}
-							
-							
-						} finally {
-							closeInputReader();
-						}	
-						
-						Double avg = weightedSum / lunghezzaTotale;
-						
-						
-						Double inc = kinc * avg;
-						Double dec = inc * n / m;
-						
-						try {
-							while( (inputFeature = readInput()) != null) {
-								Integer nrIncidenti = (Integer)inputFeature.getAttribute("INCIDENT");
-								
-								double newIncidenti = (double)nrIncidenti;
-								if(newIncidenti == 0) {
-									newIncidenti += inc;
-								} else {
-									newIncidenti -= dec;
-								}
-								
-								updateIncidentalita(geoObject, inputFeature, newIncidenti);
-							}
-						} finally {
-							closeInputReader();
-						}	
-						
-						
-					}
-					
-					
-				}
-				
-			} catch (IOException e) {
-				errors++;	
-				Ingestion.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);				
-				throw e;
-			} finally {
-				if(dropInput) {
-					dropInputFeature(datastoreParams);
-				}
-				
-				if(process != -1) {
-					// close current process phase
-					Ingestion.closeProcessPhase(dataStore, process, processPhase);
-				}
-				
-				if(dataStore != null) {
-					dataStore.dispose();
-				}				
-			}
-		}
-	}
-	
-	/**
-	 * @param geoObject
-	 * @param inputFeature
-	 * @param newIncidenti
-	 * @throws IOException 
-	 */
-	private void updateIncidentalita(OutputObject geoObject,
-			SimpleFeature inputFeature, double newIncidenti) throws IOException {
-		Filter updateFilter = filterFactory.and(filterFactory.equals(
-			filterFactory.property("fk_partner"), filterFactory.literal(partner)
-		),filterFactory.equals(
-			filterFactory.property("id_tematico_shape"), filterFactory.literal(getMapping(inputFeature, attributeMappings, "id_tematico_shape")))
-		);
-		geoObject.getWriter().modifyFeatures(geoObject.getSchema().getDescriptor("nr_incidenti_elab").getName(), newIncidenti, updateFilter);
 	}
 
 	/**
@@ -346,8 +211,16 @@ public class RoadArc extends IngestionObject {
 				String dissestoName = getTypeName(dissestoTypeName, aggregationLevel);
 				OutputObject dissestoObject = new OutputObject(dataStore, transaction, dissestoName, "");
 				
+	                        // setup CFF output object
+                                String tipobersName = getTypeName(tipobersTypeName, aggregationLevel);
+                                OutputObject tipobersObject = new OutputObject(dataStore, transaction, tipobersName, "");
+                                
+                                // setup  sostanza output object
+                                String tiposostName = getTypeName(sostanzaArcoTypeName, aggregationLevel);
+                                OutputObject tiposostObject = new OutputObject(dataStore, transaction, tiposostName, "");
+                                
 				OutputObject[] outputObjects = new OutputObject[] {vehicleObject,
-						dissestoObject, geoObject};
+						dissestoObject, geoObject, tipobersObject, tiposostObject};
 				
 				BigDecimal maxId = null;
 				
@@ -516,6 +389,7 @@ public class RoadArc extends IngestionObject {
 		int corsie = 0;
 		int[] tgm = new int[] {0, 0};
 		int[] velocita = new int[] {0, 0};
+		double[] cff = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		Set<Integer> pterr = new HashSet<Integer>();
 		
 		while( (inputFeature = readInput(iterator)) != null) {	
@@ -546,7 +420,6 @@ public class RoadArc extends IngestionObject {
 				
 				// dissesto
 				String[] pterrs = inputFeature.getAttribute("PTERR") == null ? null : inputFeature.getAttribute("PTERR").toString().split("\\|");					
-				
 				for(int j=0; j < pterrs.length; j++) {
 					try {
 						int dissesto = Integer.parseInt(pterrs[j]);
@@ -555,6 +428,13 @@ public class RoadArc extends IngestionObject {
 						
 					}
 				}
+				
+				// cff
+				double[] cffs = extractMultipleValuesDouble(inputFeature, "CFF",cff.length);
+                                for(int i=0; i<cff.length; i++) {
+                                        cff[i] += cffs[i];
+                                }
+				
 			} catch(Exception e) {						
 				errors++;
 				Ingestion.logError(dataStore, trace, errors,
@@ -573,7 +453,11 @@ public class RoadArc extends IngestionObject {
 						tgm, velocita, inputFeature);
 				addAggregateDissestoFeature(outputObjects[1], id, lunghezza,
 						pterr, inputFeature);
-				
+				addAggregateCFFFeature(outputObjects[3],
+			                id, cff, inputFeature);
+                                //no need for aggregation untill paddr will be a constant
+				addSostanzaFeature(outputObjects[4], id, inputFeature,
+                                        FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
 				rowTransaction.commit();
 				
 				updateImportProgress(total, "Importing data in " + outputName);
@@ -714,6 +598,43 @@ public class RoadArc extends IngestionObject {
 		outputObject.getWriter().addFeatures(DataUtilities
 				.collection(geoFeature));
 	}
+	
+	private void addAggregateCFFFeature(OutputObject cffObject,
+                int id, double cff[], SimpleFeature inputFeature) throws IOException {
+            
+            SimpleFeatureBuilder featureBuilder = cffObject.getBuilder();
+            for(int count=0; count < cff.length; count++) {
+                    try {
+                            double cffElement = cff[count];
+                            featureBuilder.reset();
+                            // compiles the attributes from target and read feature data, using mappings
+                            // to match input attributes with output ones
+                            for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
+                                    if(attr.getLocalName().equals(geoId)) {
+                                            featureBuilder.add(id);
+                                    } else if(attr.getLocalName().equals("cff")) {
+                                            // compute the aritmetic average
+                                            featureBuilder.add(cffElement/cff.length);
+                                    } else if(attr.getLocalName().equals("id_bersaglio")) {
+                                            featureBuilder.add(bersaglio.getProperty(Integer.toString(count)));
+                                    } else if(attr.getLocalName().equals("fk_partner")) {
+                                            featureBuilder.add(partner+"");
+                                    } else {
+                                            featureBuilder.add(null);
+                                    }
+                            }
+                            String featureid = id + "." + count;
+                            SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                            feature.getUserData().put(Hints.USE_PROVIDED_FID, true);                        
+                            
+                            cffObject.getWriter().addFeatures(DataUtilities
+                                            .collection(feature));
+                    } catch(NumberFormatException e) {
+                            
+                    }
+            }
+        }
+	
 
 	/**
 	 * @param trace
@@ -739,6 +660,8 @@ public class RoadArc extends IngestionObject {
 			addGeoFeature(outputObjects[2], id, inputFeature);						
 			addVehicleFeature(outputObjects[0], id, inputFeature);
 			addDissestoFeature(outputObjects[1], id, inputFeature);
+			addCFFFeature(outputObjects[3], id, inputFeature);
+			addSostanzaFeature(outputObjects[4], id, inputFeature, FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
 			
 			rowTransaction.commit();
 			
@@ -813,6 +736,8 @@ public class RoadArc extends IngestionObject {
 					featureBuilder.add(velocita[type]);
 				} else if(attr.getLocalName().equals("fk_partner")) {
 					featureBuilder.add(partner+"");
+				}else if(attributeMappings.containsKey(attr.getLocalName())) {
+	                                featureBuilder.add(getMapping(inputFeature,attributeMappings, attr.getLocalName()));
 				} else {
 					featureBuilder.add(null);
 				}
@@ -843,6 +768,25 @@ public class RoadArc extends IngestionObject {
 		}
 		return values;
 	}
+	
+	/**
+         * @param inputFeature
+         * @return
+         */
+        private double[] extractMultipleValuesDouble(SimpleFeature inputFeature, String attributeName, int valueNumber) {
+                String[] svalues = inputFeature.getAttribute(attributeName).toString().split("\\|");                            
+                double[] values = new double[13];
+                
+                for(int count=0; count < svalues.length; count++) {
+                        try {
+                                String el = svalues[count].replace(",", ".");
+                                values[count] = Double.parseDouble(el);
+                        } catch(NumberFormatException e) {
+                                
+                        }
+                }
+                return values;
+        }
 	
 	/**
 	 * Adds arc - dissesto data feature.
@@ -885,7 +829,74 @@ public class RoadArc extends IngestionObject {
 				
 	}
 	
+	private void addCFFFeature(OutputObject cffObject,
+                int id, SimpleFeature inputFeature) throws IOException {
+	    
+	    SimpleFeatureBuilder featureBuilder = cffObject.getBuilder();
+	    Object cffAttribute = inputFeature.getAttribute("CFF");	    
+            String[] cffAttributeSplitted =  cffAttribute == null ? null : cffAttribute.toString().split("\\|");                                       
+            
+            for(int count=0; count < cffAttributeSplitted.length; count++) {
+                    try {
+                            String el = cffAttributeSplitted[count].replace(",", ".");
+                            double cffElement = Double.parseDouble(el);
+                            featureBuilder.reset();
+                            // compiles the attributes from target and read feature data, using mappings
+                            // to match input attributes with output ones
+                            for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
+                                    if(attr.getLocalName().equals(geoId)) {
+                                            featureBuilder.add(id);
+                                    } else if(attr.getLocalName().equals("cff")) {
+                                            featureBuilder.add(cffElement);
+                                    } else if(attr.getLocalName().equals("id_bersaglio")) {
+                                            featureBuilder.add(bersaglio.getProperty(Integer.toString(count)));
+                                    } else if(attr.getLocalName().equals("fk_partner")) {
+                                            featureBuilder.add(partner+"");
+                                    } else {
+                                            featureBuilder.add(null);
+                                    }
+                            }
+//                            String fid2 = el.replaceAll("\\,", "");
+//                            fid2 = el.replaceAll("\\.", "");
+                            String featureid = id + "." + count;
+                            SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                            feature.getUserData().put(Hints.USE_PROVIDED_FID, true);                        
+                            
+                            cffObject.getWriter().addFeatures(DataUtilities
+                                            .collection(feature));
+                    } catch(NumberFormatException e) {
+                            
+                    }
+            }
+	}
 	
+        private void addSostanzaFeature(OutputObject sostanzaObject, int id,
+                SimpleFeature inputFeature, List<String> sostanze, JDBCDataStore datastore)
+                throws IOException {
+    
+            SimpleFeatureBuilder featureBuilder = sostanzaObject.getBuilder();
+    
+            for (String id_sostanza : sostanze) {
+                for (AttributeDescriptor attr : sostanzaObject.getSchema().getAttributeDescriptors()) {
+                    if (attr.getLocalName().equals(geoId)) {
+                        featureBuilder.add(id);
+                    } else if (attr.getLocalName().equals("id_sostanza")) {
+                        featureBuilder.add(id_sostanza);
+                    } else if (attr.getLocalName().equals("padr")) {
+                        featureBuilder.add(PADDR_WORKAROUTD_VALUE);
+                    } else if (attr.getLocalName().equals("fk_partner")) {
+                        featureBuilder.add(partner + "");
+                    } else {
+                        featureBuilder.add(null);
+                    }
+                }
+                String featureid = id + "." + id_sostanza;
+                SimpleFeature feature = featureBuilder.buildFeature(featureid);
+                feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
+    
+                sostanzaObject.getWriter().addFeatures(DataUtilities.collection(feature));
+            }
+        }
 	
 	/**
 	 * @param e

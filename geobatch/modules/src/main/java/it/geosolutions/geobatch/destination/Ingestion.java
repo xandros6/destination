@@ -37,7 +37,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 public class Ingestion {
 	
-	static class Process {
+	public static class Process {
 		int id = 0;
 		int maxTrace = 0;
 		int maxError = 0;

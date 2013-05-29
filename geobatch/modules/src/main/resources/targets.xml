@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map>
 	<entry>
-	  <!-- popolazione residente -->
+	  <!-- popolazione residente PRES-->
       <int>1</int>
       <map>
       	<entry>      	
@@ -15,7 +15,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- popolazione turistica -->
+	  <!-- popolazione turistica PTUR-->
       <int>2</int>
       <map>
       	<entry>      	
@@ -41,7 +41,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- addetti industria e servizi -->
+	  <!-- addetti industria e servizi AIND-->
       <int>4</int>
       <map>
       	<entry>      	
@@ -49,8 +49,20 @@
       		<string>ID_TEMA</string>
       	</entry>
       	<entry>      	
-      		<string>denominazione</string>
-      		<string>DENOM</string>
+      		<string>denominazione_it</string>
+      		<string>DENOM_IT</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_en</string>
+      		<string>DENOM_EN</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_de</string>
+      		<string>DENOM_DE</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_fr</string>
+      		<string>DENOM_FR</string>
       	</entry>
       	<entry>      	
       		<string>cod_fisc</string>
@@ -67,7 +79,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- addetti strutture sanitarie -->
+	  <!-- addetti strutture sanitarie ASAN-->
       <int>5</int>
       <map>
       	<entry>      	
@@ -75,9 +87,21 @@
       		<string>ID_TEMA</string>
       	</entry>
       	<entry>      	
-      		<string>denominazione</string>
-      		<string>DENOM</string>
-      	</entry>
+			<string>denominazione_it</string>
+			<string>DENOM_IT</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_en</string>
+			<string>DENOM_EN</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_de</string>
+			<string>DENOM_DE</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_fr</string>
+			<string>DENOM_FR</string>
+		</entry>
       	<entry>      	
       		<string>fk_tipo_uso</string>
       		<string>#{FK_USO == 0 ? null : FK_USO}</string>
@@ -109,7 +133,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- addetti strutture scolastiche -->
+	  <!-- addetti strutture scolastiche ASCOL-->
       <int>6</int>
       <map>
       	<entry>      	
@@ -117,9 +141,21 @@
       		<string>ID_TEMA</string>
       	</entry>
       	<entry>      	
-      		<string>denominazione</string>
-      		<string>DENOM</string>
-      	</entry>
+			<string>denominazione_it</string>
+			<string>DENOM_IT</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_en</string>
+			<string>DENOM_EN</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_de</string>
+			<string>DENOM_DE</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_fr</string>
+			<string>DENOM_FR</string>
+		</entry>
       	<entry>      	
       		<string>fk_tipo_uso</string>
       		<string>FK_GR_SCOL</string>
@@ -143,7 +179,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- strutture commerciali -->
+	  <!-- strutture commerciali ACOMM-->
       <int>7</int>
       <map>
      	<entry>      	
@@ -151,12 +187,36 @@
       		<string>ID_TEMA</string>
       	</entry>
       	<entry>      	
-      		<string>denominazione</string>
-      		<string>DENOM</string>
+			<string>denominazione_it</string>
+			<string>DENOM_IT</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_en</string>
+			<string>DENOM_EN</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_de</string>
+			<string>DENOM_DE</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_fr</string>
+			<string>DENOM_FR</string>
+		</entry>
+      	<entry>      	
+      		<string>insegna_it</string>
+      		<string>INSEGNA_IT</string>
       	</entry>
       	<entry>      	
-      		<string>insegna</string>
-      		<string>INSEGNA</string>
+      		<string>insegna_en</string>
+      		<string>INSEGNA_EN</string>
+      	</entry>
+      	<entry>      	
+      		<string>insegna_de</string>
+      		<string>INSEGNA_DE</string>
+      	</entry>
+      	<entry>      	
+      		<string>insegna_fr</string>
+      		<string>INSEGNA_FR</string>
       	</entry>
       	<entry>      	
       		<string>sup_vendita</string>
@@ -217,7 +277,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- aree protette -->
+	  <!-- aree protette APROT-->
       <int>12</int>
       <map>
       	<entry>      	
@@ -261,17 +321,45 @@
       </map>
     </entry>
     <entry>
-	  <!-- acque sotterranee -->
+	  <!-- acque sotterranee ASOTT-->
       <int>14</int>
       <map>
      	<entry>      	
       		<string>id_tematico</string>
       		<string>ID_TIPO</string>
       	</entry>
-      	<entry>      	
-      		<string>denominazione</string>
-      		<string>DENOM</string>
-      	</entry>
+		<entry>      	
+			<string>denominazione_it</string>
+			<string>DENOM_IT</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_en</string>
+			<string>DENOM_EN</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_de</string>
+			<string>DENOM_DE</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_fr</string>
+			<string>DENOM_FR</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_ente_de</string>
+			<string>DEN_ENT_DE</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_ente_en</string>
+			<string>DEN_ENT_EN</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_ente_fr</string>
+			<string>DEN_ENT_FR</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_ente_it</string>
+			<string>DEN_ENT_IT</string>
+		</entry>
       	<entry>      	
       		<string>profondita_max</string>
       		<string>PROF_MAX</string>
@@ -292,7 +380,7 @@
       </map>      
     </entry> 
     <entry>
-	  <!-- acque superficiali -->
+	  <!-- acque superficiali ASUP-->
       <int>15</int>
       <map>
       	<entry>      	
@@ -300,8 +388,36 @@
       		<string>ID_TEMA</string>
       	</entry>
       	<entry>      	
-      		<string>denominazione</string>
-      		<string>DENOM</string>
+      		<string>denominazione_it</string>
+      		<string>DENOM_IT</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_en</string>
+      		<string>DENOM_EN</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_fr</string>
+      		<string>DENOM_FR</string>
+      	</entry>
+      	<entry>      	
+      		<string>denominazione_de</string>
+      		<string>DENOM_DE</string>
+      	</entry>
+      	<entry>      	
+      		<string>toponimo_completo_de</string>
+      		<string>TOPON_DE</string>
+      	</entry>
+      	<entry>      	
+      		<string>toponimo_completo_it</string>
+      		<string>TOPON_IT</string>
+      	</entry>
+      	<entry>      	
+      		<string>toponimo_completo_fr</string>
+      		<string>TOPON_FR</string>
+      	</entry>
+      	<entry>      	
+      		<string>toponimo_completo_en</string>
+      		<string>TOPON_en</string>
       	</entry>
       	<entry>      	
       		<string>fk_classe_clc</string>
@@ -318,7 +434,7 @@
       </map>
     </entry>
     <entry>
-	  <!-- beni culturali -->
+	  <!-- beni culturali BCULT-->
       <int>16</int>
       <map>
       	<entry>      	
@@ -326,9 +442,21 @@
       		<string>ID_TEMA</string>
       	</entry>
       	<entry>      	
-      		<string>denominazione</string>
-      		<string>DESC_</string>
-      	</entry>
+			<string>denominazione_it</string>
+			<string>DESC_IT</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_en</string>
+			<string>DESC_EN</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_de</string>
+			<string>DESC_DE</string>
+		</entry>
+		<entry>      	
+			<string>denominazione_fr</string>
+			<string>DESC_FR</string>
+		</entry>
       	<entry>      	
       		<string>fk_tipo_bene</string>
       		<string>#{FK_BCULT == 0 ? null : FK_BCULT}</string>

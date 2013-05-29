@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -245,6 +246,20 @@ public abstract class IngestionObject {
 		return (Set<Integer>) unique.evaluate(inputReader
 				.getFeatures(new Query(inputTypeName, Filter.INCLUDE)));				
 	}
+	
+        protected Set<BigDecimal> getAggregationBigValues(String aggregateAttribute) throws IOException {
+            // get unique aggregation values
+            Function unique = filterFactory.function("Collection_Unique",
+                    filterFactory.property(aggregateAttribute));
+            FeatureCollection<SimpleFeatureType, SimpleFeature> features = inputReader
+                    .getFeatures(inputQuery);
+    
+            Set<BigDecimal> set = (Set<BigDecimal>)unique.evaluate(features);
+            if(set == null){
+                set = new HashSet<BigDecimal>(); 
+            }
+            return set;
+        }
 	
 	
 	/**
