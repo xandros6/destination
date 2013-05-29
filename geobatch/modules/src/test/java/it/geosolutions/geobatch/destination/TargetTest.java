@@ -21,7 +21,6 @@ import it.geosolutions.geobatch.catalog.Identifiable;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import junit.framework.TestCase;
@@ -52,7 +51,7 @@ public class TargetTest extends TestCase {
 			}
 		}));
 		
-		target.importTarget(cfg.getDataStore(), null);
+		target.importTarget(cfg.getDataStore(), null, false);
 		
 	}
 }
