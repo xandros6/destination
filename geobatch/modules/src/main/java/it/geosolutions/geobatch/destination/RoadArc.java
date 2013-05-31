@@ -613,20 +613,17 @@ public class RoadArc extends IngestionObject {
                             // compiles the attributes from target and read feature data, using mappings
                             // to match input attributes with output ones
                             for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
-                                    if(attr.getLocalName().equals(geoId)) {
-                                            featureBuilder.add(id);
-                                    } else if(attr.getLocalName().equals("cff")) {
+                                    if(attr.getLocalName().equals("cff")) {
                                             // compute the aritmetic average
                                             featureBuilder.add(cffElement/cff.length);
-                                    } else if(attr.getLocalName().equals("id_bersaglio")) {
-                                            featureBuilder.add(bersaglio.getProperty(Integer.toString(count)));
-                                    } else if(attr.getLocalName().equals("fk_partner")) {
+                                    }else if(attr.getLocalName().equals("fk_partner")) {
                                             featureBuilder.add(partner+"");
                                     } else {
                                             featureBuilder.add(null);
                                     }
                             }
-                            String featureid = id + "." + count;
+                            String idBersaglio = bersaglio.getProperty(Integer.toString(count+1));
+                            String featureid = id + "." + idBersaglio;
                             SimpleFeature feature = featureBuilder.buildFeature(featureid);
                             feature.getUserData().put(Hints.USE_PROVIDED_FID, true);                        
                             
