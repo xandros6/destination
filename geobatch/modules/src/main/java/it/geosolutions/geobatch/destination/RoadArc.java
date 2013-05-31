@@ -391,7 +391,7 @@ public class RoadArc extends IngestionObject {
 		int[] velocita = new int[] {0, 0};
 		double[] cff = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		Set<Integer> pterr = new HashSet<Integer>();
-		
+		int idOrigin = -1;
 		while( (inputFeature = readInput(iterator)) != null) {	
 			try {
 				if(aggregateGeo == null) {
@@ -404,6 +404,7 @@ public class RoadArc extends IngestionObject {
 				} else {
 					geo = aggregateGeo;
 				}
+				idOrigin = (idOrigin == -1)?((Number)getMapping(inputFeature, attributeMappings, "id_origine")).intValue():idOrigin;
 				int currentLunghezza = ((Number)getMapping(inputFeature, attributeMappings, "lunghezza")).intValue(); 
 				lunghezza +=  currentLunghezza;
 				incidenti += ((Number)getMapping(inputFeature, attributeMappings, "nr_incidenti")).intValue();
@@ -448,7 +449,7 @@ public class RoadArc extends IngestionObject {
 			
 			try {							
 				addAggregateGeoFeature(outputObjects[2], id, idTematico, geo,
-						lunghezza, corsie, incidenti, inputFeature);						
+						lunghezza, corsie, incidenti, inputFeature, idOrigin);						
 				addAggregateVehicleFeature(outputObjects[0], id, lunghezza,
 						tgm, velocita, inputFeature);
 				addAggregateDissestoFeature(outputObjects[1], id, lunghezza,
@@ -569,7 +570,7 @@ public class RoadArc extends IngestionObject {
 	 * @throws IOException 
 	 */
 	private void addAggregateGeoFeature(OutputObject outputObject, int id, int idTematico,
-			Geometry geo, int lunghezza, int corsie, int incidenti, SimpleFeature inputFeature) throws IOException {
+			Geometry geo, int lunghezza, int corsie, int incidenti, SimpleFeature inputFeature, int idOrigin) throws IOException {
 		SimpleFeatureBuilder geoFeatureBuilder = outputObject.getBuilder();
 		for(AttributeDescriptor attr : outputObject.getSchema().getAttributeDescriptors()) {
 			if(attr.getLocalName().equals(geoId)) {
@@ -584,6 +585,8 @@ public class RoadArc extends IngestionObject {
 				geoFeatureBuilder.add(lunghezza);
 			} else if(attr.getLocalName().equals("nr_incidenti")) {
 				geoFeatureBuilder.add(incidenti);
+			} else if(attr.getLocalName().equals("id_origine")) {
+			        geoFeatureBuilder.add(idOrigin);
 			} else if(attr.getLocalName().equals("nr_corsie")) {
 				if(lunghezza == 0) {
 					geoFeatureBuilder.add(0);
