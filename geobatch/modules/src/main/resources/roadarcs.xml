@@ -17,6 +17,10 @@
 		<string>LUNGHEZZA</string>
 	</entry>
 	<entry>      	
+		<string>flg_nr_incidenti</string>
+		<string>FLG_N_INC</string>
+	</entry>
+	<entry>      	
 		<string>flg_nr_corsie</string>
 		<string>FLG_N_CORS</string>
 	</entry>
