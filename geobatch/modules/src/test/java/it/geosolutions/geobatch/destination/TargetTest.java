@@ -18,6 +18,7 @@ package it.geosolutions.geobatch.destination;
 
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;

@@ -5,7 +5,7 @@ import org.geotools.process.factory.DescribeProcess;
 import org.geotools.text.Text;
 
 /**
- * Factory providing some buffer creating operations.
+ * Factory providing some operations for the destination project.
  * <p>
  * Internally this factory makes use of the information provided by
  * the {@link DescribeProcess} annotations to produce the correct
@@ -16,9 +16,13 @@ import org.geotools.text.Text;
  */
 public class DestinationProcessFactory extends AnnotatedBeanProcessFactory {
 
+	
+	
     public DestinationProcessFactory() {
         super(Text.text("Destination Process Factory"), "ds",                
                 MultipleBuffer.class);
     }
+    
+    
 
 }

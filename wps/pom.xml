@@ -58,7 +58,9 @@
         </developer>
     </developers>
 
-
+    <properties>
+        <gs.version>2.2-SNAPSHOT</gs.version>
+    </properties>
   <!-- =========================================================== -->
   <!--     Dependency Mangement                                    -->
   <!-- =========================================================== -->
@@ -72,8 +74,12 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-process-feature</artifactId>
             <version>${project.version}</version>
-        </dependency> 		
-        
+        </dependency>
+        <dependency>
+            <groupId>org.geoserver</groupId>
+            <artifactId>main</artifactId>
+            <version>${gs.version}</version>
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.geotools</groupId>
@@ -87,6 +93,7 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
+        
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
