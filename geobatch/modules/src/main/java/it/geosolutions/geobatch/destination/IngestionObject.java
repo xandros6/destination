@@ -304,7 +304,9 @@ public abstract class IngestionObject {
 		inputReader = Ingestion.createFeatureSource(dataStore, transaction,
 				featureName);		
 		inputQuery = new Query(featureName);
-	        sequenceManager = new SequenceManager(dataStore, this.getClass().getSimpleName()+SEQUENCE_SUFFIX);
+	        if(sequenceManager == null){
+		    sequenceManager = new SequenceManager(dataStore, this.getClass().getSimpleName()+SEQUENCE_SUFFIX);
+	        }
 		return inputReader;
 	}
 	
@@ -316,7 +318,10 @@ public abstract class IngestionObject {
 			inputIterator.close();
 			inputIterator = null;
 		}
-		sequenceManager.disposeManager();
+		if(inputIterator != null) {
+		    sequenceManager.disposeManager();
+		    sequenceManager = null;
+		}
 	}
 	
 	protected String getInputGeometryName(JDBCDataStore dataStore) throws IOException {
