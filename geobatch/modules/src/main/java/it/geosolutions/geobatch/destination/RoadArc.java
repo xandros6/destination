@@ -16,6 +16,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.common.ElementsCounter;
 import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -390,6 +392,8 @@ public class RoadArc extends IngestionObject {
 		int[] tgm = new int[] {0, 0};
 		int[] velocita = new int[] {0, 0};
 		double[] cff = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		ElementsCounter flgTgmCounter = new ElementsCounter();
+		ElementsCounter flgVelocCounter = new ElementsCounter();
 		Set<Integer> pterr = new HashSet<Integer>();
 		int idOrigin = -1;
 		while( (inputFeature = readInput(iterator)) != null) {	
@@ -410,14 +414,18 @@ public class RoadArc extends IngestionObject {
 				incidenti += ((Number)getMapping(inputFeature, attributeMappings, "nr_incidenti")).intValue();
 				corsie += ((Number)getMapping(inputFeature, attributeMappings, "nr_corsie")).intValue() * currentLunghezza;
 				
+				
 				// by vehicle
 				int[] tgms = extractMultipleValues(inputFeature, "TGM");
 				int[] velocitas = extractMultipleValues(inputFeature, "VELOCITA");
-				
 				for(int i=0; i<tgms.length; i++) {
 					tgm[i] += tgms[i] * currentLunghezza;
 					velocita[i] += velocitas[i] * currentLunghezza;
 				}
+				String currentFlgTGM = (String)inputFeature.getAttribute("FLG_TGM");
+				String currentFlgVeloc = (String)inputFeature.getAttribute("FLG_VELOC");
+				flgTgmCounter.addElement(currentFlgTGM);
+		                flgVelocCounter.addElement(currentFlgVeloc);
 				
 				// dissesto
 				String[] pterrs = inputFeature.getAttribute("PTERR") == null ? null : inputFeature.getAttribute("PTERR").toString().split("\\|");					
@@ -451,7 +459,7 @@ public class RoadArc extends IngestionObject {
 				addAggregateGeoFeature(outputObjects[2], id, idTematico, geo,
 						lunghezza, corsie, incidenti, inputFeature, idOrigin);						
 				addAggregateVehicleFeature(outputObjects[0], id, lunghezza,
-						tgm, velocita, inputFeature);
+						tgm, velocita, flgTgmCounter.getMax(), flgVelocCounter.getMax(), inputFeature);
 				addAggregateDissestoFeature(outputObjects[1], id, lunghezza,
 						pterr, inputFeature);
 				addAggregateCFFFeature(outputObjects[3],
@@ -523,7 +531,7 @@ public class RoadArc extends IngestionObject {
 	 * @throws IOException 
 	 */
 	private void addAggregateVehicleFeature(OutputObject outputObject, int id,
-			int lunghezza, int[] tgm, int[] velocita,
+			int lunghezza, int[] tgm, int[] velocita, String flgTgm, String flgVeloc,
 			SimpleFeature inputFeature) throws IOException {
 		SimpleFeatureBuilder byvehicleFeatureBuilder = outputObject.getBuilder();
 
@@ -539,7 +547,12 @@ public class RoadArc extends IngestionObject {
 					}
 				} else if(attr.getLocalName().equals("id_tipo_veicolo")) {
 					byvehicleFeatureBuilder.add(type + 1);
-				} else if(attr.getLocalName().equals("velocita_media")) {
+				} else if(attr.getLocalName().equals("flg_velocita")) {
+				        byvehicleFeatureBuilder.add(flgVeloc);
+                                } else if(attr.getLocalName().equals("flg_densita_veicolare")) {
+                                        byvehicleFeatureBuilder.add(flgTgm);    
+                                }
+				else if(attr.getLocalName().equals("velocita_media")) {
 					if(lunghezza == 0) {
 						byvehicleFeatureBuilder.add(0);
 					} else {
