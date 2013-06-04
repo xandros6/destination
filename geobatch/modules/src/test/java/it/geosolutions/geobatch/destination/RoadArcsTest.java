@@ -19,29 +19,25 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.geosolutions.geobatch.destination.commons;
+package it.geosolutions.geobatch.destination;
 
-import it.geosolutions.geobatch.destination.common.SequenceManager;
+import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.geotools.data.DataStoreFinder;
-import org.geotools.jdbc.JDBCDataStore;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.Test;
 
 /**
  * @author DamianoG
- *
+ * 
  */
-public class SequenceCreatorTest {
+public class RoadArcsTest {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SequenceCreatorTest.class);
-    
-    public static void main(String[] args) {
+    @Test
+    public void testImportTarget() throws IOException {
 
         Map<String, Serializable> datastoreParams = new HashMap<String, Serializable>();
         datastoreParams.put("port", 5432);
@@ -52,16 +48,11 @@ public class SequenceCreatorTest {
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
-
-        JDBCDataStore dataStore;
+        RoadArc arcsImport = new RoadArc("RP_C_Grafo_20130424",
+                new ProgressListenerForwarder(null));
         try {
-            dataStore = (JDBCDataStore) DataStoreFinder.getDataStore(datastoreParams);
-            SequenceManager sm = new SequenceManager(dataStore, "RP_BU-ASAN_20130424_02_seq");
-            LOGGER.info(sm.retrieveValue()+"");
-            LOGGER.info(sm.retrieveValue()+"");
-            sm.disposeManager();
+            arcsImport.importArcs(datastoreParams, null, 3, true, false);
         } catch (IOException e) {
         }
     }
-    
 }

@@ -16,6 +16,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.common.SequenceManager;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -76,6 +77,10 @@ public abstract class IngestionObject {
 	public static FilterFactory2 filterFactory = CommonFactoryFinder.getFilterFactory2();
 	
 	public static final int NO_TARGET = -1;
+	
+	private String SEQUENCE_SUFFIX = "_seq";
+	
+	private SequenceManager sequenceManager;
 	
 	//
 	private String inputTypeName = "";	
@@ -299,6 +304,7 @@ public abstract class IngestionObject {
 		inputReader = Ingestion.createFeatureSource(dataStore, transaction,
 				featureName);		
 		inputQuery = new Query(featureName);
+	        sequenceManager = new SequenceManager(dataStore, this.getClass().getSimpleName()+SEQUENCE_SUFFIX);
 		return inputReader;
 	}
 	
@@ -310,6 +316,7 @@ public abstract class IngestionObject {
 			inputIterator.close();
 			inputIterator = null;
 		}
+		sequenceManager.disposeManager();
 	}
 	
 	protected String getInputGeometryName(JDBCDataStore dataStore) throws IOException {
@@ -431,9 +438,11 @@ public abstract class IngestionObject {
 	 * 
 	 * @param id
 	 * @return
+	 * @throws IOException 
 	 */
-	protected int nextId(Number id) {		
-		return id.intValue() + (++readCount);
+	protected int nextId(Number id) throws IOException {
+	    return (int)sequenceManager.retrieveValue();
+		//return id.intValue() + (++readCount);
 	}
 	
 	/**
@@ -565,4 +574,8 @@ public abstract class IngestionObject {
 	public static Object readResourceFromXML(String resourceName) {
 		return xstream.fromXML(VectorTarget.class.getResourceAsStream(resourceName));
 	}
+	
+//	private createSequenceForInputType(){
+//	    this.inputTypeName
+//	}
 }

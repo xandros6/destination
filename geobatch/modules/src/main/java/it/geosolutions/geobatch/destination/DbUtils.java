@@ -106,9 +106,13 @@ public class DbUtils {
 	}
 	
 	/**
-	 * Executes an sql query on the given datastore connection.
-	 */
-	public static void executeSql(Connection conn, Transaction transaction, String sql, boolean commit) throws IOException, SQLException {		
+         * Executes an sql query on the given datastore connection.
+         */
+	public static void executeSql(Connection conn, Transaction transaction, String sql, boolean commit) throws IOException, SQLException {
+	    executeSql(conn, transaction, sql, commit, false);
+	}
+	
+	public static void executeSql(Connection conn, Transaction transaction, String sql, boolean commit, boolean silent) throws IOException, SQLException {		
 		Statement stmt = null;
 		
 		try {						
@@ -118,12 +122,14 @@ public class DbUtils {
 				transaction.commit();
 			}
 		} catch (IOException e) {
-			transaction.rollback();		
+			transaction.rollback();
 			LOGGER.error(e.getMessage(), e);
 			throw e;
 		} catch (SQLException e) {
 			transaction.rollback();		
-			LOGGER.error(e.getMessage(), e);
+			if(!silent){
+			    LOGGER.error(e.getMessage(), e);
+			}
 			throw e;
 			
 		} finally {
