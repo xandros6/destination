@@ -1,0 +1,57 @@
+<classpath>
+  <classpathentry kind="src" path="src/main/java"/>
+  <classpathentry kind="src" path="src/main/resources" excluding="**/*.java"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes"/>
+  <classpathentry kind="src" path="src/test/resources" output="target/test-classes" excluding="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4.jar" sourcepath="M2_REPO/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/geosolutions/.m2/repository/commons-pool/commons-pool/1.5.4/commons-pool-1.5.4-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-api/8-SNAPSHOT/gt-api-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-api/8-SNAPSHOT/gt-api-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-coverage/8-SNAPSHOT/gt-coverage-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-coverage/8-SNAPSHOT/gt-coverage-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-cql/8-SNAPSHOT/gt-cql-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-cql/8-SNAPSHOT/gt-cql-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-epsg-hsql/8-SNAPSHOT/gt-epsg-hsql-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-epsg-hsql/8-SNAPSHOT/gt-epsg-hsql-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-grid/8-SNAPSHOT/gt-grid-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-grid/8-SNAPSHOT/gt-grid-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-main/8-SNAPSHOT/gt-main-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-main/8-SNAPSHOT/gt-main-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-metadata/8-SNAPSHOT/gt-metadata-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-metadata/8-SNAPSHOT/gt-metadata-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-opengis/8-SNAPSHOT/gt-opengis-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-opengis/8-SNAPSHOT/gt-opengis-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-process/8-SNAPSHOT/gt-process-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-process/8-SNAPSHOT/gt-process-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-process-feature/8-SNAPSHOT/gt-process-feature-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-process-feature/8-SNAPSHOT/gt-process-feature-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-property/8-SNAPSHOT/gt-property-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-property/8-SNAPSHOT/gt-property-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-referencing/8-SNAPSHOT/gt-referencing-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-referencing/8-SNAPSHOT/gt-referencing-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/geotools/gt-sample-data/8-SNAPSHOT/gt-sample-data-8-SNAPSHOT.jar" sourcepath="M2_REPO/org/geotools/gt-sample-data/8-SNAPSHOT/gt-sample-data-8-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/hsqldb/hsqldb/1.8.0.7/hsqldb-1.8.0.7.jar"/>
+  <classpathentry kind="var" path="M2_REPO/it/geosolutions/imageio-ext/imageio-ext-tiff/1.1.7/imageio-ext-tiff-1.1.7.jar"/>
+  <classpathentry kind="var" path="M2_REPO/it/geosolutions/imageio-ext/imageio-ext-utilities/1.1.7/imageio-ext-utilities-1.1.7.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/media/jai_codec/1.1.3/jai_codec-1.1.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/media/jai_core/1.1.3/jai_core-1.1.3.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/geosolutions/.m2/repository/javax/media/jai_core/1.1.3/jai_core-1.1.3-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/javax/media/jai_imageio/1.1/jai_imageio-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jdom/jdom/1.0/jdom-1.0.jar" sourcepath="M2_REPO/jdom/jdom/1.0/jdom-1.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jgridshift/jgridshift/1.0/jgridshift-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/net/java/dev/jsr-275/jsr-275/1.0-beta-2/jsr-275-1.0-beta-2.jar" sourcepath="M2_REPO/net/java/dev/jsr-275/jsr-275/1.0-beta-2/jsr-275-1.0-beta-2-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/geosolutions/.m2/repository/net/java/dev/jsr-275/jsr-275/1.0-beta-2/jsr-275-1.0-beta-2-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/jaitools/jt-utils/1.3.0/jt-utils-1.3.0.jar" sourcepath="M2_REPO/org/jaitools/jt-utils/1.3.0/jt-utils-1.3.0-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/geosolutions/.m2/repository/org/jaitools/jt-utils/1.3.0/jt-utils-1.3.0-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/jaitools/jt-zonalstats/1.3.0/jt-zonalstats-1.3.0.jar" sourcepath="M2_REPO/org/jaitools/jt-zonalstats/1.3.0/jt-zonalstats-1.3.0-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/geosolutions/.m2/repository/org/jaitools/jt-zonalstats/1.3.0/jt-zonalstats-1.3.0-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/vividsolutions/jts/1.12/jts-1.12.jar" sourcepath="M2_REPO/com/vividsolutions/jts/1.12/jts-1.12-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.4/junit-4.4.jar" sourcepath="M2_REPO/junit/junit/4.4/junit-4.4-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/java3d/vecmath/1.3.2/vecmath-1.3.2.jar"/>
+  <classpathentry kind="var" path="M2_REPO/xerces/xercesImpl/2.7.1/xercesImpl-2.7.1.jar" sourcepath="M2_REPO/xerces/xercesImpl/2.7.1/xercesImpl-2.7.1-sources.jar"/>
+</classpath>
