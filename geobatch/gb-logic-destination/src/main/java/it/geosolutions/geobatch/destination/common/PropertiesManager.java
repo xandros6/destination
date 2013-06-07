@@ -46,9 +46,12 @@ public class PropertiesManager {
     public PropertiesManager() {
     }
 
-    public static Properties loadProperty(String path) {
+    public static Properties loadProperty(String base, String name) {
         Properties targetProp = new Properties();
-        InputStream is = loadInputStream(path);
+        InputStream is = loadInputStream(base + name);
+        if(is == null){
+            is = loadInputStream(name);
+        }
         try {
             targetProp.load(is);
         } catch (Exception e) {
@@ -78,7 +81,7 @@ public class PropertiesManager {
             try {
                 is = new FileInputStream(new File(pathName));
             } catch (FileNotFoundException e) {
-                LOGGER.error(e.getMessage(), e);
+                LOGGER.trace(e.getMessage(), e);
             }
         }
         return is;
