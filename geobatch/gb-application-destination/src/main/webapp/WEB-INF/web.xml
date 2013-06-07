@@ -21,7 +21,6 @@
 		<param-value>
 			classpath*:applicationContext.xml 
 			WEB-INF/applicationContextSecurity.xml
-			WEB-INF/applicationContext-unredd.xml
         </param-value>
 	</context-param>
 	<!--  spring context loader -->
@@ -36,19 +35,6 @@
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	
-	<!-- Restlet adapter -->
-    <servlet>
-        <servlet-name>rservlet</servlet-name>
-        <servlet-class>
-             com.noelios.restlet.ext.spring.RestletFrameworkServlet
-        </servlet-class>
-        <init-param>
-            <param-name>contextConfigLocation</param-name>
-            <param-value>classpath*:/rservlet-servlet.xml</param-value>
-        </init-param>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-	
 	<!-- context-param>
 		<param-name>GEOBATCH_DATA_DIR</param-name>
 		<param-value>/opt/geobatch/data</param-value>
@@ -61,12 +47,6 @@
 		<servlet-name>geobatch</servlet-name>
 		<url-pattern>*.form</url-pattern>
 	</servlet-mapping>
-
-    <!-- Catch all request URIs starting with  prefix /rest-->
-    <servlet-mapping>
-        <servlet-name>rservlet</servlet-name>
-        <url-pattern>/rest/*</url-pattern>
-    </servlet-mapping>
 
 	<filter>
         <filter-name>springSecurityFilterChain</filter-name>

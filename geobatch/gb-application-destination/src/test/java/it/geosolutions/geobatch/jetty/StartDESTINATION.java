@@ -42,8 +42,8 @@ import org.slf4j.LoggerFactory;
  * @author wolf
  * 
  */
-public class StartUNREDD {
-    private static final Logger log = LoggerFactory.getLogger(StartUNREDD.class);
+public class StartDESTINATION {
+    private static final Logger log = LoggerFactory.getLogger(StartDESTINATION.class);
 
     public static void main(String[] args) {
         Server jettyServer = null;
@@ -61,7 +61,7 @@ public class StartUNREDD {
             int port = parsePort(portVariable);
 
             if (port <= 0) {
-                port = 8084;
+                port = 8081;
             }
 
             conn.setPort(port);
