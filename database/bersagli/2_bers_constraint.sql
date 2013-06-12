@@ -1,0 +1,40 @@
+/* Creazione di PK, CHECK e FK */
+
+ALTER TABLE siig_geo_bers_non_umano_pt ADD CONSTRAINT pk_siig_geo_bers_non_umano_pt PRIMARY KEY (idgeo_bers_non_umano_pt);
+ALTER TABLE siig_d_iucn ADD CONSTRAINT pk_siig_d_iucn PRIMARY KEY (id_iucn);
+ALTER TABLE siig_geo_bers_non_umano_ln ADD CONSTRAINT pk_siig_geo_bers_non_umano_ln PRIMARY KEY (idgeo_bers_non_umano_ln);
+ALTER TABLE siig_d_bene_culturale ADD CONSTRAINT pk_siig_d_bene_culturale PRIMARY KEY (id_tipo_bene);
+ALTER TABLE siig_geo_bersaglio_umano_pt ADD CONSTRAINT pk_siig_geo_bersaglio_umano_pt PRIMARY KEY (idgeo_bersaglio_umano_pt);
+ALTER TABLE siig_d_ateco ADD CONSTRAINT pk_siig_d_ateco PRIMARY KEY (id_ateco);
+ALTER TABLE siig_geo_bers_non_umano_pl ADD CONSTRAINT pk_siig_geo_bers_non_umano_pl PRIMARY KEY (idgeo_bers_non_umano_pl);
+ALTER TABLE siig_geo_bersaglio_umano_pl ADD CONSTRAINT pk_siig_geo_bersaglio_umano_pl PRIMARY KEY (idgeo_bersaglio_umano_pl);
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT pk_siig_t_bersaglio_umano PRIMARY KEY (id_tematico,id_bersaglio,id_partner);
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c33 CHECK (FLG_NR_ADDETTI_SCUOLE IN ('C','S'));
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c32 CHECK (FLG_NR_ISCRITTI IN ('C','S'));
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c29 CHECK (FLG_LETTI_ORDINARI IN ('C','S'));
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c35 CHECK (FLG_NR_ADDETTI_COMM IN ('C','S'));
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c34 CHECK (FLG_NR_UTENTI IN ('C','S'));
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c31 CHECK (FLG_NR_ADDETTI_H IN ('C','S'));
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT dom_s_c30 CHECK (FLG_LETTI_DAY_H IN ('C','S'));
+ALTER TABLE siig_d_classe_clc ADD CONSTRAINT pk_siig_d_classe_clc PRIMARY KEY (id_classe_clc);
+ALTER TABLE siig_d_tipo_captazione ADD CONSTRAINT pk_siig_d_tipo_captazione PRIMARY KEY (id_tipo_captazione);
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT pk_siig_t_bersaglio_non_umano PRIMARY KEY (id_tematico,id_bersaglio,id_partner);
+ALTER TABLE siig_d_tipo_uso ADD CONSTRAINT pk_siig_d_tipo_uso PRIMARY KEY (id_tipo_uso);
+ALTER TABLE siig_d_partner ADD CONSTRAINT pk_siig_d_partner PRIMARY KEY (id_partner);
+
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT fk_siig_t_bersaglio_01 FOREIGN KEY (id_bersaglio) REFERENCES siig_t_bersaglio (id_bersaglio) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT fk_siig_d_partner_01 FOREIGN KEY (id_partner) REFERENCES siig_d_partner (id_partner) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT fk_siig_geo_bers_umano_pl_01 FOREIGN KEY (fk_bersaglio_umano_pl) REFERENCES siig_geo_bersaglio_umano_pl (idgeo_bersaglio_umano_pl) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT fk_siig_geo_bers_umano_pt_01 FOREIGN KEY (fk_bersaglio_umano_pt) REFERENCES siig_geo_bersaglio_umano_pt (idgeo_bersaglio_umano_pt) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT fk_siig_d_tipo_uso_01 FOREIGN KEY (fk_tipo_uso) REFERENCES siig_d_tipo_uso (id_tipo_uso) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_umano ADD CONSTRAINT fk_siig_d_ateco_01 FOREIGN KEY (fk_ateco) REFERENCES siig_d_ateco (id_ateco) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_d_partner_02 FOREIGN KEY (id_partner) REFERENCES siig_d_partner (id_partner) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_t_bersaglio_08 FOREIGN KEY (id_bersaglio) REFERENCES siig_t_bersaglio (id_bersaglio) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_d_tipo_uso_02 FOREIGN KEY (fk_tipo_uso) REFERENCES siig_d_tipo_uso (id_tipo_uso) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_d_tipo_captazione_01 FOREIGN KEY (fk_tipo_captazione) REFERENCES siig_d_tipo_captazione (id_tipo_captazione) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_d_bene_culturale_01 FOREIGN KEY (fk_tipo_bene) REFERENCES siig_d_bene_culturale (id_tipo_bene) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_geo_bers_non_um_pl_01 FOREIGN KEY (fk_bers_non_umano_pl) REFERENCES siig_geo_bers_non_umano_pl (idgeo_bers_non_umano_pl) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_geo_bers_non_um_ln_01 FOREIGN KEY (fk_bers_non_umano_ln) REFERENCES siig_geo_bers_non_umano_ln (idgeo_bers_non_umano_ln) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_geo_bers_non_um_pt_01 FOREIGN KEY (fk_bers_non_umano_pt) REFERENCES siig_geo_bers_non_umano_pt (idgeo_bers_non_umano_pt) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_d_iucn_01 FOREIGN KEY (fk_iucn) REFERENCES siig_d_iucn (id_iucn) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE siig_t_bersaglio_non_umano ADD CONSTRAINT fk_siig_d_classe_clc_01 FOREIGN KEY (fk_classe_clc) REFERENCES siig_d_classe_clc (id_classe_clc) ON DELETE NO ACTION NOT DEFERRABLE INITIALLY IMMEDIATE;

@@ -1,0 +1,16 @@
+<layer>
+  <name>acque_superficiali</name>
+  <id>LayerInfoImpl--67fd9ceb:13ccdbc5905:-3c88</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--67fd9ceb:13ccdbc5905:-3c87</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--67fd9ceb:13ccdbc5905:-3c89</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>
