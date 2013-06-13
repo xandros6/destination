@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,7 +34,7 @@ import org.junit.Test;
  */
 public class RoadArcTest extends TestCase {
 
-	@Test
+	@Test  @Ignore
 	public void testImportArcs() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
@@ -55,7 +56,7 @@ public class RoadArcTest extends TestCase {
 		
 	}
 	
-	@Test
+	@Test  @Ignore
 	public void testRemoveZeros() throws IOException {
 		String input = "D:\\Develop\\arcsoutput.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
@@ -77,7 +78,7 @@ public class RoadArcTest extends TestCase {
 		
 	}
 	
-	@Test
+	@Test  @Ignore
 	public void testAggregateArcs() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
@@ -98,8 +99,8 @@ public class RoadArcTest extends TestCase {
 		arc.importArcs(cfg.getDataStore(), null, 2, false, false);
 		
 	}
-	
-	@Test
+	 
+	@Test  @Ignore
 	public void testAggregateGrid() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));

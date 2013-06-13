@@ -1,6 +1,4 @@
 /*
- *  fra2015
- *  https://github.com/geosolutions-it/fra2015
  *  Copyright (C) 2007-2012 GeoSolutions S.A.S.
  *  http://www.geo-solutions.it
  *

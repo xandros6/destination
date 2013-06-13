@@ -1,6 +1,4 @@
 /*
- *  fra2015
- *  https://github.com/geosolutions-it/fra2015
  *  Copyright (C) 2007-2012 GeoSolutions S.A.S.
  *  http://www.geo-solutions.it
  *
@@ -28,6 +26,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -36,7 +35,7 @@ import org.junit.Test;
  */
 public class RoadArcsTest {
 
-    @Test
+    @Test @Ignore
     public void testImportTarget() throws IOException {
 
         Map<String, Serializable> datastoreParams = new HashMap<String, Serializable>();

@@ -29,6 +29,7 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -37,7 +38,7 @@ import org.junit.Test;
  */
 public class ImportArcs extends TestCase {
 
-    @Test
+    @Test @Ignore
     public void testImportArcs() {
         importArcs();
     }
