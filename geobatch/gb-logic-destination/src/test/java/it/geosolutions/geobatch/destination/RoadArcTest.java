@@ -32,7 +32,7 @@ import org.junit.Test;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public class RoadArcTest extends TestCase {
+public class RoadArcTest {
 
 	@Test  @Ignore
 	public void testImportArcs() throws IOException {

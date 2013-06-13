@@ -36,7 +36,7 @@ import org.junit.Test;
  * @author DamianoG
  * 
  */
-public class ImportArcs extends TestCase {
+public class ImportArcs{
 
     @Test @Ignore
     public void testImportArcs() {

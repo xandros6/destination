@@ -35,9 +35,11 @@ import org.slf4j.LoggerFactory;
  * @author DamianoG
  *
  */
-public class SequenceCreatorTest {
+public class SequenceCreatorTester {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(SequenceCreatorTest.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(SequenceCreatorTester.class);
+    
+    public SequenceCreatorTester(){}
     
     public static void main(String[] args) {
 

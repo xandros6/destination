@@ -26,15 +26,18 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author DamianoG
  *
  */
-public class TargetPropertiesLoaderTest extends Assert{
+public class TargetPropertiesLoaderTest {
 
-    @Test
+    public TargetPropertiesLoaderTest(){};
+    
+    @Test @Ignore
     public void testTargetLoading(){
         
         System.setProperty("EXTERNAL_PROP_DIR_PATH", "C:\\Users\\geosolutions\\Documents\\destination\\targets_raster\\tiled");
@@ -49,11 +52,11 @@ public class TargetPropertiesLoaderTest extends Assert{
         Map<Integer, String> m1 = tpl.getTargetValuesZone();
         List<Integer> l1 = tpl.getAllCopSuoloValues();
         
-        assertNotNull(mm);
-        assertNotNull(p1);
-        assertNotNull(p2);
-        assertNotNull(p3);
-        assertNotNull(m1);
-        assertNotNull(l1);
+        Assert.assertNotNull(mm);
+        Assert.assertNotNull(p1);
+        Assert.assertNotNull(p2);
+        Assert.assertNotNull(p3);
+        Assert.assertNotNull(m1);
+        Assert.assertNotNull(l1);
     }
 }

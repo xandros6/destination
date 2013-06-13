@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  * 
  */
-public class TargetTest{
+public class TargetRunner{
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TargetTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TargetRunner.class);
     
     private class TargetThread implements Runnable {
 
@@ -69,7 +69,7 @@ public class TargetTest{
                 new ProgressListenerForwarder(null));
         VectorTarget targetIngestion2 = new VectorTarget("RP_BU-ASAN_20130424_02",
                 new ProgressListenerForwarder(null));
-        TargetTest vtest = new TargetTest();
+        TargetRunner vtest = new TargetRunner();
         
         TargetThread vt1 = vtest.new TargetThread(targetIngestion1, datastoreParams);
         Thread t1 = new Thread(vt1);
