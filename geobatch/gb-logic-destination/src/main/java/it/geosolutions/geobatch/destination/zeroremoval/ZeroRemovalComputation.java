@@ -43,6 +43,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This class implements the zero removal computation.
+ * It uses as source and target the same table, one of the arc geometry tables (siig_geo_ln_arco_X) 
+ * It is responsible for compute the NR_INCIDENTI_ELAB field starting from the values taken from NR_INCIDENTI
+ * The process entry point is the method removeZeros that is called by the groovy script.
+ * 
+ * Due to some problems that the total risk formula has to manage arcs with a number of incident equals to 0
+ * we want to calculate the field NR_INCIDENTI_ELAB from NR_INCIDENTI "spreading" the records with NR_INCIDENTI > 0 on those that have that value = 0
+ * The total risk formula will use NR_INCIDENTI_ELAB instead of NR_INCIDENTI
+ * 
+ * The algorithm is this:
+ * 
+ *      given a road
+ *              foreach arcs in road
+ *                      if NR_INCIDENTI = 0
+ *                              NR_INCIDENTI_ELAB = NR_INCIDENTI + (kInc * weightedAverage)
+ *                      if NR_INCIDENTI > 0
+ *                              NR_INCIDENTI_ELAB = NR_INCIDENTI - (kInc * weightedAverage * n / m)
+ *      
+ *       where:
+ *                         kInc = a global correction factor (default is KINCR_DEFAULT_VALUE)
+ *              weightedAverage = average of incidents weighted on arcs length
+ *                            n = sum of the length of arcs with NR_INCIDENTI = 0
+ *                            m = sum of the length of arcs with NR_INCIDENTI > 0                              
+ * 
  * @author DamianoG
  * 
  */
@@ -53,55 +77,41 @@ public class ZeroRemovalComputation extends IngestionObject {
     private static Pattern TYPE_NAME_PARTS = Pattern
             .compile("^([a-z]{4})_([a-z]{3})_([a-z]{2})_([a-z]{4})_([1-3]{1})");
 
-    private static String GRID_TYPE_NAME = "siig_geo_grid";
-
-    private static String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
-
-    private static String NR_INCIDENTI = "nr_incidenti";
-
-    private static String LUNGHEZZA = "lunghezza";
-
-    private static String GEOID = "id_geo_arco";
-
-    private static String ID_ORIGIN = "id_origine";
+    private static final String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
+    private static final String NR_INCIDENTI = "nr_incidenti";
+    private static final String LUNGHEZZA = "lunghezza";
+    private static final String GEOID = "id_geo_arco";
+    private static final String ID_ORIGIN = "id_origine";
+    private static final String PARTNER_FIELD = "fk_partner";
+    private static final double KINCR_DEFAULT_VALUE = .2;
     
-    private static String PARTNER_FIELD = "fk_partner";
-
-    public static Properties aggregation = new Properties();
-
-    private static Map attributeMappings = null;
-
-    private int partner;
-
-    static {
-        // load mappings from resources
-        attributeMappings = (Map) readResourceFromXML("/roadarcs.xml");
-
-        InputStream aggregationStream = null;
-        try {
-            aggregationStream = RoadArc.class.getResourceAsStream("/aggregation.properties");
-            aggregation.load(aggregationStream);
-        } catch (IOException e) {
-            LOGGER.error("Unable to load configuration: " + e.getMessage(), e);
-        } finally {
-            try {
-                if (aggregationStream != null) {
-                    aggregationStream.close();
-                }
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
-    }
+    /**
+     * A value that multiply all weightedAverage in order to avoid negative results
+     */
+    private double kInc;
 
     /**
+     * 
+     * @param kIncr
      * @param inputTypeName
      * @param listenerForwarder
      */
-    public ZeroRemovalComputation(int partner, String inputTypeName,
+    public ZeroRemovalComputation(double kIncr, String inputTypeName,
             ProgressListenerForwarder listenerForwarder) {
         super(inputTypeName, listenerForwarder);
-        this.partner = partner;
+        this.kInc = kIncr;
+    }
+    
+    /**
+     * This constructor set the default value KINCR_DEFAULT_VALUE to kIncr field 
+     * 
+     * @param inputTypeName
+     * @param listenerForwarder
+     */
+    public ZeroRemovalComputation(String inputTypeName,
+            ProgressListenerForwarder listenerForwarder) {
+        super(inputTypeName, listenerForwarder);
+        this.kInc = KINCR_DEFAULT_VALUE;
     }
 
     @Override
@@ -114,7 +124,8 @@ public class ZeroRemovalComputation extends IngestionObject {
     }
 
     /**
-     * @param geoTypeName2
+     * 
+     * @param typeName
      * @param aggregationLevel
      * @return
      */
@@ -123,18 +134,21 @@ public class ZeroRemovalComputation extends IngestionObject {
     }
 
     /**
-     * Imports the arcs feature from the original Feature to the SIIG arcs tables (in staging).
+     * 
+     * This method implements the zero removal startegy. see the class javadoc.
      * 
      * @param datastoreParams
      * @param crs
+     * @param aggregationLevel
+     * @param onGrid
+     * @param partnerId
      * @throws IOException
      */
     public void removeZeros(Map<String, Serializable> datastoreParams,
-            CoordinateReferenceSystem crs, int aggregationLevel, boolean onGrid, int partner_id)
+            CoordinateReferenceSystem crs, int aggregationLevel, int partnerId)
             throws IOException {
         reset();
 
-        double kinc = 1;
         if (isValid()) {
             JDBCDataStore dataStore = null;
 
@@ -150,32 +164,34 @@ public class ZeroRemovalComputation extends IngestionObject {
             try {
                 dataStore = connectToDataStore(datastoreParams);
 
-//                Ingestion.Process importData = getProcessData(dataStore);
-//                process = importData.getId();
-//                trace = importData.getMaxTrace();
-//                errors = importData.getMaxError();
-
                 // setup input reader
-                createInputReader(dataStore, null, onGrid ? GRID_TYPE_NAME : null);
+                createInputReader(dataStore, null, null);
 
                 // setup geo output object
                 String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
                 OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
 
                 setInputFilter(filterFactory.equals(filterFactory.property(PARTNER_FIELD),
-                        filterFactory.literal(partner_id)));
-                // get unique aggregation values
+                        filterFactory.literal(partnerId)));
+                // get unique aggregation values in order to identify the roads
                 Set<BigDecimal> aggregationValues = getAggregationBigValues(ID_ORIGIN);
 
                 for (BigDecimal aggregationValue : aggregationValues) {
+                    //
+                    // First of all filter all the arcs to a specified road and partner 
+                    //
                     setInputFilter(filterFactory.and(filterFactory.equals(
                             filterFactory.property(ID_ORIGIN),
-                            filterFactory.literal(aggregationValue)), filterFactory.equals(
-                            filterFactory.property(PARTNER_FIELD),
-                            filterFactory.literal(partner_id))));
+                            filterFactory.literal(aggregationValue)),
+                            filterFactory.equals(filterFactory.property(PARTNER_FIELD),
+                                    filterFactory.literal(partnerId))));
                     int arcs = getImportCount();
                     Long incidenti = (Long) getSumOnInput(NR_INCIDENTI, new Long(0)).longValue();
                     if (incidenti != 0) {
+                        
+                        //
+                        // Calculate  weightedAverage, n, m for the current road 
+                        //
                         Long lunghezzaTotale = (Long) getSumOnInput(LUNGHEZZA, new Long(0)).longValue();
 
                         Double weightedSum = 0.0;
@@ -204,11 +220,14 @@ public class ZeroRemovalComputation extends IngestionObject {
                             closeInputReader();
                         }
 
-                        Double avg = weightedSum / lunghezzaTotale;
+                        Double weightedAvg = weightedSum / lunghezzaTotale;
 
-                        Double inc = kinc * avg;
+                        Double inc = kInc * weightedAvg;
                         Double dec = inc * n / m;
-
+                        
+                        //
+                        // Then apply the incr or the decr to the arcs
+                        //
                         try {
                             while ((inputFeature = readInput()) != null) {
                                 int nrIncidenti = ((BigDecimal) inputFeature

@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import junit.framework.Assert;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
@@ -60,18 +62,41 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
     
     private final static Logger LOGGER = LoggerFactory.getLogger(PostgisOnlineTestCase.class);
     
-    public static final String TEST_VULNERABILITY_TABLE = "tmp_vulnerability";
+    public String testTable;
     
     protected JDBCDataStore dataStore;
     protected OutputObject vulnerabilityObj;
-    protected Transaction outTransaction = null;
+    protected Transaction outTransaction;
+    protected String tableName;
     
+    /**
+     * The table where to copy the schema
+     */
+    protected String originTable;
+    
+    /**
+     * @param originTable the originTable to set
+     */
+    public void setOriginTable(String originTable) {
+        this.originTable = originTable;
+    }
+
+    /**
+     * @return the originTable
+     */
+    public String getOriginTable() {
+        return originTable;
+    }
+
+
+
     protected abstract String getFixtureId();
 
     @Before
     public void before() throws Exception {
         LOGGER.debug(" BaseTest:: <start_of_before()> Create temporary resources on DB...");
-        super.before();         
+        super.before();
+        this.testTable = (testTable == null)? "tmp_table_test" : this.testTable;
         try{
             connect();
         } catch(Exception e) {
@@ -84,7 +109,7 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         dataStore.createSchema(getTmpTable());
         try{
             
-            vulnerabilityObj = new OutputObject(dataStore, outTransaction, TEST_VULNERABILITY_TABLE, VulnerabilityComputation.GEOID);
+            vulnerabilityObj = new OutputObject(dataStore, outTransaction, testTable, VulnerabilityComputation.GEOID);
             loadFeature(vulnerabilityObj);
         }
         finally{
@@ -172,29 +197,20 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         return ret;
     }
     
-    private SimpleFeatureType getTmpTable() throws IOException{
-        SimpleFeatureType schema = (SimpleFeatureType) dataStore.getSchema(VulnerabilityComputation.VULNERABILITY_TYPE_NAME.replace("X", "1"));
+    protected SimpleFeatureType getTmpTable() throws IOException{
+        if(originTable == null){
+            Assert.fail("You must setup the origin table to copy, call the method setOriginTable(tableName) where tableName is an existing table into the schema");
+        }
+        SimpleFeatureType schema = (SimpleFeatureType) dataStore.getSchema(originTable);
         SimpleFeatureTypeBuilder sftb = new SimpleFeatureTypeBuilder();
-        sftb.setName(TEST_VULNERABILITY_TABLE);
+        sftb.setName(testTable);
         sftb.add("id_geo_arco", Integer.class);
         sftb.add("id_distanza", Integer.class);
         sftb.addAll(schema.getAttributeDescriptors());
         return sftb.buildFeatureType();
     }
     
-    private void loadFeature(OutputObject objOut) throws IOException{
-        List<SimpleFeature> list = new ArrayList<SimpleFeature>();
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|2|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid3=3|3|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid4=4|4|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid5=5|5|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid6=6|6|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid7=7|7|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=8|8|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=9|9|8|0|0|0|0|0|0|0|0|0|0|0|0|0|0|2"));
-        SimpleFeatureCollection sfc = DataUtilities.collection(list);
-        objOut.getWriter().addFeatures(sfc);
+    protected void loadFeature(OutputObject objOut) throws IOException{
     }
     
     private void removeTable() throws Exception{
@@ -205,11 +221,12 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         try{
             c = dataStore.getConnection(t);
             stmt = c.createStatement();
-            String sql = "DROP TABLE " +  dataStore.getDatabaseSchema() + "." + VulnerabilityOperationTest.TEST_VULNERABILITY_TABLE;
+            String sql = "DROP TABLE " +  dataStore.getDatabaseSchema() + "." + testTable;
             stmt.executeUpdate(sql);
         }
         catch(SQLException e){
-            // An exception occurs? Maybe the table is already been deleted... swallow the exception...
+         // An exception occurs? Maybe the table is already been deleted... swallow the exception...
+            LOGGER.warn("table don't dropped...");
         }
         finally{
             if(t != null){
