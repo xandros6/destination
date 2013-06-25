@@ -1,14 +1,12 @@
+target/
+
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+*.log
 .classpath
 .project
-.settings
-*/target
-data
-raster
-target
-deploy
+.settings/
