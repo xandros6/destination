@@ -14,10 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.ingestion;
 
-import it.geosolutions.geobatch.destination.common.ElementsCounter;
-import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
+import it.geosolutions.geobatch.destination.common.InputObject;
+import it.geosolutions.geobatch.destination.common.OutputObject;
+import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -55,9 +56,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public class RoadArc extends IngestionObject {
+public class ArcsIngestionProcess extends InputObject {
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(RoadArc.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(ArcsIngestionProcess.class);
 		
 	private static Pattern typeNameParts  = Pattern.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");
 	
@@ -90,8 +91,8 @@ public class RoadArc extends IngestionObject {
 		InputStream aggregationStream = null;
                 InputStream bersaglioStream = null;
 		try {
-		        aggregationStream = RoadArc.class.getResourceAsStream("/aggregation.properties");
-		        bersaglioStream = RoadArc.class.getResourceAsStream("/bersaglio.properties");
+		        aggregationStream = ArcsIngestionProcess.class.getResourceAsStream("/aggregation.properties");
+		        bersaglioStream = ArcsIngestionProcess.class.getResourceAsStream("/bersaglio.properties");
 			aggregation.load(aggregationStream);
 			bersaglio.load(bersaglioStream);
 		} catch (IOException e) {
@@ -119,7 +120,7 @@ public class RoadArc extends IngestionObject {
 	 * 
 	 * @param inputTypeName
 	 */
-	public RoadArc(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
+	public ArcsIngestionProcess(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
 		super(inputTypeName, listenerForwarder);		
 	}
 	
@@ -190,7 +191,7 @@ public class RoadArc extends IngestionObject {
 					trace = logFile(dataStore,  process, NO_TARGET,
 							partner, codicePartner, date, false);
 				} else {
-					Ingestion.Process importData = getProcessData(dataStore);
+					MetadataIngestionHandler.Process importData = getProcessData(dataStore);
 					process = importData.getId();
 					trace = importData.getMaxTrace();
 					errors = importData.getMaxError();
@@ -238,7 +239,7 @@ public class RoadArc extends IngestionObject {
 					transaction.commit();	
 				} catch (IOException e) {
 					errors++;	
-					Ingestion.logError(dataStore, trace, errors, "Error removing old data", getError(e), 0);					
+					MetadataIngestionHandler.logError(dataStore, trace, errors, "Error removing old data", getError(e), 0);					
 					transaction.rollback();					
 					throw e;
 				} finally {
@@ -259,10 +260,10 @@ public class RoadArc extends IngestionObject {
 					processPhase = "B";
 					errors = aggregateArcs(trace, dataStore, outputObjects, maxId.intValue(), total, errors, geoName, aggregationLevel);
 				}
-				Ingestion.updateLogFile(dataStore, trace, total, errors, processPhase);
+				MetadataIngestionHandler.updateLogFile(dataStore, trace, total, errors, processPhase);
 			} catch (IOException e) {
 				errors++;	
-				Ingestion.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);				
+				MetadataIngestionHandler.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);				
 				throw e;
 			} finally {
 				if(dropInput) {
@@ -271,7 +272,7 @@ public class RoadArc extends IngestionObject {
 				
 				if(process != -1) {
 					// close current process phase
-					Ingestion.closeProcessPhase(dataStore, process, processPhase);
+					MetadataIngestionHandler.closeProcessPhase(dataStore, process, processPhase);
 				}
 				
 				if(dataStore != null) {
@@ -446,7 +447,7 @@ public class RoadArc extends IngestionObject {
 				
 			} catch(Exception e) {						
 				errors++;
-				Ingestion.logError(dataStore, trace, errors,
+				MetadataIngestionHandler.logError(dataStore, trace, errors,
 						"Error writing output feature", getError(e),
 						idTematico);
 			}
@@ -474,7 +475,7 @@ public class RoadArc extends IngestionObject {
 				errors++;
 				rollbackId();
 				rowTransaction.rollback();
-				Ingestion.logError(dataStore, trace, errors,
+				MetadataIngestionHandler.logError(dataStore, trace, errors,
 						"Error writing output feature", getError(e),
 						idTematico);
 			} finally {	
@@ -683,7 +684,7 @@ public class RoadArc extends IngestionObject {
 			errors++;
 			rollbackId();
 			rowTransaction.rollback();
-			Ingestion.logError(dataStore, trace, errors,
+			MetadataIngestionHandler.logError(dataStore, trace, errors,
 					"Error writing output feature", getError(e),
 					idTematico);
 		} finally {				

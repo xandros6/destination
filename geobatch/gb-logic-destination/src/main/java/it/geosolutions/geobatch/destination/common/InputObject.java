@@ -14,9 +14,12 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.common;
 
-import it.geosolutions.geobatch.destination.common.SequenceManager;
+import it.geosolutions.geobatch.destination.common.utils.DbUtils;
+import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
+import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
+import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -60,7 +63,7 @@ import com.thoughtworks.xstream.XStream;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public abstract class IngestionObject {
+public abstract class InputObject {
 	
 	private static final XStream xstream = new XStream();
 	
@@ -70,7 +73,7 @@ public abstract class IngestionObject {
 	
 	public static StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(IngestionObject.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(InputObject.class);
 	
 	private static CoordinateReferenceSystem defaultCrs = null;
 	
@@ -99,7 +102,7 @@ public abstract class IngestionObject {
 	 * 
 	 * @param inputTypeName
 	 */
-	public IngestionObject(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
+	public InputObject(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
 		super();
 		this.inputTypeName = inputTypeName;
 		this.listenerForwarder = listenerForwarder;
@@ -115,7 +118,7 @@ public abstract class IngestionObject {
 	static {	
 		// load mappings from resources
 		try {
-			partners.load(IngestionObject.class.getResourceAsStream("/partners.properties"));
+			partners.load(InputObject.class.getResourceAsStream("/partners.properties"));
 			
 			evaluationContext.addPropertyAccessor(new PropertyAccessor() {
 				
@@ -226,7 +229,7 @@ public abstract class IngestionObject {
 	 * @throws IOException 
 	 */
 	protected int createProcess(JDBCDataStore dataStore) throws IOException {
-		return Ingestion.createProcess(dataStore);
+		return MetadataIngestionHandler.createProcess(dataStore);
 	}
 	
 	/**
@@ -237,8 +240,8 @@ public abstract class IngestionObject {
 	 * @return
 	 * @throws IOException 
 	 */
-	protected Ingestion.Process getProcessData(JDBCDataStore dataStore) throws IOException {
-		return Ingestion.getProcessData(dataStore, inputTypeName);
+	protected MetadataIngestionHandler.Process getProcessData(JDBCDataStore dataStore) throws IOException {
+		return MetadataIngestionHandler.getProcessData(dataStore, inputTypeName);
 	}
 			
 	protected Set<Integer> getAggregationValues(String aggregateAttribute) throws IOException {		
@@ -283,7 +286,7 @@ public abstract class IngestionObject {
 	 */
 	protected int logFile(JDBCDataStore dataStore, 
 			int processo, int bersaglio, int partner, String codicePartner, String date, boolean update) throws IOException {
-		return Ingestion.logFile(dataStore,  processo, -1,
+		return MetadataIngestionHandler.logFile(dataStore,  processo, -1,
 				partner, codicePartner, inputTypeName, date, false);
 	}
 	
@@ -301,7 +304,7 @@ public abstract class IngestionObject {
 		if(featureName == null) {
 			featureName = inputTypeName;
 		}
-		inputReader = Ingestion.createFeatureSource(dataStore, transaction,
+		inputReader = MetadataIngestionHandler.createFeatureSource(dataStore, transaction,
 				featureName);		
 		inputQuery = new Query(featureName);
 	        if(sequenceManager == null){
@@ -341,7 +344,7 @@ public abstract class IngestionObject {
 	protected static FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureSource(
 			JDBCDataStore dataStore, Transaction transaction, String typeName)
 			throws IOException {
-		return Ingestion.createFeatureSource(dataStore, transaction, typeName);
+		return MetadataIngestionHandler.createFeatureSource(dataStore, transaction, typeName);
 	}
 	
 	/**
@@ -577,7 +580,7 @@ public abstract class IngestionObject {
 	}
 	
 	public static Object readResourceFromXML(String resourceName) {
-		return xstream.fromXML(VectorTarget.class.getResourceAsStream(resourceName));
+		return xstream.fromXML(TargetIngestionProcess.class.getResourceAsStream(resourceName));
 	}
 	
 //	private createSequenceForInputType(){

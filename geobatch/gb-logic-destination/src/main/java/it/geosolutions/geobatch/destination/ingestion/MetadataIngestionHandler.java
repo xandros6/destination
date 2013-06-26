@@ -14,7 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.ingestion;
+
+
+import it.geosolutions.geobatch.destination.common.utils.DbUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -35,7 +38,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public class Ingestion {
+public class MetadataIngestionHandler {
 	
 	public static class Process {
 		int id = 0;

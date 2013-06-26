@@ -17,7 +17,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.geosolutions.geobatch.destination.common;
+package it.geosolutions.geobatch.destination.ingestion;
 
 import java.util.HashMap;
 import java.util.Map;

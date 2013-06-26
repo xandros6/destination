@@ -19,7 +19,8 @@
  */
 package it.geosolutions.geobatch.destination;
 
-import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
+import it.geosolutions.geobatch.destination.common.OutputObject;
+import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.commons.PostgisOnlineTestCase;
 import it.geosolutions.geobatch.destination.zeroremoval.ZeroRemovalComputation;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;

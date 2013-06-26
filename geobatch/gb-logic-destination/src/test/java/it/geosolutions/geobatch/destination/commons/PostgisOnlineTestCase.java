@@ -20,7 +20,7 @@
 package it.geosolutions.geobatch.destination.commons;
 
 import static org.junit.Assume.assumeTrue;
-import it.geosolutions.geobatch.destination.OutputObject;
+import it.geosolutions.geobatch.destination.common.OutputObject;
 import it.geosolutions.geobatch.destination.vulnerability.VulnerabilityComputation;
 
 import java.io.IOException;

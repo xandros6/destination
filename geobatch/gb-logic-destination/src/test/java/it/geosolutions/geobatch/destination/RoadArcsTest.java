@@ -19,6 +19,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -47,7 +48,7 @@ public class RoadArcsTest {
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
-        RoadArc arcsImport = new RoadArc("RP_C_Grafo_20130424",
+        ArcsIngestionProcess arcsImport = new ArcsIngestionProcess("RP_C_Grafo_20130424",
                 new ProgressListenerForwarder(null));
         try {
             arcsImport.importArcs(datastoreParams, null, 3, true, false);

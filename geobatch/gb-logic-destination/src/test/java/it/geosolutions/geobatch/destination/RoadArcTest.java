@@ -18,6 +18,7 @@ package it.geosolutions.geobatch.destination;
 
 import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
 import it.geosolutions.geobatch.catalog.Identifiable;
+import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.FileInputStream;
@@ -38,7 +39,7 @@ public class RoadArcTest {
 	public void testImportArcs() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		RoadArc arc = new RoadArc(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
+		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
 			
 			@Override
 			public void setId(String arg0) {
@@ -60,7 +61,7 @@ public class RoadArcTest {
 	public void testRemoveZeros() throws IOException {
 		String input = "D:\\Develop\\arcsoutput.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		RoadArc arc = new RoadArc(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
+		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
 			
 			@Override
 			public void setId(String arg0) {
@@ -82,7 +83,7 @@ public class RoadArcTest {
 	public void testAggregateArcs() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		RoadArc arc = new RoadArc(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
+		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
 			
 			@Override
 			public void setId(String arg0) {
@@ -104,7 +105,7 @@ public class RoadArcTest {
 	public void testAggregateGrid() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
 		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		RoadArc arc = new RoadArc(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
+		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
 			
 			@Override
 			public void setId(String arg0) {

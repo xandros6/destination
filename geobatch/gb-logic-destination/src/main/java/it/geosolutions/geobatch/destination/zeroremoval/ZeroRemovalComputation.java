@@ -19,10 +19,10 @@
  */
 package it.geosolutions.geobatch.destination.zeroremoval;
 
-import it.geosolutions.geobatch.destination.Ingestion;
-import it.geosolutions.geobatch.destination.IngestionObject;
-import it.geosolutions.geobatch.destination.OutputObject;
-import it.geosolutions.geobatch.destination.RoadArc;
+import it.geosolutions.geobatch.destination.common.InputObject;
+import it.geosolutions.geobatch.destination.common.OutputObject;
+import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
+import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * @author DamianoG
  * 
  */
-public class ZeroRemovalComputation extends IngestionObject {
+public class ZeroRemovalComputation extends InputObject {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZeroRemovalComputation.class);
 
@@ -254,13 +254,13 @@ public class ZeroRemovalComputation extends IngestionObject {
 
             } catch (IOException e) {
                 errors++;
-                Ingestion
+                MetadataIngestionHandler
                         .logError(dataStore, trace, errors, "Error importing data", getError(e), 0);
                 throw new IOException();
             } finally {
                 if (process != -1) {
                     // close current process phase
-                    Ingestion.closeProcessPhase(dataStore, process, processPhase);
+                    MetadataIngestionHandler.closeProcessPhase(dataStore, process, processPhase);
                 }
 
                 if (dataStore != null) {

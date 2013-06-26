@@ -19,7 +19,7 @@
  */
 package it.geosolutions.geobatch.destination.commons;
 
-import it.geosolutions.geobatch.destination.common.SequenceManager;
+import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
 
 import java.io.IOException;
 import java.io.Serializable;

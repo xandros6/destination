@@ -14,7 +14,10 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.common;
+
+
+import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 
 import java.io.IOException;
 
@@ -44,7 +47,7 @@ public class OutputObject {
 		
 		schema = dataStore.getSchema(name);
 		builder = new SimpleFeatureBuilder(schema);
-		source = Ingestion.createFeatureSource(
+		source = MetadataIngestionHandler.createFeatureSource(
 				dataStore, transaction, name);			
 	}
 

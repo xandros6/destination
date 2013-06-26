@@ -17,10 +17,10 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.geosolutions.geobatch.destination.common;
+package it.geosolutions.geobatch.destination.common.utils;
 
-import it.geosolutions.geobatch.destination.OutputObject;
-import it.geosolutions.geobatch.destination.RoadArc;
+import it.geosolutions.geobatch.destination.common.OutputObject;
+import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FeatureLoaderUtils {
 
-    private final static Logger LOGGER = LoggerFactory.getLogger(RoadArc.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(ArcsIngestionProcess.class);
     
     public final static String ID_ORIGINE = "id_origine";
     

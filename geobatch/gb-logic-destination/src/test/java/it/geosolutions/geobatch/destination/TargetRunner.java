@@ -16,6 +16,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -36,10 +37,10 @@ public class TargetRunner{
     
     private class TargetThread implements Runnable {
 
-        VectorTarget targetIngestion;
+        TargetIngestionProcess targetIngestion;
         Map<String, Serializable> datastoreParams;
         
-        public TargetThread(VectorTarget targetIngestion, Map<String, Serializable> datastoreParams) {
+        public TargetThread(TargetIngestionProcess targetIngestion, Map<String, Serializable> datastoreParams) {
             this.targetIngestion = targetIngestion;
             this.datastoreParams = datastoreParams;
         }
@@ -65,9 +66,9 @@ public class TargetRunner{
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
         
-        VectorTarget targetIngestion1 = new VectorTarget("RP_BU-ACOMM_20130424_02",
+        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("RP_BU-ACOMM_20130424_02",
                 new ProgressListenerForwarder(null));
-        VectorTarget targetIngestion2 = new VectorTarget("RP_BU-ASAN_20130424_02",
+        TargetIngestionProcess targetIngestion2 = new TargetIngestionProcess("RP_BU-ASAN_20130424_02",
                 new ProgressListenerForwarder(null));
         TargetRunner vtest = new TargetRunner();
         

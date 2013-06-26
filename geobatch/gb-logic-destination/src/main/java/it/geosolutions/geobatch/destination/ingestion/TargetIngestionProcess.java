@@ -14,8 +14,11 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.ingestion;
 
+import it.geosolutions.geobatch.destination.common.InputObject;
+import it.geosolutions.geobatch.destination.common.OutputObject;
+import it.geosolutions.geobatch.destination.common.utils.DbUtils;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
@@ -65,10 +68,10 @@ import com.thoughtworks.xstream.XStream;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public class VectorTarget extends IngestionObject {
+public class TargetIngestionProcess extends InputObject {
 		
 	
-	private final static Logger LOGGER = LoggerFactory.getLogger(VectorTarget.class);
+	private final static Logger LOGGER = LoggerFactory.getLogger(TargetIngestionProcess.class);
 	
 	private static Pattern typeNameParts  = Pattern.compile("^([A-Z]{2})_([A-Z]{2,3})-([A-Z]+)_([0-9]{8})_([0-9]{2})$");
 	
@@ -97,8 +100,8 @@ public class VectorTarget extends IngestionObject {
 	static {	
 		// load mappings from resources
 		try {			
-			targetTypes.load(VectorTarget.class.getResourceAsStream("/targets.properties"));	
-			geometryTypes.load(VectorTarget.class.getResourceAsStream("/geometries.properties"));
+			targetTypes.load(TargetIngestionProcess.class.getResourceAsStream("/targets.properties"));	
+			geometryTypes.load(TargetIngestionProcess.class.getResourceAsStream("/geometries.properties"));
 			attributeMappings = (Map) readResourceFromXML("/targets.xml");							
 		} catch (IOException e) {
 			LOGGER.error("Unable to load configuration: "+e.getMessage(), e);
@@ -111,7 +114,7 @@ public class VectorTarget extends IngestionObject {
 	 * 
 	 * @param inputTypeName
 	 */
-	public VectorTarget(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
+	public TargetIngestionProcess(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
 		super(inputTypeName, listenerForwarder);		
 	}
 
@@ -241,7 +244,7 @@ public class VectorTarget extends IngestionObject {
 					transaction.commit();	
 				} catch (IOException e) {
 					errors++;	
-					Ingestion.logError(dataStore, trace, errors, "Error removing old data", getError(e), 0);					
+					MetadataIngestionHandler.logError(dataStore, trace, errors, "Error removing old data", getError(e), 0);					
 					transaction.rollback();					
 					throw e;
 				} finally {
@@ -279,7 +282,7 @@ public class VectorTarget extends IngestionObject {
 							errors++;
 							rollbackId();
 							rowTransaction.rollback();
-							Ingestion.logError(dataStore, trace, errors,
+							MetadataIngestionHandler.logError(dataStore, trace, errors,
 									"Error writing output feature", getError(e),
 									idTematico);
 						} finally {				
@@ -288,7 +291,7 @@ public class VectorTarget extends IngestionObject {
 																
 					}
 					importFinished(total, "Data imported in " + geoTypeName + "/" + outTypeName);
-					Ingestion.updateLogFile(dataStore, trace, total, errors, "A");
+					MetadataIngestionHandler.updateLogFile(dataStore, trace, total, errors, "A");
 					
 				} finally {
 					closeInputReader();
@@ -296,7 +299,7 @@ public class VectorTarget extends IngestionObject {
 				
 			} catch (IOException e) {
 				errors++;	
-				Ingestion.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);				
+				MetadataIngestionHandler.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);				
 				throw e;
 			} finally {
 				if(dropInput) {
@@ -305,7 +308,7 @@ public class VectorTarget extends IngestionObject {
 				
 				if(process != -1) {
 					// close current process phase
-					Ingestion.closeProcessPhase(dataStore, process, "A");
+					MetadataIngestionHandler.closeProcessPhase(dataStore, process, "A");
 				}
 				
 				if(dataStore != null) {
