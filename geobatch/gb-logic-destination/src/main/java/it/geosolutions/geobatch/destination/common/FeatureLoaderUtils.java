@@ -37,13 +37,18 @@ import org.geotools.feature.FeatureIterator;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author DamianoG
+ * 
+ * This class contains a set of static utility methods for load a list of values from a given feature and a geiven attribute.
+ * The purpose of these methods is to deal with tables "that are configuration table" so with a reasonable low amount of records.
+ * No controls are made so if you run these methods on a table with one Giga of records you get an out of memory.
+ * 
+ * Some of these methods cache the results.
  * 
  */
 public class FeatureLoaderUtils {
@@ -56,6 +61,17 @@ public class FeatureLoaderUtils {
     
     private static MultiKeyMap featureAttributesMap = new MultiKeyMap();
 
+    /**
+     * Load all the values from a given BigDecimal attribute and return a list of String
+     * 
+     * <b>The result is cached</b>
+     * 
+     * @param datastore
+     * @param featureTypeName
+     * @param attribute
+     * @param forceLoading
+     * @return
+     */
     public static List<String> loadFeatureAttributes(JDBCDataStore datastore, String featureTypeName,
             String attribute, boolean forceLoading){
         List<BigDecimal> list = loadFeatureAttributesInternal(datastore, featureTypeName,
@@ -67,6 +83,17 @@ public class FeatureLoaderUtils {
         return resultList;
     }
     
+    /**
+     * Load all the values from a given BigDecimal attribute and return a list of Double
+     * 
+     * <b>The result is cached</b>
+     * 
+     * @param datastore
+     * @param featureTypeName
+     * @param attribute
+     * @param forceLoading
+     * @return
+     */
     public static List<Double> loadFeatureAttributesInt(JDBCDataStore datastore, String featureTypeName,
             String attribute, boolean forceLoading){
         List<BigDecimal> list = loadFeatureAttributesInternal(datastore, featureTypeName,
@@ -119,31 +146,51 @@ public class FeatureLoaderUtils {
         }
         return ListUtils.unmodifiableList(attributes);
     }
+    
+    /**
+     * Load all the values from a given attribute and return a list of that type.
+     * 
+     * <b>The result is NOT cached</b>
+     * 
+     * @param datastore
+     * @param featureTypeName
+     * @param attribute
+     * @param forceLoading
+     * @return
+     */
+    public static <T> List<T> loadFeatureAttributesGeneric(JDBCDataStore datastore, String featureTypeName,
+            String attribute, boolean forceLoading) {
 
-    public static FeatureIterator loadByIdOrig(JDBCDataStore datastore, Transaction transaction,
-            String featureTypeName, int idOrig) {
-
+        List<T> attributes = new ArrayList<T>();
         FeatureIterator iter = null;
+        Transaction transaction = null;
         try {
-            OutputObject arcoX = new OutputObject(datastore, transaction, featureTypeName, "");
-            FeatureCollection<SimpleFeatureType, SimpleFeature> bersaglioCollection = null;
-
-            
-            Filter updateFilter = filterFactory.and(filterFactory.equals(
-                    filterFactory.property("fk_partner"), filterFactory.literal(1)
-            ),filterFactory.equals(
-                    filterFactory.property("id_tematico_shape"), filterFactory.literal(1))
-            );
-            
-            
-            bersaglioCollection = arcoX.getReader()
-                    .getFeatures(updateFilter);
-
+            transaction = new DefaultTransaction();
+            OutputObject tipobersObject = new OutputObject(datastore, transaction, featureTypeName,
+                    "");
+            FeatureCollection<SimpleFeatureType, SimpleFeature> bersaglioCollection = tipobersObject
+                    .getReader().getFeatures();
             iter = bersaglioCollection.features();
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        }
-        return iter;
-    }
 
+            while (iter.hasNext()) {
+                SimpleFeature sf = (SimpleFeature) iter.next();
+                // BigDecimal bd = (BigDecimal) sf.getAttribute("id_sostanza");
+                T bd = (T) sf.getAttribute(attribute);
+                attributes.add(bd);
+            }
+        } catch (IOException e) {
+        } finally {
+            if (iter != null) {
+                iter.close();
+            }
+            if (transaction != null) {
+                try {
+                    transaction.close();
+                } catch (IOException e) {
+                    LOGGER.error(e.getMessage(), e);
+                }
+            }
+        }
+        return attributes;
+    }
 }

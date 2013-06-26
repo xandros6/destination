@@ -22,16 +22,13 @@ package it.geosolutions.geobatch.destination.commons;
 import static org.junit.Assume.assumeTrue;
 import it.geosolutions.geobatch.destination.OutputObject;
 import it.geosolutions.geobatch.destination.vulnerability.VulnerabilityComputation;
-import it.geosolutions.geobatch.destination.vulnerability.VulnerabilityOperationTest;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -39,17 +36,14 @@ import junit.framework.Assert;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.test.OnlineTestSupport;
 import org.junit.After;
 import org.junit.Before;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,6 +191,8 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         return ret;
     }
     
+    public abstract void setupPrimaryKey(SimpleFeatureTypeBuilder sftb);
+    
     protected SimpleFeatureType getTmpTable() throws IOException{
         if(originTable == null){
             Assert.fail("You must setup the origin table to copy, call the method setOriginTable(tableName) where tableName is an existing table into the schema");
@@ -204,8 +200,7 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         SimpleFeatureType schema = (SimpleFeatureType) dataStore.getSchema(originTable);
         SimpleFeatureTypeBuilder sftb = new SimpleFeatureTypeBuilder();
         sftb.setName(testTable);
-        sftb.add("id_geo_arco", Integer.class);
-        sftb.add("id_distanza", Integer.class);
+        setupPrimaryKey(sftb);
         sftb.addAll(schema.getAttributeDescriptors());
         return sftb.buildFeatureType();
     }

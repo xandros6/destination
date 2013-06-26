@@ -74,10 +74,10 @@ public class ZeroRemovalComputation extends IngestionObject {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(ZeroRemovalComputation.class);
 
-    private static Pattern TYPE_NAME_PARTS = Pattern
+    public static Pattern TYPE_NAME_PARTS = Pattern
             .compile("^([a-z]{4})_([a-z]{3})_([a-z]{2})_([a-z]{4})_([1-3]{1})");
 
-    private static final String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
+    public static String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
     private static final String NR_INCIDENTI = "nr_incidenti";
     private static final String LUNGHEZZA = "lunghezza";
     private static final String GEOID = "id_geo_arco";

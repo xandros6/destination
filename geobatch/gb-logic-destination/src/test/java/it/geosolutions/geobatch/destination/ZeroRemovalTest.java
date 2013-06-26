@@ -19,6 +19,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.common.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.commons.PostgisOnlineTestCase;
 import it.geosolutions.geobatch.destination.zeroremoval.ZeroRemovalComputation;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
@@ -26,9 +27,11 @@ import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -38,7 +41,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 /**
  * @author DamianoG
@@ -48,13 +50,23 @@ public class ZeroRemovalTest extends PostgisOnlineTestCase{
 
     @Before
     public void before() throws Exception{
+        //Setup the origin table... this table schema will be copied and replicated into the test table
         setOriginTable("siig_geo_ln_arco_1");
-        testTable = "siig_geo_ln_arcoo_1";
+        // The test table, where the tests run
+        testTable = "siig_geo_ln_arcotest_1";
         super.before();
     }
     
     @Test
     public void testZeroRemovalProcess() throws IOException {
+        //Alter the standard pattern and name for feature name validity check... it's an awful stuff but mandatory for this kind of test
+        ZeroRemovalComputation.TYPE_NAME_PARTS = Pattern.compile("^([a-z]{4})_([a-z]{3})_([a-z]{2})_([a-z]{8})_([1-3]{1})");
+        ZeroRemovalComputation.GEO_TYPE_NAME = "siig_geo_ln_arcotest_X"; 
+        
+        //Prepare the static list of results to compare with
+        Double [] results = {0.0,72.66666666666667,963.6666666666666,53.666666666666664,0.8952380952380953,1.8952380952380952,2.895238095238095,3.895238095238095,4.895238095238096,0.6285714285714286,6.895238095238096};
+        List<Double> resultsList = Arrays.asList(results);
+        
         ZeroRemovalComputation vulnerabilityComputation = new ZeroRemovalComputation(super.testTable, new ProgressListenerForwarder(null));
         Map<String, Serializable> datastoreParams = new HashMap<String, Serializable>();
         datastoreParams.put(JDBCDataStoreFactory.DBTYPE.key, "postgis");
@@ -65,34 +77,31 @@ public class ZeroRemovalTest extends PostgisOnlineTestCase{
         datastoreParams.put(JDBCDataStoreFactory.USER.key, getFixture().getProperty("pg_user"));
         datastoreParams.put(JDBCDataStoreFactory.PASSWD.key, getFixture().getProperty("pg_password"));
         vulnerabilityComputation.removeZeros(datastoreParams, null, 1, 1);
-        System.out.println("");
-    }
-
-    @Override
-    protected SimpleFeatureType getTmpTable() throws IOException{
-        if(originTable == null){
-            Assert.fail("You must setup the origin table to copy, call the method setOriginTable(tableName) where tableName is an existing table into the schema");
+        List<Double> nr_incidenti_elab = FeatureLoaderUtils.loadFeatureAttributesGeneric(dataStore, testTable, "nr_incidenti_elab", true);
+        for(Double el : nr_incidenti_elab){
+            Assert.assertTrue(resultsList.contains(el));
         }
-        SimpleFeatureType schema = (SimpleFeatureType) dataStore.getSchema(originTable);
-        SimpleFeatureTypeBuilder sftb = new SimpleFeatureTypeBuilder();
-        sftb.setName(testTable);
-        sftb.add("id_geo_arco", Integer.class);
-        sftb.addAll(schema.getAttributeDescriptors());
-        return sftb.buildFeatureType();
+    }
+    
+    @Override
+    public void setupPrimaryKey(SimpleFeatureTypeBuilder sftb) {
+        sftb.add("id_geo_arco", Integer.class);   
     }
     
     @Override
     protected void loadFeature(OutputObject objOut) throws IOException{
         List<SimpleFeature> list = new ArrayList<SimpleFeature>();
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|2|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid3=3|3|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid4=4|4|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid5=5|5|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid6=6|0|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid7=7|7|0|0|0|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=8|0|0|0|0|0|0|1|0|20|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=9|0|0|0|0|0|0|20|0|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|2|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid3=3|3|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid4=4|4|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid5=5|5|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid6=6|0|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid7=7|7|0|0|100|0|0|1|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=8|0|0|0|100|0|0|20|0|1|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid9=9|90|0|0|100|0|0|1|0|2|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid10=10|0|0|0|100|0|0|1|0|2|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid11=11|1000|0|0|100|0|0|1|0|2|0|0"));
         SimpleFeatureCollection sfc = DataUtilities.collection(list);
         objOut.getWriter().addFeatures(sfc);
     }
