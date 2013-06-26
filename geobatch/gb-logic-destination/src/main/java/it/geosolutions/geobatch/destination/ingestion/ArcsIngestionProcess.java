@@ -71,7 +71,9 @@ public class ArcsIngestionProcess extends InputObject {
 		
 	private String gridTypeName = "siig_geo_grid";
 	
-	private String geoTypeName = "siig_geo_ln_arco_X";	
+	private String geoTypeName = "siig_geo_ln_arco_X";
+	private String geoTypeNamePl = "siig_geo_pl_arco_X";
+	
 	private String geoId = "id_geo_arco";
 	
 	private String byVehicleTypeName = "siig_r_tipovei_geoarcoX";
@@ -202,9 +204,20 @@ public class ArcsIngestionProcess extends InputObject {
 				
 				Transaction transaction = new DefaultTransaction();
 				
-				// setup geo output object
-				String geoName = getTypeName(geoTypeName, aggregationLevel);
-				OutputObject geoObject = new OutputObject(dataStore, transaction, geoName, geoId);				
+				// setup the MAIN geo output object
+				// The mainGeoObject is that one is used for compute also the other outputObjects
+				// For aggregation level 1 and 2 is that one related to table siig_geo_ln_arco_X but for aggregation 3 is siig_geo_pl_arco_X 
+				String geoName = getTypeName((aggregationLevel == 3 ? geoTypeNamePl : geoTypeName), aggregationLevel);
+				OutputObject mainGeoObject = new OutputObject(dataStore, transaction, geoName, geoId);
+				
+				// setup secondary geo output object
+				// Obviously in that case the related table for different aggregation level is the inverse that is for mainGeoObject
+				// Actually ( 26/06/2013 ) that obj is used just for aggregation level 3
+				OutputObject secondaryGeoObject = null;
+                                if(aggregationLevel == 3){
+                                    String geoNameSecondary = getTypeName((geoTypeName), aggregationLevel);
+                                    secondaryGeoObject = new OutputObject(dataStore, transaction, geoNameSecondary, geoId);
+                                }
 				
 				// setup vehicle output object
 				String vehicleName = getTypeName(byVehicleTypeName, aggregationLevel);
@@ -223,7 +236,7 @@ public class ArcsIngestionProcess extends InputObject {
                                 OutputObject tiposostObject = new OutputObject(dataStore, transaction, tiposostName, "");
                                 
 				OutputObject[] outputObjects = new OutputObject[] {vehicleObject,
-						dissestoObject, geoObject, tipobersObject, tiposostObject};
+						dissestoObject, mainGeoObject, tipobersObject, tiposostObject};
 				
 				BigDecimal maxId = null;
 				
@@ -234,7 +247,7 @@ public class ArcsIngestionProcess extends InputObject {
 					);
 					removeObjects(outputObjects, removeFilter);
 					
-					maxId = (BigDecimal)getOutputId(geoObject);
+					maxId = (BigDecimal)getOutputId(mainGeoObject);
 					
 					transaction.commit();	
 				} catch (IOException e) {
@@ -253,12 +266,17 @@ public class ArcsIngestionProcess extends InputObject {
 				
 				if(onGrid) {
 					processPhase = "C";
+					//aggregate arcs on grid and compute also the other tables with that aggregation
 					errors = aggregateArcsOnGrid(trace, dataStore, outputObjects, maxId.intValue(), total, errors, geoName, aggregationLevel);
+					//aggregate arcs by id_segm level 3 and fill just the table 3
+					resetInputCounter();
+					OutputObject[] outputObjectsPl = new OutputObject[] {null, null, secondaryGeoObject};
+					errors += aggregateArcs(trace, dataStore, outputObjectsPl, maxId.intValue(), total, errors, geoName, aggregationLevel, true);
 				} else if(aggregationLevel == 1) {
 					errors = importWithoutAggregation(trace, dataStore, outputObjects, maxId.intValue(), total, errors, geoName);
 				} else {
 					processPhase = "B";
-					errors = aggregateArcs(trace, dataStore, outputObjects, maxId.intValue(), total, errors, geoName, aggregationLevel);
+					errors = aggregateArcs(trace, dataStore, outputObjects, maxId.intValue(), total, errors, geoName, aggregationLevel, false);
 				}
 				MetadataIngestionHandler.updateLogFile(dataStore, trace, total, errors, processPhase);
 			} catch (IOException e) {
@@ -320,7 +338,7 @@ public class ArcsIngestionProcess extends InputObject {
 				
 				try  {
 					errors = aggregateStep(trace, dataStore, outputObjects, total,
-							errors, outputName, id, idTematico, iterator, cell);
+							errors, outputName, id, idTematico, iterator, cell, false);
 				} finally {
 					iterator.close();
 				}
@@ -343,7 +361,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 */
 	private int aggregateArcs(int trace, JDBCDataStore dataStore,
 			OutputObject[] outputObjects, int startId, int total, int errors,
-			String outputName, int aggregationLevel) throws IOException {
+			String outputName, int aggregationLevel, boolean computeOnlyGeoFeature) throws IOException {
 		String aggregationAttribute = aggregation.getProperty(aggregationLevel + "");
 		// get unique aggregation values		
 		Set<Integer> aggregationValues = getAggregationValues(aggregationAttribute);		
@@ -359,7 +377,7 @@ public class ArcsIngestionProcess extends InputObject {
 			));
 			try {
 				errors = aggregateStep(trace, dataStore, outputObjects, total,
-						errors, outputName, id, idTematico, null, null);
+						errors, outputName, id, idTematico, null, null, computeOnlyGeoFeature);
 			} finally {
 				closeInputReader();
 			}	
@@ -383,7 +401,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 */
 	private int aggregateStep(int trace, JDBCDataStore dataStore,
 			OutputObject[] outputObjects, int total, int errors,
-			String outputName, int id, int idTematico, FeatureIterator<SimpleFeature> iterator, Geometry aggregateGeo) throws IOException {
+			String outputName, int id, int idTematico, FeatureIterator<SimpleFeature> iterator, Geometry aggregateGeo, boolean computeOnlyGeoFeature) throws IOException {
 		
 		SimpleFeature inputFeature;
 		Geometry geo = null;
@@ -410,6 +428,13 @@ public class ArcsIngestionProcess extends InputObject {
 					geo = aggregateGeo;
 				}
 				idOrigin = (idOrigin == -1)?((Number)getMapping(inputFeature, attributeMappings, "id_origine")).intValue():idOrigin;
+ 
+				if(computeOnlyGeoFeature){
+				    // We don't want compute the other statistic table if we are aggregating level 3 not on grid, 
+				    // we just want to fill the table siig_geo_ln_arco_3
+				    continue;
+				}
+				
 				int currentLunghezza = ((Number)getMapping(inputFeature, attributeMappings, "lunghezza")).intValue(); 
 				lunghezza +=  currentLunghezza;
 				incidenti += ((Number)getMapping(inputFeature, attributeMappings, "nr_incidenti")).intValue();
@@ -459,15 +484,16 @@ public class ArcsIngestionProcess extends InputObject {
 			try {							
 				addAggregateGeoFeature(outputObjects[2], id, idTematico, geo,
 						lunghezza, corsie, incidenti, inputFeature, idOrigin);						
-				addAggregateVehicleFeature(outputObjects[0], id, lunghezza,
-						tgm, velocita, flgTgmCounter.getMax(), flgVelocCounter.getMax(), inputFeature);
-				addAggregateDissestoFeature(outputObjects[1], id, lunghezza,
-						pterr, inputFeature);
-				addAggregateCFFFeature(outputObjects[3],
-			                id, cff, inputFeature);
-                                //no need for aggregation untill paddr will be a constant
-				addSostanzaFeature(outputObjects[4], id, inputFeature,
-                                        FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
+				if(!computeOnlyGeoFeature){
+                                    addAggregateVehicleFeature(outputObjects[0], id, lunghezza, tgm, velocita,
+                                            flgTgmCounter.getMax(), flgVelocCounter.getMax(), inputFeature);
+                                    addAggregateDissestoFeature(outputObjects[1], id, lunghezza, pterr,
+                                            inputFeature);
+                                    addAggregateCFFFeature(outputObjects[3], id, cff, inputFeature);
+                                    // no need for aggregation untill paddr will be a constant
+                                    addSostanzaFeature(outputObjects[4], id, inputFeature,
+                                            FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
+				}
 				rowTransaction.commit();
 				
 				updateImportProgress(total, "Importing data in " + outputName);

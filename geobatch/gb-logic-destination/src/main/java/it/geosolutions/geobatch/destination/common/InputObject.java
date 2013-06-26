@@ -168,6 +168,10 @@ public abstract class InputObject {
 		readCount = 0;
 	}
 	
+	protected void resetInputCounter(){
+	    inputCount = 0;
+	}
+	
 	/**
 	 * Checks for typeName validity.
 	 * 
@@ -456,9 +460,12 @@ public abstract class InputObject {
 	/**
 	 * Returns the next value to use for the output feature id.
 	 * 
+	 * @Deprecated This method is became useless due to the usage of the sequence for id generation 
+	 * 
 	 * @param id
 	 * @return
 	 */
+	@Deprecated
 	protected int rollbackId() {		
 		return readCount--;
 	}
@@ -512,7 +519,9 @@ public abstract class InputObject {
 	 */
 	protected void setTransaction(OutputObject[] outputObjects, Transaction transaction) {
 		for(OutputObject obj : outputObjects) {
-			obj.getWriter().setTransaction(transaction);
+		        if(obj != null){
+		            obj.getWriter().setTransaction(transaction);
+		        }
 		}
 	}
 	
