@@ -39,8 +39,8 @@ import org.junit.Test;
  */
 public class ImportArcs{
 
-    @Test @Ignore
-    public void testImportArcs() {
+    
+    public static void main(String [] args) {
         importArcs();
     }
 

@@ -33,15 +33,14 @@ import org.junit.Test;
  * @author DamianoG
  *
  */
-public class TargetPropertiesLoaderTest {
+public class TargetPropertiesLoaderTest extends DestinationOnlineTestCase{
 
     public TargetPropertiesLoaderTest(){};
     
-    @Test @Ignore
+    @Test
     public void testTargetLoading(){
         
-        System.setProperty("EXTERNAL_PROP_DIR_PATH", "C:\\Users\\geosolutions\\Documents\\destination\\targets_raster\\tiled");
-        
+        System.setProperty("EXTERNAL_PROP_DIR_PATH", getExternalPropDirPath());
         
         TargetPropertiesLoader tpl = new TargetPropertiesLoader();
         
@@ -58,5 +57,22 @@ public class TargetPropertiesLoaderTest {
         Assert.assertNotNull(p3);
         Assert.assertNotNull(m1);
         Assert.assertNotNull(l1);
+    }
+
+    /* (non-Javadoc)
+     * @see it.geosolutions.geobatch.destination.commons.PostgisOnlineTestCase#getFixtureId()
+     */
+    @Override
+    protected String getFixtureId() {
+        return "destination";
+    }
+    
+    @Override
+    protected Properties createExampleFixture() {
+        Properties ret = new Properties();
+        for (Map.Entry entry : getExamplePostgisProps().entrySet()) {
+            ret.setProperty(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return ret;
     }
 }

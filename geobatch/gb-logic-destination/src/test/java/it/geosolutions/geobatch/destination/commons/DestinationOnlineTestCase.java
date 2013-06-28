@@ -50,11 +50,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author DamianoG
+ * 
+ * This class provide some feature to easy implement a geotools like online test case. Use the fixture mechanism.
+ * Subclass this class if you want to implement an online test case
+ * 
+ * TODO Actually if a test don't require DB access this class force to setup it anyway
  *
  */
-public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
+public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
     
-    private final static Logger LOGGER = LoggerFactory.getLogger(PostgisOnlineTestCase.class);
+    private final static Logger LOGGER = LoggerFactory.getLogger(DestinationOnlineTestCase.class);
     
     public String testTable;
     
@@ -146,6 +151,7 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
     
     protected DataStore createDatastore() throws IOException {
         Map params = getPostgisParams();
+        params.put("Expose primary keys","true");
         DataStore dataStore = DataStoreFinder.getDataStore(params);
         return dataStore;
     }
@@ -178,6 +184,14 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         return params;
     }
     
+    protected String getRasterParams(String key) {
+        return getFixture().getProperty(key);
+    }
+    
+    protected String getExternalPropDirPath() {
+        return getFixture().getProperty("external_prop_dir_path");
+    }
+    
     protected Properties getExamplePostgisProps() {
         Properties ret = new Properties();
         ret.setProperty("pg_host", "localhost");
@@ -187,20 +201,24 @@ public abstract class PostgisOnlineTestCase extends OnlineTestSupport {
         ret.setProperty("pg_user", "siig_p");
         ret.setProperty("pg_password", "siig_p");
         ret.setProperty("src_table", "siig_geo_ln_arco_1");
+        ret.setProperty("ground_coverage_target", "<RASTER_FILE_ABSOLUTE_PATH>");
+        ret.setProperty("not_human_target", "<RASTER_FILE_ABSOLUTE_PATH>");
+        ret.setProperty("human_target", "<RASTER_FILE_ABSOLUTE_PATH>");
+        ret.setProperty("external_prop_dir_path", "<EXTERNAL_PROP_DIR_PATH>");
 
         return ret;
     }
     
-    public abstract void setupPrimaryKey(SimpleFeatureTypeBuilder sftb);
-    
     protected SimpleFeatureType getTmpTable() throws IOException{
         if(originTable == null){
-            Assert.fail("You must setup the origin table to copy, call the method setOriginTable(tableName) where tableName is an existing table into the schema");
+            // TODO if a test don't use the DB but is implemented as online test don't force the input table setup
+            LOGGER.info("You must setup the origin table to copy, call the method setOriginTable(tableName) in a @Before annotated method, where tableName is an existing table into the schema...");
+            LOGGER.info("Set the temp table name to siig_geo_ln_arco_1");
+            originTable = "siig_geo_ln_arco_1";
         }
         SimpleFeatureType schema = (SimpleFeatureType) dataStore.getSchema(originTable);
         SimpleFeatureTypeBuilder sftb = new SimpleFeatureTypeBuilder();
         sftb.setName(testTable);
-        setupPrimaryKey(sftb);
         sftb.addAll(schema.getAttributeDescriptors());
         return sftb.buildFeatureType();
     }

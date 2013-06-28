@@ -21,7 +21,7 @@ package it.geosolutions.geobatch.destination;
 
 import it.geosolutions.geobatch.destination.common.OutputObject;
 import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
-import it.geosolutions.geobatch.destination.commons.PostgisOnlineTestCase;
+import it.geosolutions.geobatch.destination.commons.DestinationOnlineTestCase;
 import it.geosolutions.geobatch.destination.zeroremoval.ZeroRemovalComputation;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 import org.geotools.data.DataUtilities;
@@ -47,7 +48,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author DamianoG
  * 
  */
-public class ZeroRemovalTest extends PostgisOnlineTestCase{
+public class ZeroRemovalTest extends DestinationOnlineTestCase{
 
     @Before
     public void before() throws Exception{
@@ -85,24 +86,19 @@ public class ZeroRemovalTest extends PostgisOnlineTestCase{
     }
     
     @Override
-    public void setupPrimaryKey(SimpleFeatureTypeBuilder sftb) {
-        sftb.add("id_geo_arco", Integer.class);   
-    }
-    
-    @Override
     protected void loadFeature(OutputObject objOut) throws IOException{
         List<SimpleFeature> list = new ArrayList<SimpleFeature>();
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|2|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid3=3|3|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid4=4|4|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid5=5|5|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid6=6|0|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid7=7|7|0|0|100|0|0|1|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=8|0|0|0|100|0|0|20|0|1|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid9=9|90|0|0|100|0|0|1|0|2|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid10=10|0|0|0|100|0|0|1|0|2|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid11=11|1000|0|0|100|0|0|1|0|2|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|2|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid3=3|3|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid4=4|4|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid5=5|5|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid6=6|0|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid7=7|7|0|0|100|0|0|1|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=8|0|0|0|100|0|0|20|0|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid9=9|90|0|0|100|0|0|1|0|2|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid10=10|0|0|0|100|0|0|1|0|2|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid11=11|1000|0|0|100|0|0|1|0|2|0|0|0"));
         SimpleFeatureCollection sfc = DataUtilities.collection(list);
         objOut.getWriter().addFeatures(sfc);
     }
@@ -110,5 +106,14 @@ public class ZeroRemovalTest extends PostgisOnlineTestCase{
     @Override
     protected String getFixtureId() {
         return "destination";
+    }
+    
+    @Override
+    protected Properties createExampleFixture() {
+        Properties ret = new Properties();
+        for (Map.Entry entry : getExamplePostgisProps().entrySet()) {
+            ret.setProperty(entry.getKey().toString(), entry.getValue().toString());
+        }
+        return ret;
     }
 }

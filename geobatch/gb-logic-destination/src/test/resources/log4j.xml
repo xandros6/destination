@@ -12,7 +12,7 @@
 	</appender>
 
 	<logger name="it.geosolutions">
-		<level value="debug" />
+		<level value="info" />
 		<!--<level value="info" />  -->
 	</logger>
 

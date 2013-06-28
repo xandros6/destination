@@ -34,6 +34,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author DamianoG
  *
+ * Test the creation and the usage of a postgis sequence used for the arcs id generation
+ * 
+ * TODO: implement as onlinetestCase
+ *
  */
 public class SequenceCreatorTester {
 
