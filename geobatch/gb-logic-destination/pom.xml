@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ======================================================================= 
+	Maven Project Configuration File GeoSolutions GeoBatch Project http://geobatch.geo-solutions.it 
+	Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ======================================================================= -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>it.geosolutions.geobatch.destination</groupId>
+		<artifactId>gb-destination</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	<!-- =========================================================== -->
+	<!-- Module Description -->
+	<!-- =========================================================== -->
+	<groupId>it.geosolutions.geobatch.destination</groupId>
+	<artifactId>gb-logic-destination</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>GeoBatch Destination Module</name>
+	<description>
+    Destination ingestion logic used through scripting action
+  </description>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	<!-- =========================================================== -->
+	<!-- Dependency Management -->
+	<!-- =========================================================== -->
+	<dependencies>
+		<dependency>
+			<groupId>it.geosolutions.geobatch</groupId>
+			<artifactId>gb-action-ds2ds</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>it.geosolutions.geobatch</groupId>
+			<artifactId>gb-action-ds2ds</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-cql</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geotiff</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-sample-data</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>it.geosololutions</groupId>
+			<artifactId>gt-process-destination</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jaitools</groupId>
+			<artifactId>jt-vectorbinarize</artifactId>
+			<version>1.3.0</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+
+</project>
