@@ -85,7 +85,7 @@ public class RiskQueryBuilder {
     private static Level[] levels = new Level[] {
         new Level(0, 17061, false, true, 1),
         new Level(17061, 500000, false, false, 2),
-        new Level(500000, 0 , true, false, 3),
+        new Level(500000, 0 , false, false, 3),
     };
         
     
@@ -101,12 +101,12 @@ public class RiskQueryBuilder {
         ambientali.add(new Bersaglio(15,"superficiali","mq_acque_superficiali"));
         ambientali.add(new Bersaglio(16,"culturali","mq_beni_culturali"));
         
-        umani.add(new Bersaglio(1,"residenti","nr_pers_residenti", new int[] {1, 35, 2, 3}));
-        umani.add(new Bersaglio(2,"turistica","nr_turisti_max", new int[] {4, 36, 5, 6}));
-        umani.add(new Bersaglio(4,"industria","nr_pers_servizi", new int[] {10, 38, 11, 12}));
-        umani.add(new Bersaglio(5,"sanitarie","nr_pers_ospedali", new int[] {13, 39, 14, 15}));
-        umani.add(new Bersaglio(6,"scolastiche","nr_pers_scuole", new int[] {16, 40, 17, 18}));
-        umani.add(new Bersaglio(7,"commerciali","nr_pers_distrib", new int[] {19, 41, 20, 21}));
+        umani.add(new Bersaglio(1,"residenti","nr_pers_residenti", new int[] {1, 2, 3, 4}));
+        umani.add(new Bersaglio(2,"turistica","nr_turisti_max", new int[] {1, 2, 3, 4}));
+        umani.add(new Bersaglio(4,"industria","nr_pers_servizi", new int[] {1, 2, 3, 4}));
+        umani.add(new Bersaglio(5,"sanitarie","nr_pers_ospedali", new int[] {1, 2, 3, 4}));
+        umani.add(new Bersaglio(6,"scolastiche","nr_pers_scuole", new int[] {1, 2, 3, 4}));
+        umani.add(new Bersaglio(7,"commerciali","nr_pers_distrib", new int[] {1, 2, 3, 4}));
         
         combinedColors.put("low-low", "14F200");
         combinedColors.put("low-medium", "0A7900");
@@ -126,8 +126,9 @@ public class RiskQueryBuilder {
      */
     public static void main(String[] args) {
        
-       //buildSimple(2, true);
-       buildCombined(1);
+       buildSimple(2, true);
+       //buildSimple(3, true);
+       //buildCombined(3);
        //buildSimpleStyle(3);
        //buildCombinedStyle(3);
     }
@@ -150,6 +151,8 @@ public class RiskQueryBuilder {
         buildStyleEnd(builder);
         System.out.println(builder.toString());
     }
+    
+    
     
     private static void buildCombinedStyle(int level) {        
         StringBuilder builder = new StringBuilder();
@@ -503,6 +506,42 @@ public class RiskQueryBuilder {
         builder.append("</StyledLayerDescriptor>\n");
     }
 
+    private static void buildSimple(int level, boolean human) {       
+        StringBuilder builder = new StringBuilder();
+        Level lev = levels[level - 1];
+        if(lev.isGrid) {
+            builder.append("select grid.gid,grid.geometria,avg(a3.rischio) as rischio\n");
+            builder.append(" FROM\n"); 
+            builder.append("(");
+        }
+        builder.append("select siig_geo_ln_arco_"+level+".id_geo_arco,");
+        buildRisk(level, "rischio", builder, human);
+        builder.append(",siig_geo_ln_arco_"+level+".lunghezza,siig_geo_ln_arco_"+level+".geometria\n");
+        builder.append("from siig_geo_ln_arco_"+level+"\n");
+        builder.append("where siig_geo_ln_arco_"+level+".geometria && st_makeenvelope(%bounds%, 32632)\n");
+        if(lev.isGrid) {
+            builder.append(") as a3,\n");
+            builder.append("(SELECT\n");
+            builder.append("        row_number() OVER (ORDER BY q_grid.cell) AS gid,\n");
+            builder.append("        q_grid.cell AS geometria\n");
+            builder.append("    FROM\n");
+            builder.append("        (\n");
+            builder.append("            SELECT\n");
+            builder.append("              (st_dump(makegrid_2d(st_geomfromtext\n");
+            builder.append("              (\n");
+            builder.append("             'Polygon((317643 4881313,516288 4881313,516288 5140984,317643 5140984,317643 4881313))'\n");
+            builder.append("                ::text, 32632), 5000, 32632))).geom AS cell) q_grid) as grid\n");
+            builder.append("WHERE\n");
+            builder.append("st_intersects(a3.geometria, grid.geometria)\n");
+            builder.append("GROUP BY\n");
+            builder.append("grid.gid,\n");
+            builder.append("grid.geometria\n");
+        }
+    
+        //builder.append("order by id_geo_arco\n");
+        System.out.println(builder.toString());
+     }
+    
     private static void buildCombined(int level) {        
         
         StringBuilder builder = new StringBuilder();
@@ -570,41 +609,7 @@ public class RiskQueryBuilder {
         builder.append("),0) as " + riskName);
     }
 
-    private static void buildSimple(int level, boolean human) {       
-       StringBuilder builder = new StringBuilder();
-       Level lev = levels[level - 1];
-       if(lev.isGrid) {
-           builder.append("select grid.gid,grid.geometria,avg(a3.rischio) as rischio\n");
-           builder.append(" FROM\n"); 
-           builder.append("(");
-       }
-       builder.append("select siig_geo_ln_arco_"+level+".id_geo_arco,");
-       buildRisk(level, "rischio", builder, human);
-       builder.append(",siig_geo_ln_arco_"+level+".lunghezza,siig_geo_ln_arco_"+level+".geometria\n");
-       builder.append("from siig_geo_ln_arco_"+level+"\n");
-       builder.append("where siig_geo_ln_arco_"+level+".geometria && st_makeenvelope(%bounds%, 32632)\n");
-       if(lev.isGrid) {
-           builder.append(") as a3,\n");
-           builder.append("(SELECT\n");
-           builder.append("        row_number() OVER (ORDER BY q_grid.cell) AS gid,\n");
-           builder.append("        q_grid.cell AS geometria\n");
-           builder.append("    FROM\n");
-           builder.append("        (\n");
-           builder.append("            SELECT\n");
-           builder.append("              (st_dump(makegrid_2d(st_geomfromtext\n");
-           builder.append("              (\n");
-           builder.append("             'Polygon((317643 4881313,516288 4881313,516288 5140984,317643 5140984,317643 4881313))'\n");
-           builder.append("                ::text, 32632), 5000, 32632))).geom AS cell) q_grid) as grid\n");
-           builder.append("WHERE\n");
-           builder.append("st_intersects(a3.geometria, grid.geometria)\n");
-           builder.append("GROUP BY\n");
-           builder.append("grid.gid,\n");
-           builder.append("grid.geometria\n");
-       }
-   
-       //builder.append("order by id_geo_arco\n");
-       System.out.println(builder.toString());
-    }
+    
 
     private static void buildAmbientali(StringBuilder builder, int level) {
         int count = 0;
@@ -617,12 +622,12 @@ public class RiskQueryBuilder {
             builder.append("          where id_geo_arco = siig_geo_ln_arco_"+level+".id_geo_arco\n");
             builder.append("          and id_distanza = (\n");
             builder.append("               select fk_distanza\n");
-            builder.append("               from siig_r_area_danno\n");
-            builder.append("               inner join siig_d_gravita on siig_r_area_danno.id_gravita = siig_d_gravita.id_gravita\n");
+            builder.append("               from siig_r_area_danno\n");            
             builder.append("               where siig_r_area_danno.id_bersaglio = "+bersaglio.id+"\n");
             builder.append("               and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
             builder.append("               and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
             builder.append("               and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+            builder.append("               and siig_r_area_danno.id_gravita = 5\n");
             builder.append("          )\n");
             builder.append("         ) * (\n");
             
@@ -667,12 +672,11 @@ public class RiskQueryBuilder {
                     builder.append("                  where id_geo_arco = siig_geo_ln_arco_"+level+".id_geo_arco\n");
                     builder.append("                  and id_distanza = (\n");
                     builder.append("                      select fk_distanza\n");
-                    builder.append("                      from siig_r_area_danno\n");
-                    builder.append("                      inner join siig_d_gravita on siig_r_area_danno.id_gravita = siig_d_gravita.id_gravita\n");
-                    builder.append("                      where siig_d_gravita.id_gravita = "+bersaglio.gravita[i]+"\n");             
-                    builder.append("                        and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
+                    builder.append("                      from siig_r_area_danno\n");                    
+                    builder.append("                      where siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+                    builder.append("                        and siig_r_area_danno.id_gravita = "+bersaglio.gravita[i]+"\n");
                     builder.append("                        and siig_r_area_danno.id_bersaglio = " + bersaglio.id + "\n");
                     builder.append("                  )\n");
                 } else {
@@ -682,11 +686,10 @@ public class RiskQueryBuilder {
                     builder.append("                  and id_distanza = (\n");
                     builder.append("                      select fk_distanza\n");
                     builder.append("                      from siig_r_area_danno\n");
-                    builder.append("                      inner join siig_d_gravita on siig_r_area_danno.id_gravita = siig_d_gravita.id_gravita\n");
-                    builder.append("                      where siig_d_gravita.id_gravita = "+bersaglio.gravita[i]+"\n");             
-                    builder.append("                        and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
+                    builder.append("                      where siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+                    builder.append("                        and siig_r_area_danno.id_gravita = "+bersaglio.gravita[i]+"\n");
                     builder.append("                        and siig_r_area_danno.id_bersaglio = " + bersaglio.id + "\n");
                     builder.append("                  )) - (\n");
                     builder.append("                  select coalesce("+bersaglio.eField+",1)\n");
@@ -695,14 +698,13 @@ public class RiskQueryBuilder {
                     builder.append("                  and id_distanza = (\n");
                     builder.append("                      select fk_distanza\n");
                     builder.append("                      from siig_r_area_danno\n");
-                    builder.append("                      inner join siig_d_gravita on siig_r_area_danno.id_gravita = siig_d_gravita.id_gravita\n");
-                    builder.append("                      where siig_d_gravita.id_gravita = "+bersaglio.gravita[i-1]+"\n");             
-                    builder.append("                        and siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
+                    builder.append("                      where siig_r_area_danno.id_scenario = siig_r_scenario_sostanza.id_scenario\n");
                     builder.append("                        and siig_r_area_danno.id_sostanza = siig_r_scenario_sostanza.id_sostanza\n");
                     builder.append("                        and siig_r_area_danno.flg_lieve = siig_r_scenario_sostanza.flg_lieve\n");
+                    builder.append("                        and siig_r_area_danno.id_gravita = "+bersaglio.gravita[i-1]+"\n");
                     builder.append("                        and siig_r_area_danno.id_bersaglio = " + bersaglio.id + "\n");
                     builder.append("                  )\n");
-                    builder.append("                  ),0)\n");
+                    builder.append("                  ),1)\n");
                 }
                 
                 builder.append("                ) *\n");
@@ -726,7 +728,7 @@ public class RiskQueryBuilder {
             builder.append("              from siig_t_bersaglio\n");
             builder.append("              where id_bersaglio = "+bersaglio.id+"\n");                    
             builder.append("         ) * %"+bersaglio.name+"%\n");
-            builder.append("                ,0)\n");
+            builder.append("                ,1)\n");
             count++;
             
         }

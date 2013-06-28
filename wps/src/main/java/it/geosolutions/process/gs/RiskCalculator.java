@@ -21,11 +21,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.DataStoreInfo;
@@ -41,57 +41,33 @@ import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.process.factory.DescribeParameter;
 import org.geotools.process.factory.DescribeProcess;
 import org.geotools.process.factory.DescribeResult;
-import org.geotools.process.gs.GSProcess;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.MultiLineString;
 
-
-
 /**
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
 @DescribeProcess(title = "RiskCalculator", description = "Dynamically calculates risk on road arcs.")
-public class RiskCalculator implements GSProcess {
-	
+public class RiskCalculator extends RiskCalculatorBase {
 	private static final Logger LOGGER = Logging.getLogger(RiskCalculator.class);
 	
-	private Catalog catalog;
 	
-	static class FormulaChild {
-		private int id;
-		private String operator;
-		/**
-		 * @param id
-		 * @param operator
-		 */
-		public FormulaChild(int id, String operator) {
-			super();
-			this.id = id;
-			this.operator = operator;
-		}
-		/**
-		 * @return the id
-		 */
-		public int getId() {
-			return id;
-		}
-		/**
-		 * @return the operator
-		 */
-		public String getOperator() {
-			return operator;
-		}
-		
-		
-	}
 	
+	
+	
+	
+	
+	/**
+	 * @param catalog
+	 */
 	public RiskCalculator(Catalog catalog) {
-		this.catalog = catalog;
+		super(catalog);		
 	}
+
 	@DescribeResult(description = "Risk calculus result")
 	public SimpleFeatureCollection execute(
 			@DescribeParameter(name = "features", description = "Input feature collection") SimpleFeatureCollection features,
@@ -103,81 +79,158 @@ public class RiskCalculator implements GSProcess {
 			@DescribeParameter(name = "entities", description = "ids of the entities to use in calculation") String entities,
 			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness
 		) throws IOException, SQLException {
+		
 		DataStoreInfo dataStoreInfo = catalog.getDataStoreByName(storeName);
+		if(dataStoreInfo == null) {
+			throw new IOException("DataStore not found: " + storeName);
+		}
 		JDBCDataStore dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
 		DefaultTransaction transaction = new DefaultTransaction();
+		Connection conn = null;
 		try {
-			Connection conn = dataStore.getConnection(transaction);
-			
+			 conn = dataStore.getConnection(transaction);
+			 
 			// output FeatureType (risk)
 			//  - id_geo_arco
 			//  - geometria
-			//  - nr_incidenti_elab --> rischio
+			//  - rischio1
+			//  - rischio2
 			SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();									
 			tb.add("id_geo_arco", features.getSchema().getDescriptor("id_geo_arco").getType().getBinding());
 			tb.add("geometria", MultiLineString.class,features.getSchema().getGeometryDescriptor().getCoordinateReferenceSystem());
-	        tb.add("nr_incidenti_elab", Double.class);			
+	        tb.add("rischio1", Double.class);			
+	        tb.add("rischio2", Double.class);
 	        tb.setName(new NameImpl(features.getSchema().getName().getNamespaceURI(), "risk"));	        
 	        SimpleFeatureType ft = tb.buildFeatureType();
-			
-	        // is formula supported on grid (level 3) ?
-			boolean grid = hasGrid(conn, formula);
-			int level = getLevel(features);
-			if(!grid && level == 3) {
+	        
+	        // feature level (1, 2, 3)
+	        int level = getLevel(features);	       
+	        
+	        Formula formulaDescriptor = loadFormula(conn, formula, target);
+	        
+	        if((!formulaDescriptor.hasGrid() && level == 3) || (!formulaDescriptor.hasNoGrid() && level < 3)) {
 				// grid not supported -> empty feature
 				return new EmptyFeatureCollection(ft);
-			} else {
-				String sql = getSqlQuery(conn, level, formula, target);				 				
-				if(sql == null) {
-					throw new IOException("Risk query cannot be built with the given parameters");
-				}
-				SimpleFeatureIterator iter = features.features();											
+	        } else {
+	        	// iterator on source
+	        	SimpleFeatureIterator iter = features.features();
+	        	
+	        	// result builder
 		        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(ft);
 				ListFeatureCollection result = new ListFeatureCollection(ft);
 				int count = 0;				
-				Double risk = 0.0;
+				Double[] risk = new Double[] { 0.0, 0.0 };
 				
-				// is the query using arcs? if not we can optimize (same value for all arcs)
-				boolean useArcs = isUsingArcs(conn, level, formula, target);
-				if(!useArcs) {
-					risk = getRisk(conn, sql, materials, scenarios, entities, severeness);
+				if(!formulaDescriptor.useArcs()) {
+					risk = getRisk(conn, level, formulaDescriptor, materials, scenarios, entities, severeness, target);
 				}
+				
+				// iterate source features
 				try {
+					// we will calculate risk in batch of arcs
+					// we store each feature of the batch in a map
+					// indexed by id					
 					Map<Number, SimpleFeature> temp = new HashMap<Number, SimpleFeature>();
+					// ids will store the list of id of each batch
+					// used to build risk query
 					StringBuilder ids = new StringBuilder();
+					
 					while(iter.hasNext()) {
 						SimpleFeature feature = iter.next();
 						Number id = (Number)feature.getAttribute("id_geo_arco");
 						fb.add(id);
 						fb.add(feature.getDefaultGeometry());
-						fb.add(risk);
-						ids.append(","+id);
-						temp.put(id.intValue(), fb.buildFeature(id + ""));
-						count++;
-						if(count % 10000 == 0) {
-							if(useArcs) {
-								getRisk(conn, sql, ids.toString().substring(1), materials, scenarios, entities, severeness, temp);
-							}
-							result.addAll(temp.values());
-							ids = new StringBuilder();
-							temp = new HashMap<Number, SimpleFeature>();
-							
-						}				
+						if(formulaDescriptor.takeFromSource()) {
+							risk[0] = ((Number)feature.getAttribute("rischio1")).doubleValue();
+							risk[1] = ((Number)feature.getAttribute("rischio2")).doubleValue();
+						} 
+						fb.add(risk[0]);
+						fb.add(risk[1]);
+						
+						
+						// calculate risk here only if it depends from arcs
+						if(formulaDescriptor.useArcs()) {
+							ids.append(","+id);
+							temp.put(id.intValue(), fb.buildFeature(id + ""));
+							count++;
+							if(count % 10000 == 0) {
+								getRisk(conn, level, formulaDescriptor, ids.toString()
+										.substring(1), materials, scenarios,
+										entities, severeness, target, temp);								
+								result.addAll(temp.values());
+								ids = new StringBuilder();
+								temp = new HashMap<Number, SimpleFeature>();								
+							}	
+						} else {
+							result.add(fb.buildFeature(id + ""));
+						}
 					}
-					if(useArcs && ids.length() > 0) {
-						getRisk(conn, sql, ids.toString().substring(1), materials, scenarios, entities, severeness, temp);
+					if(formulaDescriptor.useArcs() && ids.length() > 0) {
+						getRisk(conn, level, formulaDescriptor, ids.toString()
+								.substring(1), materials, scenarios, entities,
+								severeness, target, temp);
 					}
 					result.addAll(temp.values());
 				} finally {
 					iter.close();
 				}
 				return result;
-								
+	        }
+ 			
+		} finally {				
+			transaction.close();
+			if(conn != null) {
+				conn.close();
 			}
-		} finally {
-			transaction.close();			
 		}
+		
 	}
+
+	/**
+	 * Risk Calculator for formulas that depend on arcs.
+	 * 
+	 * @param conn
+	 * @param formulaDescriptor
+	 * @param substring
+	 * @param materials
+	 * @param scenarios
+	 * @param entities
+	 * @param severeness
+	 * @param temp
+	 * @throws SQLException 
+	 */
+	private void getRisk(Connection conn, int level, Formula formulaDescriptor,
+			String ids, String materials, String scenarios,
+			String entities, String severeness, int target, Map<Number, SimpleFeature> features) throws SQLException {
+	
+		String sql = formulaDescriptor.getSql();
+		
+		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
+			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, sql, "rischio1", target + "", features);
+		} else if(isAllHumanTargets(target)) {
+			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, sql, "rischio1", "1,2,4,5,6,7", features);
+		} else if(isAllNotHumanTargets(target)) {
+			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, sql, "rischio1", "10,11,12,13,14,15,16", features);			
+		} else if(isAllTargets(target)) {			
+			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, sql, "rischio1", "1,2,4,5,6,7", features);
+			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, sql, "rischio2", "10,11,12,13,14,15,16", features);
+		}				
+	}
+
+	
+
+	
+	
+
+	
+
+	
+
 	/**
 	 * @param features
 	 * @return
@@ -194,266 +247,5 @@ public class RiskCalculator implements GSProcess {
 			return 3;
 		}
 		return 0;
-	}
-	/**
-	 * @param conn
-	 * @param formula
-	 * @return
-	 * @throws SQLException 
-	 */
-	private boolean hasGrid(Connection conn, int formula) throws SQLException {
-		String sql =  "select flg_i_grid ";
-	       sql += "from siig_mtd_t_formula ";	       
-	       sql += "where id_formula=?";
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, formula);		
-			rs = stmt.executeQuery();			
-			if(rs.next()) {
-				return rs.getInt(1) == 1;				
-			}
-			return false;
-		} finally {
-			if(rs != null) {
-				rs.close();				
-			}
-			if(stmt != null) {
-				stmt.close();
-			}
-			
-		}
-	}
-	/**
-	 * @param conn
-	 * @param level
-	 * @param formula
-	 * @param target
-	 * @return
-	 * @throws SQLException 
-	 */
-	private boolean isUsingArcs(Connection conn, int level, int formula,
-			int target) throws SQLException {
-		String sql =  "select def_select ";
-	       sql += "from siig_mtd_r_formula_parametro ";
-	       sql += "inner join siig_mtd_r_param_bers_arco on siig_mtd_r_formula_parametro.id_parametro=siig_mtd_r_param_bers_arco.id_parametro and id_arco=0 ";
-	       sql += "where id_formula=? and (id_bersaglio=? or id_bersaglio=0)";
-	PreparedStatement stmt = null;
-	ResultSet rs = null;
-	try {
-		stmt = conn.prepareStatement(sql);
-		stmt.setInt(1, formula);
-		stmt.setInt(2, target);
-		rs = stmt.executeQuery();			
-		if(rs.next()) {			
-			return false;
-		}
-		return true;
-	} finally {
-		if(rs != null) {
-			rs.close();				
-		}
-		if(stmt != null) {
-			stmt.close();
-		}
-		
-	}
-	}
-	/**
-	 * @param conn
-	 * @param sql
-	 * @param materials
-	 * @param scenarios
-	 * @param severeness
-	 * @return
-	 * @throws SQLException 
-	 */
-	private Double getRisk(Connection conn, String sql, String materials,
-			String scenarios, String entities, String severeness) throws SQLException {
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			
-			if(sql.contains("id_sostanza") && !materials.equals("")) {
-				sql = sql.replace("id_sostanza = ?", "id_sostanza in (" + materials + ")");
-			}
-			if(sql.contains("id_scenario") && !scenarios.equals("")) {
-				sql = sql.replace("id_scenario = ?", "id_scenario in (" + scenarios + ")");
-			}
-			if(sql.contains("flg_lieve") && !entities.equals("")) {
-				sql = sql.replace("flg_lieve = ?", "flg_lieve in (" + entities + ")");
-			}
-			
-			if(sql.contains("id_gravita") && !severeness.equals("")) {
-				sql = sql.replace("id_gravita = ?", "id_gravita in (" + severeness + ")");
-			}
-			stmt = conn.prepareStatement(sql);
-						
-			rs = stmt.executeQuery();
-			Double risk = 0.0;
-			while(rs.next()) {				
-				risk += rs.getDouble(1);								
-			}
-			return risk;
-		} finally {
-			if(rs != null) {
-				rs.close();				
-			}
-			if(stmt != null) {
-				stmt.close();
-			}
-			
-		}
-	}
-	/**
-	 * @param conn
-	 * @param sql
-	 * @param id
-	 * @return
-	 * @throws SQLException 
-	 */
-	private void getRisk(Connection conn, String sql, String ids,
-			String materials, String scenarios, String entities, String severeness, Map<Number, SimpleFeature> features)
-			throws SQLException {
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			boolean group = sql.startsWith("select avg");
-			sql = sql.replaceAll("^select ","select id_geo_arco,");
-			sql = sql.replace("id_geo_arco = ?", "id_geo_arco in (" + ids + ")");
-			if(sql.contains("id_sostanza") && !materials.equals("")) {
-				sql = sql.replaceAll("id_sostanza\\s*=\\s*\\?", "id_sostanza in (" + materials + ")");
-			}
-			if(sql.contains("id_scenario") && !scenarios.equals("")) {
-				sql = sql.replace("id_scenario = ?", "id_scenario in (" + scenarios + ")");
-			}
-			if(sql.contains("flg_lieve") && !entities.equals("")) {
-				sql = sql.replace("flg_lieve = ?", "flg_lieve in (" + entities + ")");
-			}
-			
-			if(sql.contains("id_gravita") && !severeness.equals("")) {
-				sql = sql.replace("id_gravita = ?", "id_gravita in (" + severeness + ")");
-			}
-			if(group) {
-				sql += " group by id_geo_arco";
-			}
-			stmt = conn.prepareStatement(sql);
-						
-			rs = stmt.executeQuery();
-			
-			while(rs.next()) {
-				Number id = rs.getInt(1);
-				Number risk = rs.getDouble(2) + (Double)features.get(id).getAttribute("nr_incidenti_elab");
-				features.get(id).setAttribute("nr_incidenti_elab", risk);
-				
-			}
-			
-		} finally {
-			if(rs != null) {
-				rs.close();				
-			}
-			if(stmt != null) {
-				stmt.close();
-			}
-			
-		}
-	}
-	/**
-	 * @param conn
-	 * @param formula
-	 * @return
-	 * @throws SQLException 
-	 */
-	private String getSqlQuery(Connection conn, int level, int formula, int target) throws SQLException {
-		List<FormulaChild> childs = getChilds(conn, formula);
-		if(childs.size() == 0) {
-			return getSimpleSql(conn, level, formula, target);
-		} else {
-			/*String sql = "";
-			String operator = null;
-			for(FormulaChild child : childs) {
-				String newSql = getSqlQuery(conn, level, child.getId(), target);
-				if(operator != null && newSql != null && !sql.equals("")) {
-					sql += operator;				
-				}
-				if(newSql != null) {
-					sql += newSql;
-				}
-				operator = child.getOperator();				
-			}
-			return sql;*/
-			return null;
-		}
-		
-	}
-	/**
-	 * @param formula
-	 * @return
-	 * @throws SQLException 
-	 */
-	private List<FormulaChild> getChilds(Connection conn, int formula) throws SQLException {
-		List<FormulaChild> childs = new ArrayList<FormulaChild>();
-		String sql =  "select id_formula_figlio,operatore ";
-	       sql += "from siig_mtd_r_formula_formula ";	       
-	       sql += "where id_formula=? order by progressivo_formula";
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, formula);		
-			rs = stmt.executeQuery();			
-			while(rs.next()) {
-				childs.add(new FormulaChild(rs.getInt(1), rs.getString(2)));
-			}
-			return childs;
-		} finally {
-			if(rs != null) {
-				rs.close();				
-			}
-			if(stmt != null) {
-				stmt.close();
-			}
-			
-		}
-	}
-		
-	/**
-	 * @param conn
-	 * @param level
-	 * @param formula
-	 * @param target
-	 * @return
-	 * @throws SQLException
-	 */
-	private String getSimpleSql(Connection conn, int level, int formula,
-			int target) throws SQLException {
-		String sql =  "select def_select ";
-		       sql += "from siig_mtd_r_formula_parametro ";
-		       sql += "inner join siig_mtd_r_param_bers_arco on siig_mtd_r_formula_parametro.id_parametro=siig_mtd_r_param_bers_arco.id_parametro and (id_arco=" + level + " or id_arco=0) ";
-		       sql += "where id_formula=? and (id_bersaglio=? or id_bersaglio=0)";
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		try {
-			stmt = conn.prepareStatement(sql);
-			stmt.setInt(1, formula);
-			stmt.setInt(2, target);
-			rs = stmt.executeQuery();			
-			if(rs.next()) {
-				/*String mainTableName = "siig_geo_ln_arco_" + level;
-				String riskSql = rs.getString(1).replace("id_geo_arco = %", "id_geo_arco = "+mainTableName + ".id_geo_arco");
-				return "select id_geo_arco, ("+riskSql+") as rischio, geometria from " + mainTableName;*/
-				return rs.getString(1).replace("%", "?");
-			}
-			return null;
-		} finally {
-			if(rs != null) {
-				rs.close();				
-			}
-			if(stmt != null) {
-				stmt.close();
-			}
-			
-		}
 	}
 }

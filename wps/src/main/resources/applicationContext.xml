@@ -10,6 +10,10 @@
     <bean id="riskCalculator" class="it.geosolutions.process.gs.RiskCalculator">
       <constructor-arg index="0" ref="catalog"/>
     </bean>
+    
+    <bean id="riskCalculatorSimple" class="it.geosolutions.process.gs.RiskCalculatorSimple">
+      <constructor-arg index="0" ref="catalog"/>
+    </bean>
 
 
 </beans>

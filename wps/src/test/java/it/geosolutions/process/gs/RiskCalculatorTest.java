@@ -76,7 +76,7 @@ public class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
-	public void aatestFormulaCff() throws IOException, SQLException {
+	public void aatestFormulaCffSimpleTarget() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			
@@ -88,6 +88,87 @@ public class RiskCalculatorTest extends TestCase {
 				iter = riskCalculator.execute(featColl, dataStoreName, 2, 1, "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
+					assertNotNull(feature);
+					assertEquals(0.3, feature.getAttribute("rischio1"));
+					count++;
+				}
+			} finally {
+				if(iter != null) {
+					iter.close();
+				}
+			}
+			assertTrue(count > 0);
+			
+		}
+	}
+	
+	public void aatestFormulaCffHuman() throws IOException, SQLException {
+		
+		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
+			
+			SimpleFeatureCollection featColl = dataStore.getFeatureSource("siig_geo_ln_arco_2").getFeatures();//ff.less(ff.property("id_geo_arco"), ff.literal(1000)));
+			
+			int count = 0;
+			SimpleFeatureIterator iter = null;
+			try {
+				iter = riskCalculator.execute(featColl, dataStoreName, 2, 98, "", "", "", "").features();
+				while(iter.hasNext()) {
+					SimpleFeature feature = iter.next();
+					assertNotNull(feature);
+					assertEquals(0.3, feature.getAttribute("rischio1"));
+					count++;
+				}
+			} finally {
+				if(iter != null) {
+					iter.close();
+				}
+			}
+			assertTrue(count > 0);
+			
+		}
+	}
+	
+	public void aatestFormulaCffAll() throws IOException, SQLException {
+		
+		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
+			
+			SimpleFeatureCollection featColl = dataStore.getFeatureSource("siig_geo_ln_arco_2").getFeatures();//ff.less(ff.property("id_geo_arco"), ff.literal(1000)));
+			
+			int count = 0;
+			SimpleFeatureIterator iter = null;
+			try {
+				iter = riskCalculator.execute(featColl, dataStoreName, 2, 100, "", "", "", "").features();
+				while(iter.hasNext()) {
+					SimpleFeature feature = iter.next();
+					assertNotNull(feature);
+					assertEquals(0.3, feature.getAttribute("rischio1"));
+					assertEquals(0.0, feature.getAttribute("rischio2"));
+					count++;
+				}
+			} finally {
+				if(iter != null) {
+					iter.close();
+				}
+			}
+			assertTrue(count > 0);
+			
+		}
+	}
+	
+	public void aatestFormulaPadr() throws IOException, SQLException {
+		
+		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
+			
+			SimpleFeatureCollection featColl = dataStore.getFeatureSource("siig_geo_ln_arco_2").getFeatures();//ff.less(ff.property("id_geo_arco"), ff.literal(1000)));
+			
+			int count = 0;
+			SimpleFeatureIterator iter = null;
+			try {
+				iter = riskCalculator.execute(featColl, dataStoreName, 20, 0, "9", "", "", "").features();
+				while(iter.hasNext()) {
+					SimpleFeature feature = iter.next();
+					assertEquals(1.0, feature.getAttribute("rischio1"));
+					assertEquals(0.0, feature.getAttribute("rischio2"));
 					assertNotNull(feature);
 					count++;
 				}
@@ -101,7 +182,7 @@ public class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
-	public void bbtestFormulaPadr() throws IOException, SQLException {
+	public void testFormulaPis() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			
@@ -110,9 +191,9 @@ public class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, 20, 0, "9,10", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, 22, 0, "", "", "", "").features();
 				while(iter.hasNext()) {
-					SimpleFeature feature = iter.next();
+					SimpleFeature feature = iter.next();					
 					assertNotNull(feature);
 					count++;
 				}
@@ -226,7 +307,7 @@ public class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
-	public void testFormulaE() throws IOException, SQLException {
+	public void aatestFormulaE() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			
