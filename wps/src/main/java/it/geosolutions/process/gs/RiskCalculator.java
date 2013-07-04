@@ -16,19 +16,19 @@
  */
 package it.geosolutions.process.gs;
 
+import it.geosolutions.destination.utils.Formula;
+import it.geosolutions.destination.utils.FormulaUtils;
+
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.DataStoreInfo;
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -48,18 +48,14 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
+ * WPS Process for roads depending formula calculations.
+ * 
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
 @DescribeProcess(title = "RiskCalculator", description = "Dynamically calculates risk on road arcs.")
 public class RiskCalculator extends RiskCalculatorBase {
-	private static final Logger LOGGER = Logging.getLogger(RiskCalculator.class);
-	
-	
-	
-	
-	
-	
+	private static final Logger LOGGER = Logging.getLogger(RiskCalculator.class);	
 	
 	/**
 	 * @param catalog
@@ -71,7 +67,10 @@ public class RiskCalculator extends RiskCalculatorBase {
 	@DescribeResult(description = "Risk calculus result")
 	public SimpleFeatureCollection execute(
 			@DescribeParameter(name = "features", description = "Input feature collection") SimpleFeatureCollection features,
-			@DescribeParameter(name = "store", description = "risk data store name") String storeName,
+			@DescribeParameter(name = "store", description = "risk data store name", min = 0) String storeName,
+			@DescribeParameter(name = "batch", description = "batch calculus size", min = 0) Integer batch,
+			@DescribeParameter(name = "precision", description = "output value precision (decimals)", min = 0) Integer precision,
+			@DescribeParameter(name = "connection", description = "risk database connection params", min = 0) Map<String, String> connectionParams,
 			@DescribeParameter(name = "formula", description = "id of the formula to calculate") int formula,
 			@DescribeParameter(name = "target", description = "id of the target/s to use in calculation") int target,
 			@DescribeParameter(name = "materials", description = "ids of the materials to use in calculation") String materials,
@@ -80,11 +79,30 @@ public class RiskCalculator extends RiskCalculatorBase {
 			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness
 		) throws IOException, SQLException {
 		
-		DataStoreInfo dataStoreInfo = catalog.getDataStoreByName(storeName);
-		if(dataStoreInfo == null) {
-			throw new IOException("DataStore not found: " + storeName);
+		// building DataStore connection using Catalog/storeName or connection input parameters
+		JDBCDataStore dataStore = null;
+		if(catalog != null && storeName != null) {
+			LOGGER.info("Loading DataStore " + storeName + " from Catalog");
+			DataStoreInfo dataStoreInfo = catalog.getDataStoreByName(storeName);
+			if(dataStoreInfo == null) {
+				LOGGER.severe("DataStore not found");
+				throw new IOException("DataStore not found: " + storeName);
+			}
+			dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
+		} else if(connectionParams != null) {
+			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(connectionParams);
+		} else {
+			throw new IOException(
+					"DataStore connection not configured, either catalog, storeName or connectionParams are not available");
 		}
-		JDBCDataStore dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
+		
+		if(batch == null) {
+			batch = 10000;
+		}
+		if(precision == null) {
+			precision = 3;
+		}
+		
 		DefaultTransaction transaction = new DefaultTransaction();
 		Connection conn = null;
 		try {
@@ -100,16 +118,21 @@ public class RiskCalculator extends RiskCalculatorBase {
 			tb.add("geometria", MultiLineString.class,features.getSchema().getGeometryDescriptor().getCoordinateReferenceSystem());
 	        tb.add("rischio1", Double.class);			
 	        tb.add("rischio2", Double.class);
+	        // fake layer name (risk) used for WPS output. Layer risk must be defined in GeoServer
+	        // catalog
 	        tb.setName(new NameImpl(features.getSchema().getName().getNamespaceURI(), "risk"));	        
 	        SimpleFeatureType ft = tb.buildFeatureType();
 	        
 	        // feature level (1, 2, 3)
-	        int level = getLevel(features);	       
+	        int level = FormulaUtils.getLevel(features);	       
 	        
-	        Formula formulaDescriptor = loadFormula(conn, formula, target);
+	        LOGGER.info("Doing calculus for level " + level);
 	        
-	        if((!formulaDescriptor.hasGrid() && level == 3) || (!formulaDescriptor.hasNoGrid() && level < 3)) {
-				// grid not supported -> empty feature
+	        Formula formulaDescriptor = Formula.load(conn, formula, target);
+	        
+			if ((!formulaDescriptor.hasGrid() && level == 3)
+					|| (!formulaDescriptor.hasNoGrid() && level < 3)) {
+	        	LOGGER.info("Formula not supported on this level, returning empty collection");				
 				return new EmptyFeatureCollection(ft);
 	        } else {
 	        	// iterator on source
@@ -121,9 +144,9 @@ public class RiskCalculator extends RiskCalculatorBase {
 				int count = 0;				
 				Double[] risk = new Double[] { 0.0, 0.0 };
 				
-				if(!formulaDescriptor.useArcs()) {
+				/*if(!formulaDescriptor.useArcs()) {
 					risk = getRisk(conn, level, formulaDescriptor, materials, scenarios, entities, severeness, target);
-				}
+				}*/
 				
 				// iterate source features
 				try {
@@ -149,7 +172,20 @@ public class RiskCalculator extends RiskCalculatorBase {
 						
 						
 						// calculate risk here only if it depends from arcs
-						if(formulaDescriptor.useArcs()) {
+						ids.append(","+id);
+						temp.put(id.intValue(), fb.buildFeature(id + ""));
+						count++;
+						// calculate batch items a time 
+						if(count % batch == 0) {
+							LOGGER.info("Calculated " + count + " values");
+							FormulaUtils.calculateFormulaValues(conn, level, formulaDescriptor, ids.toString()
+									.substring(1), materials, scenarios,
+									entities, severeness, target, temp, precision);								
+							result.addAll(temp.values());
+							ids = new StringBuilder();
+							temp = new HashMap<Number, SimpleFeature>();								
+						}	
+						/*if(formulaDescriptor.useArcs()) {
 							ids.append(","+id);
 							temp.put(id.intValue(), fb.buildFeature(id + ""));
 							count++;
@@ -163,13 +199,20 @@ public class RiskCalculator extends RiskCalculatorBase {
 							}	
 						} else {
 							result.add(fb.buildFeature(id + ""));
-						}
+						}*/
 					}
-					if(formulaDescriptor.useArcs() && ids.length() > 0) {
+					
+					// final calculus for remaining items not in batch size
+					LOGGER.info("Calculating remaining items");
+					FormulaUtils.calculateFormulaValues(conn, level, formulaDescriptor, ids.toString()
+							.substring(1), materials, scenarios, entities,
+							severeness, target, temp, precision);
+					
+					/*if(formulaDescriptor.useArcs() && ids.length() > 0) {
 						getRisk(conn, level, formulaDescriptor, ids.toString()
 								.substring(1), materials, scenarios, entities,
 								severeness, target, temp);
-					}
+					}*/
 					result.addAll(temp.values());
 				} finally {
 					iter.close();
@@ -186,66 +229,4 @@ public class RiskCalculator extends RiskCalculatorBase {
 		
 	}
 
-	/**
-	 * Risk Calculator for formulas that depend on arcs.
-	 * 
-	 * @param conn
-	 * @param formulaDescriptor
-	 * @param substring
-	 * @param materials
-	 * @param scenarios
-	 * @param entities
-	 * @param severeness
-	 * @param temp
-	 * @throws SQLException 
-	 */
-	private void getRisk(Connection conn, int level, Formula formulaDescriptor,
-			String ids, String materials, String scenarios,
-			String entities, String severeness, int target, Map<Number, SimpleFeature> features) throws SQLException {
-	
-		String sql = formulaDescriptor.getSql();
-		
-		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
-			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", target + "", features);
-		} else if(isAllHumanTargets(target)) {
-			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", "1,2,4,5,6,7", features);
-		} else if(isAllNotHumanTargets(target)) {
-			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", "10,11,12,13,14,15,16", features);			
-		} else if(isAllTargets(target)) {			
-			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", "1,2,4,5,6,7", features);
-			getRisk(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio2", "10,11,12,13,14,15,16", features);
-		}				
-	}
-
-	
-
-	
-	
-
-	
-
-	
-
-	/**
-	 * @param features
-	 * @return
-	 */
-	private int getLevel(SimpleFeatureCollection features) {
-		String typeName = features.getSchema().getTypeName();
-		if(typeName.contains("1")) {
-			return 1;
-		}
-		if(typeName.contains("2")) {
-			return 2;
-		}
-		if(typeName.contains("3") || typeName.contains("grid")) {
-			return 3;
-		}
-		return 0;
-	}
 }

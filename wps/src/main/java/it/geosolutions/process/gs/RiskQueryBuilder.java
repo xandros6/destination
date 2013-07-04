@@ -126,7 +126,7 @@ public class RiskQueryBuilder {
      */
     public static void main(String[] args) {
        
-       buildSimple(2, true);
+       buildSimple(1, false);
        //buildSimple(3, true);
        //buildCombined(3);
        //buildSimpleStyle(3);
@@ -583,7 +583,7 @@ public class RiskQueryBuilder {
     private static void buildRisk(int level, String riskName,
             StringBuilder builder, boolean human) {
         
-        builder.append("coalesce(siig_geo_ln_arco_"+level+".nr_incidenti_elab * (\n");
+        builder.append("coalesce(siig_geo_ln_arco_"+level+".nr_incidenti_elab * siig_geo_ln_arco_"+level+".lunghezza / 1000 * (\n");
         
         builder.append("   select sum(siig_r_arco_"+level+"_sostanza.padr * (\n");
         

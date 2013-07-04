@@ -13,24 +13,21 @@
                                  http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.geotools</groupId>
-        <artifactId>geotools</artifactId>
-        <version>8-SNAPSHOT</version>
-    </parent>
+    
 
 
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
     <groupId>it.geosololutions</groupId>
-    <artifactId>gt-process-destination</artifactId>
+    <artifactId>destination-utils</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>Destination Project Processes</name>
+    <name>Destination Utility Classes</name>
     
 
     <description>
-      Destination Project Processes.
+      Destination Utility Classes
     </description>
   
     <licenses>
@@ -60,54 +57,66 @@
 
     <properties>
         <gs.version>2.2-SNAPSHOT</gs.version>
+        <geotools.version>8-SNAPSHOT</geotools.version>
+        <junit.version>4.10</junit.version>
     </properties>
+    
+    <build>
+     <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <!-- =========================================================== -->
   <!--     Dependency Mangement                                    -->
   <!-- =========================================================== -->
     <dependencies>
         <dependency>
-            <groupId>it.geosololutions</groupId>
-            <artifactId>destination-utils</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-process</artifactId>
-            <version>${project.version}</version>
+            <version>${geotools.version}</version>
         </dependency> 
-		<dependency>
+        <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-process-feature</artifactId>
-            <version>${project.version}</version>
+            <version>${geotools.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.geoserver</groupId>
-            <artifactId>main</artifactId>
-            <version>${gs.version}</version>
-            <scope>provided</scope>
-        </dependency>
+        
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-sample-data</artifactId>
-            <version>${project.version}</version>
+            <version>${geotools.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-property</artifactId>
-            <version>${project.version}</version>
+            <version>${geotools.version}</version>
             <scope>test</scope>
         </dependency>
         
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
-            <version>${project.version}</version>
+            <version>${geotools.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    
   <!-- ================================================================== -->
   <!-- Repositories. This is where Maven looks for dependencies. The -->
   <!-- Maven repository is implicit and doesn't need to be specified. -->

@@ -58,9 +58,9 @@
 			<artifactId>gt-sample-data</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>it.geosololutions</groupId>
-			<artifactId>gt-process-destination</artifactId>
-		</dependency>
+            <groupId>it.geosololutions</groupId>
+            <artifactId>destination-utils</artifactId>                
+        </dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

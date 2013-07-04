@@ -73,6 +73,14 @@
     <dependencyManagement>
         <dependencies>
             <!-- =========================================================== -->
+            <!-- Utils -->
+            <!-- =========================================================== -->
+            <dependency>
+                <groupId>it.geosololutions</groupId>
+                <artifactId>destination-utils</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+            <!-- =========================================================== -->
             <!-- GeoBatch -->
             <!-- =========================================================== -->
             <dependency>
@@ -140,12 +148,7 @@
                 <artifactId>gb-logic-destination</artifactId>
                 <version>${destination.version}</version>
             </dependency>
-            <!-- GEOTOOOLS for DESTINATION-->
-            <dependency>    
-                <groupId>it.geosololutions</groupId>
-                <artifactId>gt-process-destination</artifactId>
-                <version>${gt.version}</version>
-            </dependency>
+            
             <!-- =========================================================== -->
             <!-- GEOTOOOLS -->
             <!-- =========================================================== -->
