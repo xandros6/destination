@@ -44,7 +44,7 @@ public class Formula {
 	
 	Map<Integer, FormulaCriteria> criterias = new HashMap<Integer, FormulaCriteria>(); 
 			
-	Pattern searchConditionalSubFormulas = Pattern.compile("%formula\\(([0-9]+)(,[^)]+)?\\)%(\\*%bersaglio\\(([0-9]+)\\)%)?", Pattern.CASE_INSENSITIVE);		
+	Pattern searchFormulas = Pattern.compile("%formula\\(([0-9]+)(,[^)]+)?\\)%(\\*%([a-zA-Z]+)\\(([0-9]+)\\)%)?", Pattern.CASE_INSENSITIVE);			
 
 	/**
 	 * @param grid
@@ -91,8 +91,12 @@ public class Formula {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static Formula load(Connection conn, int formula, int target) throws SQLException {
-		String sql =  "select formula, flg_visibile, flg_i, flg_m ";
+	public static Formula load(Connection conn, int processing, int formula, int target) throws SQLException {
+		String sql =  "select formula, flg_visibile, ";
+		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=1),0) as flg_i, ";
+		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=4),0) as flg_m_1, ";
+		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=5),0) as flg_m_2, ";
+		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=6),0) as flg_m_3 ";
 	       sql += "from siig_mtd_t_formula ";	       
 	       sql += "where id_formula=?";
 		PreparedStatement stmt = null;
@@ -103,7 +107,7 @@ public class Formula {
 			rs = stmt.executeQuery();			
 			if(rs.next()) {
 				return new Formula(rs.getString(1), rs.getInt(2) == 1 || rs.getInt(2) == 3, rs.getInt(2) == 2 || rs.getInt(2) == 3,
-						rs.getInt(3) == 1, rs.getInt(4) == 1).parse(conn, target);				
+						rs.getInt(3) > 0, rs.getInt(4) > 0 || rs.getInt(5) > 0 || rs.getInt(6) > 0).parse(conn, target, processing);				
 			}
 			return null;
 		} finally {
@@ -117,12 +121,12 @@ public class Formula {
 		}
 	}
 	
-	public Formula parse(Connection conn, int target) throws SQLException {
+	public Formula parse(Connection conn, int target, int processing) throws SQLException {
 		if(sql != null) {
-			Matcher m = searchConditionalSubFormulas.matcher(sql);
+			Matcher m = searchFormulas.matcher(sql);
 			while(m.find()) {				
 				int formula = Integer.parseInt(m.group(1));
-				String subFormula = load(conn, formula, target).sql;
+				String subFormula = load(conn, processing, formula, target).sql;
 				String[] params = new String[0];
 				if(m.group(2) != null) {
 					params = m.group(2).split(",");
@@ -133,12 +137,25 @@ public class Formula {
 				if(filter == null) {
 					filter = "";
 				}
+				
+				String defaultFilterValue = "";
 				if(!filter.trim().equals("")) {
-					int currentTarget = Integer.parseInt(m.group(4));
-					check = (currentTarget == target) || 
-							(FormulaUtils.isAllHumanTargets(target) && isIn(currentTarget, humanTargets)) || 
-							(FormulaUtils.isAllNotHumanTargets(target) && isIn(currentTarget, notHumanTargets)) ||
-							(FormulaUtils.isAllTargets(target) && (isIn(currentTarget, humanTargets) || isIn(currentTarget, notHumanTargets)));
+					String filterType = m.group(4).toLowerCase();
+					if(filterType.equals("bersaglio")) {
+						int currentTarget = Integer.parseInt(m.group(5));
+						check = (currentTarget == target) || 
+								(FormulaUtils.isAllHumanTargets(target) && isIn(currentTarget, humanTargets)) || 
+								(FormulaUtils.isAllNotHumanTargets(target) && isIn(currentTarget, notHumanTargets)) ||
+								(FormulaUtils.isAllTargets(target) && (isIn(currentTarget, humanTargets) || isIn(currentTarget, notHumanTargets)));
+						
+						defaultFilterValue = "0";
+					}
+					if(filterType.equals("elaborazione")) {
+						int currentProcessing = Integer.parseInt(m.group(5));
+						check = (currentProcessing == processing);
+						
+						defaultFilterValue = "1";
+					}
 				}
 				if(check) {
 					for(int count = 1; count < params.length; count+=2) {
@@ -152,32 +169,45 @@ public class Formula {
 						sql = sql.replace(m.group(0), subFormula);
 					}
 				} else {
-					sql = sql.replace(m.group(0), "0");
-				}
-					/*String filterName = params[0];
-					String filterValue = params[1];
-					String defaultValue = params[2];
-					for(int count = 3; count < params.length; count+=2) {
-						String varName = "%"+params[count]+"%";
-						String varValue = params[count+1];
-						subFormula = subFormula.replace(varName, varValue);
-					}
-					boolean check = false;
-					if(filterName.equalsIgnoreCase("1") || filterName.equalsIgnoreCase("true") ) {
-						check = true;
-					}
-					if(filterName.equalsIgnoreCase("bersaglio")) {
-						check = filterValue.startsWith("%") || Integer.parseInt(filterValue) == target;						
-					}
-					
-					if(check) {
-						sql = sql.replace(m.group(0), subFormula);
-					} else {
-						sql = sql.replace(m.group(0), defaultValue);
-					}*/					
-				
+					sql = sql.replace(m.group(0), defaultFilterValue);
+				}													
 				
 			}
+			
+			 /*m = searchProcessingConditionalFormulas.matcher(sql);
+				while(m.find()) {				
+					int formula = Integer.parseInt(m.group(1));
+					String subFormula = load(conn, processing, formula, target).sql;
+					String[] params = new String[0];
+					if(m.group(2) != null) {
+						params = m.group(2).split(",");
+					}
+					
+					String filter = m.group(3);
+					boolean check = true;
+					if(filter == null) {
+						filter = "";
+					}
+					if(!filter.trim().equals("")) {
+						int currentProcessing = Integer.parseInt(m.group(4));
+						check = (currentProcessing == processing);
+					}
+					if(check) {
+						for(int count = 1; count < params.length; count+=2) {
+							String varName = "%"+params[count]+"%";
+							String varValue = params[count+1];
+							subFormula = subFormula.replace(varName, varValue);
+						}
+						if(!filter.equals("")) {
+							sql = sql.replace(m.group(0), "#" + subFormula + "#" + filter);
+						} else {
+							sql = sql.replace(m.group(0), subFormula);
+						}
+					} else {
+						sql = sql.replace(m.group(0), "0");
+					}													
+					
+				}*/
 			
 		}
 		return this;
