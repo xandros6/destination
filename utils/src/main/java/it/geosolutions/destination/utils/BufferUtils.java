@@ -179,7 +179,6 @@ public class BufferUtils {
                     }                                       
                 }
                 GeometryCollection aggregate = geometryFactory.createGeometryCollection(geometries.toArray(new Geometry[] {}));
-                
                 // simplify aggregated geometry
                 TopologyPreservingSimplifier simplifier = new TopologyPreservingSimplifier(aggregate);
                 simplifier.setDistanceTolerance(5);
