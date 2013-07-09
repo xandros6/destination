@@ -85,8 +85,8 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 2,
-						1, "", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 2,
+						1, "", "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -112,7 +112,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 2, 98, "", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 2, 98, "", "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -138,7 +138,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 2, 100, "", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 2, 100, "", "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -165,7 +165,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 20, 0, "9", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 20, 0, "9", "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertEquals(1.0, feature.getAttribute("rischio1"));
@@ -192,7 +192,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 22, 0, "", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 22, 0, "", "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();					
 					assertNotNull(feature);
@@ -217,7 +217,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 22, 0, "", "", "", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 22, 0, "", "", "", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -242,7 +242,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 16, 0, "1,4", "4,5", "0,1", "").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 16, 0, "1,4", "4,5", "0,1", "", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -267,7 +267,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null,  36, 1, "", "4,5", "", "1,2,3,4").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 36, 1, "", "4,5", "", "1,2,3,4", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -292,7 +292,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null,  37, 10, "", "4,5", "", "5").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 1, 37, 10, "", "4,5", "", "5", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);
@@ -317,7 +317,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 			int count = 0;
 			SimpleFeatureIterator iter = null;
 			try {
-				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 32, 1, "9", "4,5", "0,1", "1,2,3,4").features();
+				iter = riskCalculator.execute(featColl, dataStoreName, null, null, null, 32, 1, 1, "9", "4,5", "0,1", "1,2,3,4", "").features();
 				while(iter.hasNext()) {
 					SimpleFeature feature = iter.next();
 					assertNotNull(feature);

@@ -107,7 +107,18 @@ public abstract class RiskCalculatorBase implements GSProcess {
 	
 	
 	
-	
+	/**
+	 * @param connectionParams
+	 * @return
+	 */
+	protected Map getConnectionParameters(String connectionParams) {
+		Map<String, String> paramsMap = new HashMap<String,String>();
+		for(String param : connectionParams.split(";")) {
+			String[] paramCouple = param.split("=");
+			paramsMap.put(paramCouple[0], paramCouple[1]);
+		}
+		return paramsMap;
+	}
 	
 	
 	

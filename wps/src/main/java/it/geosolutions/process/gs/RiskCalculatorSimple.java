@@ -62,13 +62,15 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 			@DescribeParameter(name = "store", description = "risk data store name") String storeName,
 			@DescribeParameter(name = "batch", description = "batch calculus size", min = 0) Integer batch,
 			@DescribeParameter(name = "precision", description = "output value precision (decimals)", min = 0) Integer precision,
-			@DescribeParameter(name = "connection", description = "risk database connection params", min = 0) Map<String, String> connectionParams,
+			@DescribeParameter(name = "connection", description = "risk database connection params", min = 0) String connectionParams,
+			@DescribeParameter(name = "processing", description = "id of the processing type") int processing,
 			@DescribeParameter(name = "formula", description = "id of the formula to calculate") int formula,
 			@DescribeParameter(name = "target", description = "id of the target/s to use in calculation") int target,
 			@DescribeParameter(name = "materials", description = "ids of the materials to use in calculation") String materials,
 			@DescribeParameter(name = "scenarios", description = "ids of the scenarios to use in calculation") String scenarios,
 			@DescribeParameter(name = "entities", description = "ids of the entities to use in calculation") String entities,
-			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness
+			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness,
+			@DescribeParameter(name = "fp", description = "fields to use for fp calculation", min = 0) String fpfield
 		) throws IOException, SQLException {
 		// building DataStore connection using Catalog/storeName or connection input parameters
 		JDBCDataStore dataStore = null;
@@ -81,7 +83,7 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 			}
 			dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
 		} else if(connectionParams != null) {
-			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(connectionParams);
+			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(getConnectionParameters(connectionParams));
 		} else {
 			throw new IOException(
 					"DataStore connection not configured, either catalog, storeName or connectionParams are not available");
@@ -97,7 +99,7 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 		Connection conn = null;
 		try {
 			conn = dataStore.getConnection(transaction);
-			Formula formulaDescriptor = Formula.load(conn, formula, target);
+			Formula formulaDescriptor = Formula.load(conn, processing, formula, target);
 			fillWithCriterias(conn, formula, formulaDescriptor);
 			JSONObject result = new JSONObject();
 			String[] targetsList;
@@ -112,7 +114,7 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 			} else {
 				targetsList = new String[] {target +""};				
 			}
-			calculateFormulaForAllTargets(conn, formulaDescriptor, materials, scenarios, entities, severeness, targetsList, result, precision);		
+			calculateFormulaForAllTargets(conn, processing, formulaDescriptor, materials, scenarios, entities, severeness, fpfield, targetsList, result, precision);		
 			return result.toString();
 		} finally {				
 			transaction.close();
@@ -145,9 +147,9 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 	 * @throws SQLException 
 	 * @throws NumberFormatException 
 	 */
-	private void calculateFormulaForAllTargets(Connection conn, 
+	private void calculateFormulaForAllTargets(Connection conn, int processing,
 			Formula formulaDescriptor, String materials, String scenarios,
-			String entities, String severeness, String[] targets, JSONObject result, int precision) throws NumberFormatException, SQLException {
+			String entities, String severeness, String fpfield, String[] targets, JSONObject result, int precision) throws NumberFormatException, SQLException {
 		JSONArray targetsArray = new JSONArray();
 		
 		for(String target : targets) {
@@ -156,13 +158,13 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 			targetObj.accumulate("id", targetId);
 			
 			if(!formulaDescriptor.aggregateScenarios()) {										
-					calculateFormulaForAllScenarios(conn, formulaDescriptor,
+					calculateFormulaForAllScenarios(conn, processing, formulaDescriptor,
 							materials, scenarios.split(","), entities,
-							severeness, targetId, targetObj, precision);								
+							severeness, fpfield, targetId, targetObj, precision);								
 			} else {
-				calculateFormulaForAllScenarios(conn, formulaDescriptor,
+				calculateFormulaForAllScenarios(conn, processing, formulaDescriptor,
 						materials, new String[] {scenarios}, entities,
-						severeness, targetId, targetObj, precision);			
+						severeness, fpfield, targetId, targetObj, precision);			
 				//fillRisk(targetObj, getRisk(conn, 0, formulaDescriptor, materials, scenarios, entities, severeness, targetId));
 			}
 			targetsArray.add(targetObj);
@@ -182,22 +184,22 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 	 * @return
 	 * @throws SQLException 
 	 */
-	private void calculateFormulaForAllScenarios(Connection conn,
+	private void calculateFormulaForAllScenarios(Connection conn, int processing,
 			Formula formulaDescriptor, String materials, String[] scenarios,
-			String entities, String severeness, int targetId, JSONObject result, int precision) throws SQLException {
+			String entities, String severeness, String fpfield, int targetId, JSONObject result, int precision) throws SQLException {
 		JSONArray scenariosArray = new JSONArray();
 		
 		for(String scenario : scenarios) {			
 			JSONObject scenarioObj = new JSONObject();
 			scenarioObj.accumulate("id", scenario);			
 			if(!formulaDescriptor.aggregateSevereness()) {
-				calculateFormulaAllSevereness(conn, formulaDescriptor,
+				calculateFormulaAllSevereness(conn, processing, formulaDescriptor,
 						materials, scenario, entities,
-						severeness.split(","), targetId, scenarioObj, precision);		
+						severeness.split(","), fpfield, targetId, scenarioObj, precision);		
 			} else {
-				calculateFormulaAllSevereness(conn, formulaDescriptor,
+				calculateFormulaAllSevereness(conn, processing, formulaDescriptor,
 						materials, scenario, entities,
-						new String[] {severeness}, targetId, scenarioObj, precision);
+						new String[] {severeness}, fpfield, targetId, scenarioObj, precision);
 			}
 			//fillRisk(scenarioObj, getRisk(conn, 0, formulaDescriptor, materials, scenario, entities, severeness, targetId));
 			scenariosArray.add(scenarioObj);
@@ -206,16 +208,18 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 		
 	}
 	
-	private void calculateFormulaAllSevereness(Connection conn,
+	private void calculateFormulaAllSevereness(Connection conn, int processing,
 			Formula formulaDescriptor, String materials, String scenario,
-			String entities, String[] severeness, int targetId, JSONObject result, int precision) throws SQLException {
+			String entities, String[] severeness, String fpfield, int targetId, JSONObject result, int precision) throws SQLException {
 		JSONArray severenessArray = new JSONArray();
 		
 		for(String sev : severeness) {			
 			JSONObject severenessObj = new JSONObject();
 			severenessObj.accumulate("id", sev);			
 			
-			fillRisk(severenessObj, FormulaUtils.calculateFormulaValues(conn, 0, formulaDescriptor, materials, scenario, entities, sev, targetId, precision));
+			fillRisk(severenessObj, FormulaUtils.calculateFormulaValues(conn,
+					0, processing, formulaDescriptor, materials, scenario, entities, sev, fpfield,
+					targetId, precision));
 			severenessArray.add(severenessObj);
 		}
 		result.accumulate("severeness", severenessArray);
