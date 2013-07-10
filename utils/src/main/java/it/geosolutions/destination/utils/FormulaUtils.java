@@ -271,7 +271,7 @@ public class FormulaUtils {
 				Number id = rs.getInt(1);
 				if(features != null) {
 					// accumulate
-					risk = fixDecimals(rs.getDouble(2), precision) + (Double)features.get(id).getAttribute(field);
+					risk = fixDecimals(rs.getDouble(2), precision) + (features.get(id).getAttribute(field) != null ? (Double)features.get(id).getAttribute(field) : 0.0);
 					features.get(id).setAttribute(field, risk);				
 				} else {
 					risk = fixDecimals(rs.getDouble(2), precision);

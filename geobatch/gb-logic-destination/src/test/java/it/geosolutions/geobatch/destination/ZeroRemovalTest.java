@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 
 import org.geotools.data.DataUtilities;
 import org.geotools.data.simple.SimpleFeatureCollection;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.junit.Assert;
 import org.junit.Before;

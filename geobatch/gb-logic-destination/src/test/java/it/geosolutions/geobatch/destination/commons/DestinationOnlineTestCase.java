@@ -180,6 +180,7 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
         params.put(JDBCDataStoreFactory.DATABASE.key, getFixture().getProperty("pg_database"));
         params.put(JDBCDataStoreFactory.USER.key, getFixture().getProperty("pg_user"));
         params.put(JDBCDataStoreFactory.PASSWD.key, getFixture().getProperty("pg_password"));
+        params.put(JDBCDataStoreFactory.EXPOSE_PK.key, getFixture().getProperty("expose_primary_keys"));
         params.put("src_table", getFixture().getProperty("src_table"));
         return params;
     }
@@ -205,6 +206,7 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
         ret.setProperty("not_human_target", "<RASTER_FILE_ABSOLUTE_PATH>");
         ret.setProperty("human_target", "<RASTER_FILE_ABSOLUTE_PATH>");
         ret.setProperty("external_prop_dir_path", "<EXTERNAL_PROP_DIR_PATH>");
+        ret.setProperty("expose_primary_keys", "TRUE");
 
         return ret;
     }
