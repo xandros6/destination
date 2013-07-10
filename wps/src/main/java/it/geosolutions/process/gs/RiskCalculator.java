@@ -70,13 +70,15 @@ public class RiskCalculator extends RiskCalculatorBase {
 			@DescribeParameter(name = "store", description = "risk data store name", min = 0) String storeName,
 			@DescribeParameter(name = "batch", description = "batch calculus size", min = 0) Integer batch,
 			@DescribeParameter(name = "precision", description = "output value precision (decimals)", min = 0) Integer precision,
-			@DescribeParameter(name = "connection", description = "risk database connection params", min = 0) Map<String, String> connectionParams,
+			@DescribeParameter(name = "connection", description = "risk database connection params", min = 0) String connectionParams,
+			@DescribeParameter(name = "processing", description = "id of the processing type") int processing,
 			@DescribeParameter(name = "formula", description = "id of the formula to calculate") int formula,
 			@DescribeParameter(name = "target", description = "id of the target/s to use in calculation") int target,
 			@DescribeParameter(name = "materials", description = "ids of the materials to use in calculation") String materials,
 			@DescribeParameter(name = "scenarios", description = "ids of the scenarios to use in calculation") String scenarios,
 			@DescribeParameter(name = "entities", description = "ids of the entities to use in calculation") String entities,
-			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness
+			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness,
+			@DescribeParameter(name = "fp", description = "fields to use for fp calculation", min = 0) String fpfield
 		) throws IOException, SQLException {
 		
 		// building DataStore connection using Catalog/storeName or connection input parameters
@@ -90,7 +92,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 			}
 			dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
 		} else if(connectionParams != null) {
-			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(connectionParams);
+			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(getConnectionParameters(connectionParams));
 		} else {
 			throw new IOException(
 					"DataStore connection not configured, either catalog, storeName or connectionParams are not available");
@@ -128,7 +130,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 	        
 	        LOGGER.info("Doing calculus for level " + level);
 	        
-	        Formula formulaDescriptor = Formula.load(conn, formula, target);
+	        Formula formulaDescriptor = Formula.load(conn, processing, formula, target);
 	        
 			if ((!formulaDescriptor.hasGrid() && level == 3)
 					|| (!formulaDescriptor.hasNoGrid() && level < 3)) {
@@ -178,9 +180,9 @@ public class RiskCalculator extends RiskCalculatorBase {
 						// calculate batch items a time 
 						if(count % batch == 0) {
 							LOGGER.info("Calculated " + count + " values");
-							FormulaUtils.calculateFormulaValues(conn, level, formulaDescriptor, ids.toString()
+							FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
 									.substring(1), materials, scenarios,
-									entities, severeness, target, temp, precision);								
+									entities, severeness, fpfield, target, temp, precision);								
 							result.addAll(temp.values());
 							ids = new StringBuilder();
 							temp = new HashMap<Number, SimpleFeature>();								
@@ -204,9 +206,9 @@ public class RiskCalculator extends RiskCalculatorBase {
 					
 					// final calculus for remaining items not in batch size
 					LOGGER.info("Calculating remaining items");
-					FormulaUtils.calculateFormulaValues(conn, level, formulaDescriptor, ids.toString()
+					FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
 							.substring(1), materials, scenarios, entities,
-							severeness, target, temp, precision);
+							severeness, fpfield, target, temp, precision);
 					
 					/*if(formulaDescriptor.useArcs() && ids.length() > 0) {
 						getRisk(conn, level, formulaDescriptor, ids.toString()
@@ -228,5 +230,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 		}
 		
 	}
+
+	
 
 }

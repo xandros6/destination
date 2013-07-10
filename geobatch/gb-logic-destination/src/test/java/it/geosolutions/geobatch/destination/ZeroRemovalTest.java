@@ -87,17 +87,14 @@ public class ZeroRemovalTest extends DestinationOnlineTestCase{
     @Override
     protected void loadFeature(OutputObject objOut) throws IOException{
         List<SimpleFeature> list = new ArrayList<SimpleFeature>();
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|2|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid3=3|3|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid4=4|4|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid5=5|5|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid6=6|0|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid7=7|7|0|0|100|0|0|1|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid8=8|0|0|0|100|0|0|20|0|1|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid9=9|90|0|0|100|0|0|1|0|2|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid10=10|0|0|0|100|0|0|1|0|2|0|0|0"));
-        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid11=11|1000|0|0|100|0|0|1|0|2|0|0|0"));
+        // fid	id_geo_arco	nr_incidenti	nr_incidenti_elab	nr_corsie	lunghezza	nr_bers_umani_strada	id_tematico_shape	fk_partner	geometria	id_origine	flg_nr_corsie	flg_nr_incidenti
+
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid1=1|1|1|0|3|100|0|1|1|1|0|0|0"));
+        list.add(DataUtilities.createFeature(objOut.getSchema(), "fid2=2|1|20|0|3|1000|0|1|1|1|0|0|0"));
+        for(int i = 3 ; i<=500 ; i++){
+        	 list.add(DataUtilities.createFeature(objOut.getSchema(), "fid"+i+"="+i+"|1|0|0|3|100|0|1|1|1|0|0|0"));
+        }
+
         SimpleFeatureCollection sfc = DataUtilities.collection(list);
         objOut.getWriter().addFeatures(sfc);
     }

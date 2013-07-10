@@ -40,6 +40,9 @@ public class FormulaUtils {
 	/** humanTargetsList */
 	public static final String humanTargetsList = "1,2,4,5,6,7";
 	
+	private static Pattern searchTargetConditional = Pattern.compile("#(.*?)#\\*%bersaglio\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
+	private static Pattern searchProcessingConditional = Pattern.compile("#(.*?)#\\*%elaborazione\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
+	
 	/**
 	 * Checks that a given target is included in a comma delimited list.
 	 * 
@@ -135,28 +138,28 @@ public class FormulaUtils {
 	 * @param precision
 	 * @throws SQLException
 	 */
-	public static void calculateFormulaValues(Connection conn, int level,
+	public static void calculateFormulaValues(Connection conn, int level, int processing,
 			Formula formulaDescriptor, String ids, String materials,
-			String scenarios, String entities, String severeness, int target,
+			String scenarios, String entities, String severeness, String fpfield, int target,
 			Map<Number, SimpleFeature> features, int precision)
 			throws SQLException {
 	
 		String sql = formulaDescriptor.getSql();
 		
 		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
-			calculateFormulaValues(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", target + "", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", target + "", features, precision);
 		} else if(isAllHumanTargets(target)) {
-			calculateFormulaValues(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", "1,2,4,5,6,7", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", features, precision);
 		} else if(isAllNotHumanTargets(target)) {
-			calculateFormulaValues(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", "10,11,12,13,14,15,16", features, precision);			
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "10,11,12,13,14,15,16", features, precision);			
 		} else if(isAllTargets(target)) {			
-			calculateFormulaValues(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio1", "1,2,4,5,6,7", features, precision);
-			calculateFormulaValues(conn, level, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, sql, "rischio2", "10,11,12,13,14,15,16", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio2", "10,11,12,13,14,15,16", features, precision);
 		}				
 	}
 	
@@ -173,37 +176,37 @@ public class FormulaUtils {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static Double[] calculateFormulaValues(Connection conn, int level, Formula formulaDescriptor,
+	public static Double[] calculateFormulaValues(Connection conn, int level, int processing, Formula formulaDescriptor,
 			String materials, String scenarios, String entities,
-			String severeness, int target, int precision) throws SQLException {
+			String severeness, String fpfield, int target, int precision) throws SQLException {
 
 		String sql = formulaDescriptor.getSql();
 		if(!formulaDescriptor.takeFromSource()) {
 			if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
-				return new Double[] {calculateFormulaValues(conn, level, formulaDescriptor,
+				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
 						"", materials, scenarios, entities,
-						severeness, sql, "", target + "",
+						severeness, fpfield, sql, "", target + "",
 						null, precision).doubleValue(), 0.0};
 				
 			} else if(isAllHumanTargets(target)) {
-				return new Double[] {calculateFormulaValues(conn, level, formulaDescriptor,
+				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
 						"", materials, scenarios, entities,
-						severeness, sql, "", humanTargetsList,
+						severeness, fpfield, sql, "", humanTargetsList,
 						null, precision).doubleValue(), 0.0};
 				
 			} else if(isAllNotHumanTargets(target)) {
-				return new Double[] {calculateFormulaValues(conn, level, formulaDescriptor,
+				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
 						"", materials, scenarios, entities,
-						severeness, sql, "", notHumanTargetsList,
+						severeness, fpfield, sql, "", notHumanTargetsList,
 						null, precision).doubleValue(), 0.0};				
 			} else if(isAllTargets(target)) {
-				return new Double[] {calculateFormulaValues(conn, level, formulaDescriptor,
+				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
 						"", materials, scenarios, entities,
-						severeness, sql, "", humanTargetsList,
+						severeness, fpfield, sql, "", humanTargetsList,
 						null, precision).doubleValue(),
-						calculateFormulaValues(conn, level, formulaDescriptor,
+						calculateFormulaValues(conn, level, processing, formulaDescriptor,
 						"", materials, scenarios, entities,
-						severeness, sql, "", notHumanTargetsList,
+						severeness, fpfield, sql, "", notHumanTargetsList,
 						null, precision).doubleValue()};			
 				
 			}	
@@ -232,29 +235,41 @@ public class FormulaUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Number calculateFormulaValues(Connection conn, int level, Formula formulaDescriptor,
+	public static Number calculateFormulaValues(Connection conn, int level, int processing, Formula formulaDescriptor,
 			String ids, String materials, String scenarios, String entities,
-			String severeness, String sql, String field, String targets,
+			String severeness, String fpfield, String sql, String field, String targets,
 			Map<Number, SimpleFeature> features, int precision) throws SQLException {
 		// replace input placemarks
 		sql = sql.replace("%id_bersaglio%", targets);
 		sql = sql.replace("%id_sostanza%", materials);
 		sql = sql.replace("%id_scenario%", scenarios);
 		sql = sql.replace("%flg_lieve%", entities);
+		sql = sql.replace("%fp_field%", fpfield);
 		sql = sql.replace("%id_geo_arco%", ids);
 		sql = sql.replace("%id_gravita%", severeness);
 		sql = sql.replace("%livello%", level+"");
 		// replace aggregated level
 		sql = sql.replace("siig_geo_ln_arco_3", "siig_geo_pl_arco_3");
 		// replace conditional params
-		Pattern searchConditional = Pattern.compile("#(.*?)#\\*%bersaglio\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
-		Matcher m = searchConditional.matcher(sql);
+		
+		Matcher m = searchTargetConditional.matcher(sql);
 		while(m.find()) {
 			int target = Integer.parseInt(m.group(2));
 			if(FormulaUtils.checkTarget(target, targets)) {
 				sql = sql.replace(m.group(0), m.group(1));
 			} else {
 				sql = sql.replace(m.group(0), "0");
+			}
+			
+		}
+		
+		m = searchProcessingConditional.matcher(sql);
+		while(m.find()) {
+			int currentProcessing = Integer.parseInt(m.group(2));
+			if(currentProcessing == processing) {
+				sql = sql.replace(m.group(0), m.group(1));
+			} else {
+				sql = sql.replace(m.group(0), "1");
 			}
 			
 		}
@@ -268,13 +283,14 @@ public class FormulaUtils {
 			rs = stmt.executeQuery();	
 			Number risk = 0.0;
 			while(rs.next()) {
-				Number id = rs.getInt(1);
+				
 				if(features != null) {
 					// accumulate
+					Number id = rs.getInt(1);
 					risk = fixDecimals(rs.getDouble(2), precision) + (features.get(id).getAttribute(field) != null ? (Double)features.get(id).getAttribute(field) : 0.0);
 					features.get(id).setAttribute(field, risk);				
 				} else {
-					risk = fixDecimals(rs.getDouble(2), precision);
+					risk = fixDecimals(rs.getDouble(1), precision);
 				}
 			}
 			return risk;
