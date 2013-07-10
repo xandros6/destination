@@ -241,7 +241,7 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
         }
         catch(SQLException e){
          // An exception occurs? Maybe the table is already been deleted... swallow the exception...
-            LOGGER.warn("table don't dropped...");
+            LOGGER.warn("could not drop test table ...", e);
         }
         finally{
             if(t != null){
