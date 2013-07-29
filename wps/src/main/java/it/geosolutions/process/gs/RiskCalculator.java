@@ -159,7 +159,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 					// ids will store the list of id of each batch
 					// used to build risk query
 					StringBuilder ids = new StringBuilder();
-					
+					String fk_partner = null;
 					while(iter.hasNext()) {
 						SimpleFeature feature = iter.next();
 						Number id = (Number)feature.getAttribute("id_geo_arco");
@@ -181,7 +181,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 						if(count % batch == 0) {
 							LOGGER.info("Calculated " + count + " values");
 							FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
-									.substring(1), materials, scenarios,
+									.substring(1), fk_partner, materials, scenarios,
 									entities, severeness, fpfield, target, temp, precision);								
 							result.addAll(temp.values());
 							ids = new StringBuilder();
@@ -207,7 +207,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 					// final calculus for remaining items not in batch size
 					LOGGER.info("Calculating remaining items");
 					FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
-							.substring(1), materials, scenarios, entities,
+							.substring(1), fk_partner, materials, scenarios, entities,
 							severeness, fpfield, target, temp, precision);
 					
 					/*if(formulaDescriptor.useArcs() && ids.length() > 0) {

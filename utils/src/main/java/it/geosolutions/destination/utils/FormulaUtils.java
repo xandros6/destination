@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -139,7 +140,7 @@ public class FormulaUtils {
 	 * @throws SQLException
 	 */
 	public static void calculateFormulaValues(Connection conn, int level, int processing,
-			Formula formulaDescriptor, String ids, String materials,
+			Formula formulaDescriptor, String ids, String fk_partner, String materials,
 			String scenarios, String entities, String severeness, String fpfield, int target,
 			Map<Number, SimpleFeature> features, int precision)
 			throws SQLException {
@@ -147,19 +148,19 @@ public class FormulaUtils {
 		String sql = formulaDescriptor.getSql();
 		
 		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
-			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", target + "", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", target + "", null, features, precision, null, null, null, null);
 		} else if(isAllHumanTargets(target)) {
-			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", null, features, precision, null, null, null, null);
 		} else if(isAllNotHumanTargets(target)) {
-			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "10,11,12,13,14,15,16", features, precision);			
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "10,11,12,13,14,15,16", null, features, precision, null, null, null, null);			
 		} else if(isAllTargets(target)) {			
-			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", features, precision);
-			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio2", "10,11,12,13,14,15,16", features, precision);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", null, features, precision, null, null, null, null);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio2", "10,11,12,13,14,15,16", null, features, precision, null, null, null, null);
 		}				
 	}
 	
@@ -177,37 +178,37 @@ public class FormulaUtils {
 	 * @throws SQLException 
 	 */
 	public static Double[] calculateFormulaValues(Connection conn, int level, int processing, Formula formulaDescriptor,
-			String materials, String scenarios, String entities,
-			String severeness, String fpfield, int target, int precision) throws SQLException {
+			String fk_partner, String materials, String scenarios, String entities,
+			String severeness, String fpfield, int target, String deletedTargets, int precision) throws SQLException {
 
 		String sql = formulaDescriptor.getSql();
 		if(!formulaDescriptor.takeFromSource()) {
 			if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
 				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
-						"", materials, scenarios, entities,
-						severeness, fpfield, sql, "", target + "",
-						null, precision).doubleValue(), 0.0};
+						"", fk_partner, materials, scenarios, entities,
+						severeness, fpfield, sql, "", target + "", deletedTargets,
+						null, precision, null, null, null, null).doubleValue(), 0.0};
 				
 			} else if(isAllHumanTargets(target)) {
 				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
-						"", materials, scenarios, entities,
-						severeness, fpfield, sql, "", humanTargetsList,
-						null, precision).doubleValue(), 0.0};
+						"", fk_partner, materials, scenarios, entities,
+						severeness, fpfield, sql, "", humanTargetsList, deletedTargets,
+						null, precision, null, null, null, null).doubleValue(), 0.0};
 				
 			} else if(isAllNotHumanTargets(target)) {
 				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
-						"", materials, scenarios, entities,
-						severeness, fpfield, sql, "", notHumanTargetsList,
-						null, precision).doubleValue(), 0.0};				
+						"", fk_partner, materials, scenarios, entities,
+						severeness, fpfield, sql, "", notHumanTargetsList, deletedTargets,
+						null, precision, null, null, null, null).doubleValue(), 0.0};				
 			} else if(isAllTargets(target)) {
 				return new Double[] {calculateFormulaValues(conn, level, processing, formulaDescriptor,
-						"", materials, scenarios, entities,
-						severeness, fpfield, sql, "", humanTargetsList,
-						null, precision).doubleValue(),
+						"", fk_partner, materials, scenarios, entities,
+						severeness, fpfield, sql, "", humanTargetsList, deletedTargets,
+						null, precision, null, null, null, null).doubleValue(),
 						calculateFormulaValues(conn, level, processing, formulaDescriptor,
-						"", materials, scenarios, entities,
-						severeness, fpfield, sql, "", notHumanTargetsList,
-						null, precision).doubleValue()};			
+						"", fk_partner, materials, scenarios, entities,
+						severeness, fpfield, sql, "", notHumanTargetsList, deletedTargets,
+						null, precision, null, null, null, null).doubleValue()};			
 				
 			}	
 		}
@@ -232,14 +233,256 @@ public class FormulaUtils {
 	 * @param targets
 	 * @param features
 	 * @param precision
+	 * @param cff 
+	 * @param psc 
 	 * @return
 	 * @throws SQLException
 	 */
 	public static Number calculateFormulaValues(Connection conn, int level, int processing, Formula formulaDescriptor,
-			String ids, String materials, String scenarios, String entities,
-			String severeness, String fpfield, String sql, String field, String targets,
-			Map<Number, SimpleFeature> features, int precision) throws SQLException {
+			String ids, String fk_partner, String materials, String scenarios, String entities,
+			String severeness, String fpfield, String sql, String field, String targets, String deletedTargets,
+			Map<Number, SimpleFeature> features, int precision, 
+			List<String> cff,  // optional List of csv "id_bersaglo,cff" values to use on the simulation
+			List<String> psc,  // optional List of csv id_sostanza,psc values to use on the simulation
+			List<String> padr, // optional List of csv id_sostanza,padr values to use on the simulation
+			List<String> pis   // optional List of csv id_geo_arco,pis values to use on the simulation
+	) throws SQLException {
 		// replace input placemarks
+
+		// ----- SIMULATION STUFF
+		// -- Cff
+		/**
+		 * select id_geo_arco,avg(cff) 
+  		 * from (select id_geo_arco,id_bersaglio,fk_partner,cff from siig_r_arco_%livello%_scen_tipobers 
+ 		 * where id_geo_arco in (%id_geo_arco%) and id_bersaglio in (%id_bersaglio%) %cff%)) x group by id_geo_arco
+		 */
+		if (cff == null || cff.size() == 0)
+		{
+			sql = sql.replace("%cff%", "");
+		}
+		else
+		{
+			/**
+			 * -- Example
+			 * select id_geo_arco,avg(cff) 
+			 * from 
+			 * (
+			 *   select id_geo_arco,id_bersaglio,fk_partner,cff from siig_r_arco_1_scen_tipobers where id_geo_arco in (1,2,3,4,5) and id_bersaglio in (1,2,4,5,6,7)
+			 *   union all
+			 *   select 1 as id_geo_arco, 10001 as id_bersaglio, '1' as fk_partner, 0.8 as cff
+			 *   union all
+			 *   select 2 as id_geo_arco, 10001 as id_bersaglio, '1' as fk_partner, 0.8 as cff
+			 * ) x
+			 * group by id_geo_arco
+			 */
+			StringBuilder cff_union_adds = new StringBuilder();
+			for (String customCff : cff)
+			{
+				if (customCff.length() > 0 && customCff.split(",").length > 1)
+				{
+					final String custom_id_bersaglio = customCff.split(",")[0];
+					final String custom_cff          = customCff.split(",")[1];
+					
+					cff_union_adds.append(" ")
+					              .append("union all select ")
+					              .append(ids)
+					              .append(" as id_geo_arco, ")
+					              .append(10000 + Integer.parseInt(custom_id_bersaglio))
+					              .append(" as id_bersaglio, ")
+					              .append("'").append(fk_partner).append("'")
+					              .append(" as fk_partner, ")
+					              .append(custom_cff)
+					              .append(" as cff");
+					
+					deletedTargets = deletedTargets==null?custom_id_bersaglio:deletedTargets+(deletedTargets.length()>0?",":"")+custom_id_bersaglio;
+				}
+			}
+			sql = sql.replace("%cff%", cff_union_adds.toString());
+		}
+
+		// -- Psc
+		/**
+		 * select sum(psc) 
+		 * from
+		 * (
+		 *  select id_sostanza,psc from siig_r_scenario_sostanza where id_scenario in (%id_scenario%) and id_sostanza in (%id_sostanza%) and flg_lieve in (%flg_lieve%)
+		 *  %psc%
+		 * ) x
+		 */
+		String deletedMaterials = null;
+		if (psc == null || psc.size() == 0)
+		{
+			sql = sql.replace("%psc%", "");
+		}
+		else
+		{
+			/**
+			 * -- Example
+			 * select sum(psc) 
+			 * from 
+			 * (
+			 *   select id_sostanza,psc from siig_r_scenario_sostanza where id_scenario in (1,3,7,8) and id_sostanza in (1,2,3,7,8,9) and flg_lieve in (0,1)
+			 *   union all
+			 *   select 4 as id_sostanza, 0.3 as psc
+			 * ) x
+			 */
+			StringBuilder psc_union_adds = new StringBuilder();
+			for (String customPsc : psc)
+			{
+				if (customPsc.length() > 0 && customPsc.split(",").length > 1)
+				{
+					final String custom_id_sostanza = customPsc.split(",")[0];
+					final String custom_psc         = customPsc.split(",")[1];
+					
+					psc_union_adds.append(" ")
+					              .append("union all select ")
+					              .append(ids)
+					              .append(" as id_geo_arco, ")
+					              .append(10000 + Integer.parseInt(custom_id_sostanza))
+					              .append(" as id_sostanza, ")
+					              .append(custom_psc)
+					              .append(" as psc");
+					
+					deletedMaterials = deletedMaterials==null?custom_id_sostanza:deletedMaterials+(deletedMaterials.length()>0?",":"")+custom_id_sostanza;
+				}
+			}
+			sql = sql.replace("%psc%", psc_union_adds.toString());
+		}
+
+		// -- Padr
+		/**
+		 * select id_geo_arco,%padr% as padr from siig_r_arco_%livello%_sostanza where id_geo_arco in (%id_geo_arco%) and id_sostanza = %id_sostanza%
+		 */
+		if (padr == null || padr.size() == 0)
+		{
+			sql = sql.replace("%padr%", "padr");
+		}
+		else if (padr.size() == 1)
+		{
+			sql = sql.replace("%padr%", padr.get(0) + " as padr");
+		}
+		else
+		{
+			/**
+			 * -- Example
+			 * select id_geo_arco,0.6 as padr from siig_r_arco_1_sostanza where id_geo_arco in (1,2,3,4,5) and id_sostanza = 1
+			 */
+			for (String customPadr : padr)
+			{
+				if (customPadr.length() > 0 && customPadr.split(",").length > 1)
+				{
+					final String custom_id_sostanza = customPadr.split(",")[0];
+					final String custom_padr        = customPadr.split(",")[1];
+
+					sql = sql.replace(
+			"select id_geo_arco,%padr% from siig_r_arco_%livello%_sostanza where id_geo_arco in (%id_geo_arco%) and id_sostanza = %id_sostanza%", 
+			"select id_geo_arco,"+custom_padr+" as padr from siig_r_arco_%livello%_sostanza where id_geo_arco in (%id_geo_arco%) and id_sostanza = "+custom_id_sostanza);
+				}
+			}
+		}
+		
+		// -- Pis
+		/**
+  		 * select *
+  		 * from
+  		 *  (
+  		 * 	  select id_geo_arco,%formula(117)% from siig_geo_ln_arco_%livello% where id_geo_arco in (%id_geo_arco%) group by id_geo_arco
+  		 * 	  %pis%
+  		 *  ) x
+		 */
+		String deletedArcs = null;
+		if (pis == null || pis.size() == 0)
+		{
+			sql = sql.replace("%pis%", "");
+		}
+		else
+		{
+			/**
+			 * -- Example
+			 * select *
+			 *  from
+			 *  (
+			 * 	  select id_geo_arco,nr_incidenti_elab/lunghezza*1000 from siig_geo_ln_arco_1 where id_geo_arco in (1,2,3,4,5) group by id_geo_arco
+			 * 	  union all
+			 * 	  select id_geo_arco,55 from siig_geo_ln_arco_1 where id_geo_arco in (6) 
+			 *  ) x
+			 */
+			StringBuilder pis_union_adds = new StringBuilder();
+			for (String customPis : pis)
+			{
+				if (customPis.length() > 0 && customPis.split(",").length > 1)
+				{
+					final String custom_id_arco  = customPis.split(",")[0];
+					final String custom_pis      = customPis.split(",")[1];
+					
+					pis_union_adds.append(" ")
+					              .append("union all select id_geo_arco,")
+					              .append(custom_pis)
+					              .append(" from siig_geo_ln_arco_%livello% where id_geo_arco in ("+custom_id_arco+")");
+					
+					deletedArcs = deletedArcs==null?custom_id_arco:deletedArcs+(deletedArcs.length()>0?",":"")+custom_id_arco;
+				}
+			}
+			sql = sql.replace("%pis%", pis_union_adds.toString());
+		}
+		
+		// ----- CLEANUP TARGETS
+		if (targets != null && deletedTargets != null)
+		{
+			String[] sourceTargets = targets.split(",");
+			String[] targetsToRemove = deletedTargets.split(",");
+			targets = "";
+			for (String target : sourceTargets)
+			{
+				boolean skip = false;
+				for (String targetToRemove : targetsToRemove)
+				{
+					if (target.equals(targetToRemove)) {skip = true; break;}
+				}
+				
+				if(!skip) targets += target + ",";
+			}
+			targets = targets.substring(0, targets.length()-1);
+		}
+		
+		// ----- CLEANUP MATERIALS
+		if (materials != null && deletedMaterials != null)
+		{
+			String[] sourceMaterials   = materials.split(",");
+			String[] materialsToRemove = deletedMaterials.split(",");
+			materials = "";
+			for (String material : sourceMaterials)
+			{
+				boolean skip = false;
+				for (String materialToRemove : materialsToRemove)
+				{
+					if (material.equals(materialToRemove)) {skip = true; break;}
+				}
+				
+				if(!skip) materials += material + ",";
+			}
+			materials = materials.substring(0, materials.length()-1);
+		}
+
+		// ----- CLEANUP ARCS
+		if (ids != null && deletedArcs != null)
+		{
+			String[] sourceGeoArcs   = ids.split(",");
+			String[] geoArcsToRemove = deletedArcs.split(",");
+			ids = "";
+			for (String geoArc : sourceGeoArcs)
+			{
+				boolean skip = false;
+				for (String geoArcToRemove : geoArcsToRemove)
+				{
+					if (geoArc.equals(geoArcToRemove)) {skip = true; break;}
+				}
+				
+				if(!skip) ids += ids + ",";
+			}
+			ids = ids.substring(0, ids.length()-1);
+		}
+
 		sql = sql.replace("%id_bersaglio%", targets);
 		sql = sql.replace("%id_sostanza%", materials);
 		sql = sql.replace("%id_scenario%", scenarios);
@@ -303,6 +546,56 @@ public class FormulaUtils {
 			}
 			
 		}
+	}
+
+	/**
+	 * Similar to the original method calculateForumaValues, allows to specify some custom values.
+	 * It assumes the computation to be done on a single arc.
+	 * 
+	 * @param conn
+	 * @param level
+	 * @param formulaDescriptor
+	 * @param ids
+	 * @param materials
+	 * @param scenarios
+	 * @param entities
+	 * @param severeness
+	 * @param target
+	 * @param features
+	 * @param precision
+	 * @param cff 
+	 * @param psc 
+	 * @throws SQLException
+	 */
+	public static void calculateSimulationFormulaValuesOnSingleArc(Connection conn, int level, int processing,
+			Formula formulaDescriptor, int id_geo_arco, String fk_partner, String materials,
+			String scenarios, String entities, String severeness, String fpfield, int target,
+			String deletedTargets, Map<Number, SimpleFeature> features, int precision, 
+			List<String> cff, List<String> psc, List<String> padr, List<String> pis)
+			throws SQLException {
+	
+		String sql = formulaDescriptor.getSql();
+		
+		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", target + "", deletedTargets, features, precision,
+					cff, psc, padr, pis);
+		} else if(isAllHumanTargets(target)) {
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", deletedTargets, features, precision,
+					cff, psc, padr, pis);
+		} else if(isAllNotHumanTargets(target)) {
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "10,11,12,13,14,15,16", deletedTargets, features, precision,
+					cff, psc, padr, pis);			
+		} else if(isAllTargets(target)) {			
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", deletedTargets, features, precision,
+					cff, psc, padr, pis);
+			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
+					entities, severeness, fpfield, sql, "rischio2", "10,11,12,13,14,15,16", deletedTargets, features, precision,
+					cff, psc, padr, pis);
+		}				
 	}
 	
 	/**

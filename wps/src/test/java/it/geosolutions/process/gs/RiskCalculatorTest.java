@@ -31,6 +31,10 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.jdbc.JDBCDataStore;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 import org.vfny.geoserver.global.GeoserverDataDirectory;
@@ -41,7 +45,7 @@ import org.vfny.geoserver.global.GeoserverDataDirectory;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public abstract class RiskCalculatorTest extends TestCase {
+public class RiskCalculatorTest extends TestCase {
 	
 	Catalog catalog;
 	RiskCalculator riskCalculator;
@@ -50,6 +54,7 @@ public abstract class RiskCalculatorTest extends TestCase {
 	
 	String dataStoreName = System.getProperty("GS_DS_NAME");
 	
+	@Before
 	public void setUp() throws IOException {
 		String dataDirPath = System.getProperty("GS_TEST_DATA_DIR");
 		
@@ -70,13 +75,15 @@ public abstract class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
+	@After
 	public void tearDown() {
 		if(dataStore != null) {
 			dataStore.dispose();
 		}
 	}
 	
-	public void aatestFormulaCffSimpleTarget() throws IOException, SQLException {
+	@Ignore
+	public void off_testFormulaCffSimpleTarget() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			
@@ -103,7 +110,8 @@ public abstract class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
-	public void aatestFormulaCffHuman() throws IOException, SQLException {
+	@Test
+	public void testFormulaCffHuman() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			
@@ -156,7 +164,8 @@ public abstract class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
-	public void aatestFormulaPadr() throws IOException, SQLException {
+	@Ignore
+	public void off_testFormulaPadr() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			
@@ -183,7 +192,8 @@ public abstract class RiskCalculatorTest extends TestCase {
 		}
 	}
 	
-	public void testFormulaPis() throws IOException, SQLException {
+	@Ignore
+	public void off_testFormulaPis() throws IOException, SQLException {
 		
 		if(riskCalculator != null && dataStoreName != null && dataStore != null) {
 			

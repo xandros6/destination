@@ -213,13 +213,14 @@ public class RiskCalculatorSimple extends RiskCalculatorBase {
 			String entities, String[] severeness, String fpfield, int targetId, JSONObject result, int precision) throws SQLException {
 		JSONArray severenessArray = new JSONArray();
 		
+		String fk_partner = null;
 		for(String sev : severeness) {			
 			JSONObject severenessObj = new JSONObject();
 			severenessObj.accumulate("id", sev);			
 			
 			fillRisk(severenessObj, FormulaUtils.calculateFormulaValues(conn,
-					0, processing, formulaDescriptor, materials, scenario, entities, sev, fpfield,
-					targetId, precision));
+					0, processing, formulaDescriptor, fk_partner, materials, scenario, entities, sev, fpfield,
+					targetId, null, precision));
 			severenessArray.add(severenessObj);
 		}
 		result.accumulate("severeness", severenessArray);
