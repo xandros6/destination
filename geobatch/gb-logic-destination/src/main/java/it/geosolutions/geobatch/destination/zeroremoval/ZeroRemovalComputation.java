@@ -80,7 +80,7 @@ public class ZeroRemovalComputation extends InputObject {
 	private final static Logger LOGGER = LoggerFactory.getLogger(ZeroRemovalComputation.class);
 
 	public static Pattern TYPE_NAME_PARTS = Pattern
-			.compile("^([a-z]{4})_([a-z]{3})_([a-z]{2})_([a-z]{4})_([1-3]{1})");
+			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");;
 
 	public static String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
 	private static final String NR_INCIDENTI = "nr_incidenti";
@@ -89,7 +89,10 @@ public class ZeroRemovalComputation extends InputObject {
 	private static final String ID_ORIGIN = "id_origine";
 	private static final String PARTNER_FIELD = "fk_partner";
 	private static final double KINCR_DEFAULT_VALUE = .2;
-
+	
+    String codicePartner;
+    int partner;
+	
 	/**
 	 * A value that multiply all weightedAverage in order to avoid negative results
 	 */
@@ -102,8 +105,9 @@ public class ZeroRemovalComputation extends InputObject {
 	 * @param listenerForwarder
 	 */
 	public ZeroRemovalComputation(double kIncr, String inputTypeName,
-			ProgressListenerForwarder listenerForwarder) {
-		super(inputTypeName, listenerForwarder);
+			ProgressListenerForwarder listenerForwarder,
+			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
 		this.kInc = kIncr;
 	}
 
@@ -114,15 +118,21 @@ public class ZeroRemovalComputation extends InputObject {
 	 * @param listenerForwarder
 	 */
 	public ZeroRemovalComputation(String inputTypeName,
-			ProgressListenerForwarder listenerForwarder) {
-		super(inputTypeName, listenerForwarder);
+			ProgressListenerForwarder listenerForwarder,
+			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
 		this.kInc = KINCR_DEFAULT_VALUE;
 	}
 
 	@Override
 	protected boolean parseTypeName(String typeName) {
 		Matcher m = TYPE_NAME_PARTS.matcher(typeName);
-		if (m.matches()) {
+		if(m.matches()) {
+			// partner alphanumerical abbreviation (from siig_t_partner)
+			codicePartner = m.group(1);
+			// partner numerical id (from siig_t_partner)
+			partner = Integer.parseInt(partners.get(codicePartner).toString());			
+			
 			return true;
 		}
 		return false;
@@ -149,13 +159,12 @@ public class ZeroRemovalComputation extends InputObject {
 	 * @param partnerId
 	 * @throws IOException
 	 */
-	public void removeZeros(Map<String, Serializable> datastoreParams,
-			CoordinateReferenceSystem crs, int aggregationLevel, int partnerId)
+	public void removeZeros(CoordinateReferenceSystem crs, int aggregationLevel, String closePhase)
 					throws IOException {
 		reset();
 
 		if (isValid()) {
-			JDBCDataStore dataStore = null;
+			
 
 			crs = checkCrs(crs);
 
@@ -163,21 +172,33 @@ public class ZeroRemovalComputation extends InputObject {
 			int trace = -1;
 
 			int errors = 0;
+			
+			// existing process
+			MetadataIngestionHandler.Process importData = getProcessData(dataStore);
+			process = importData.getId();
+			trace = importData.getMaxTrace();
+			errors = importData.getMaxError();
+			int startErrors = errors;
 
-			String processPhase = "C";
+			if(process == -1) {
+				LOGGER.error("Cannot find process for input file");
+				throw new IOException("Cannot find process for input file");
+			}
+			
 			Transaction transaction = new DefaultTransaction("ZeroRemoval");
 			try {
-				dataStore = connectToDataStore(datastoreParams);
+				// setup geo input / output object
+				String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
 
 				// setup input reader
-				createInputReader(dataStore, null, null);
+				createInputReader(dataStore, null, geoName);
 
-				// setup geo output object
-				String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
+				
 				OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
 
 				setInputFilter(filterFactory.equals(filterFactory.property(PARTNER_FIELD),
-						filterFactory.literal(partnerId)));
+						filterFactory.literal(partner)));
+				int total = getImportCount();
 				// get unique aggregation values in order to identify the roads
 				Set<BigDecimal> aggregationValues = getAggregationBigValues(ID_ORIGIN);
 
@@ -189,7 +210,7 @@ public class ZeroRemovalComputation extends InputObject {
 							filterFactory.property(ID_ORIGIN),
 							filterFactory.literal(aggregationValue)),
 							filterFactory.equals(filterFactory.property(PARTNER_FIELD),
-									filterFactory.literal(partnerId))));
+									filterFactory.literal(partner))));
 					//int arcs = getImportCount();
 					Long incidenti = (Long) getSumOnInput(NR_INCIDENTI, new Long(0)).longValue();
 					if (incidenti != 0) {
@@ -211,6 +232,7 @@ public class ZeroRemovalComputation extends InputObject {
 						FeatureStore<SimpleFeatureType, SimpleFeature> writer = geoObject.getWriter();
 						writer.setTransaction(transaction);
 						for(SimpleFeature inputFeature : decIncManager.getElabIncident().keySet()){
+							//updateImportProgress(total, errors - startErrors, "Update feature N. incidenti elaborati = " +  decIncManager.getElabIncident().get(inputFeature));
 							LOGGER.debug("Update feature N. incidenti elaborati = " +  decIncManager.getElabIncident().get(inputFeature));
 							updateIncidentalita(writer,geoObject, inputFeature, decIncManager.getElabIncident().get(inputFeature));
 							if(count%50 == 0){
@@ -219,43 +241,42 @@ public class ZeroRemovalComputation extends InputObject {
 							count++;
 						}
 						transaction.commit();
-					}
+					}/* else {						
+						// we write all zeros when no accident is found
+						SimpleFeature inputFeature;
+						int count = 0;
+						FeatureStore<SimpleFeatureType, SimpleFeature> writer = geoObject.getWriter();
+						writer.setTransaction(transaction);
+						while((inputFeature = readInput()) != null) {
+							LOGGER.debug("Update feature N. incidenti elaborati = 0");
+							updateIncidentalita(writer,geoObject, inputFeature, 0.0);
+							if(count%50 == 0){
+								transaction.commit();
+							}
+							count++;
+						}
+						transaction.commit();
+					}*/
 				}
-
+				importFinished(total, errors - startErrors, "Accident data updated in " + geoName);
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
 				transaction.rollback();
 				errors++;
-				MetadataIngestionHandler
-				.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);
-				throw new IOException();
+				metadataHandler
+					.logError(trace, errors, "Error importing data", getError(e), 0);
+				throw new IOException(e);
 			} finally {
-				if (process != -1) {
+				if (process != -1 && closePhase != null) {
 					// close current process phase
-					MetadataIngestionHandler.closeProcessPhase(dataStore, process, processPhase);
+					metadataHandler.closeProcessPhase(process, closePhase);
 				}
 				closeInputReader();
-				if (dataStore != null) {
-					dataStore.dispose();
-				}
+				
 				transaction.close();
 			}
 		}
 	}	
-
-	/**
-	 * @param e
-	 * @return
-	 */
-	private String getError(Exception e) {
-		// TODO: human readble error
-		Throwable t = e;
-		while (t.getCause() != null) {
-			t = t.getCause();
-		}
-
-		return t.getMessage().substring(0, Math.min(t.getMessage().length(), 1000));
-	}
 
 	/**
 	 * @param writer 
@@ -309,6 +330,9 @@ public class ZeroRemovalComputation extends InputObject {
 				for (SimpleFeature inputFeature : this.elabIncident.keySet() ) {
 					int nrIncidenti = ((BigDecimal) inputFeature
 							.getAttribute(NR_INCIDENTI)).intValue();
+					if(nrIncidenti < 0) {
+						nrIncidenti = 0;
+					}
 					int lunghezza = ((BigDecimal) inputFeature.getAttribute(LUNGHEZZA))
 							.intValue();
 					double newIncidenti = (double) nrIncidenti;

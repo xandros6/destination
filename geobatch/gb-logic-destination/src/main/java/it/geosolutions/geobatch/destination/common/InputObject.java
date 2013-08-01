@@ -17,6 +17,7 @@
 package it.geosolutions.geobatch.destination.common;
 
 import it.geosolutions.geobatch.destination.common.utils.DbUtils;
+import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
@@ -97,15 +98,23 @@ public abstract class InputObject {
 	int inputCount = 0;
 	int readCount = 0;
 	
+	protected MetadataIngestionHandler metadataHandler;
+	protected JDBCDataStore dataStore;
+	
 	/**
 	 * Initializes an IngestionObject handler for the given input feature.
 	 * 
 	 * @param inputTypeName
 	 */
-	public InputObject(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
+	public InputObject(String inputTypeName,
+			ProgressListenerForwarder listenerForwarder,
+			MetadataIngestionHandler metadataHandler,
+			JDBCDataStore dataStore) {
 		super();
 		this.inputTypeName = inputTypeName;
 		this.listenerForwarder = listenerForwarder;
+		this.dataStore = dataStore;
+		this.metadataHandler = metadataHandler;
 		this.valid = this.parseTypeName(inputTypeName);
 	}
 	
@@ -212,7 +221,7 @@ public abstract class InputObject {
 	 * @param datastoreParams
 	 * @return
 	 * @throws IOException
-	 */
+	 
 	protected JDBCDataStore connectToDataStore(
 			Map<String, Serializable> datastoreParams) throws IOException {
 		JDBCDataStore dataStore;
@@ -221,7 +230,14 @@ public abstract class InputObject {
 		if(dataStore == null) {
 			throw new IOException("Cannot connect to database for: "+inputTypeName);
 		}
+		//metadataHandler = new MetadataIngestionHandler(dataStore);
 		return dataStore;
+	}*/
+	
+	protected void dispose() {
+		/*if(metadataHandler != null) {
+			metadataHandler.dispose();
+		}*/
 	}
 	
 	/**
@@ -233,7 +249,7 @@ public abstract class InputObject {
 	 * @throws IOException 
 	 */
 	protected int createProcess(JDBCDataStore dataStore) throws IOException {
-		return MetadataIngestionHandler.createProcess(dataStore);
+		return metadataHandler.createProcess();
 	}
 	
 	/**
@@ -245,33 +261,33 @@ public abstract class InputObject {
 	 * @throws IOException 
 	 */
 	protected MetadataIngestionHandler.Process getProcessData(JDBCDataStore dataStore) throws IOException {
-		return MetadataIngestionHandler.getProcessData(dataStore, inputTypeName);
+		return metadataHandler.getProcessData(inputTypeName);
 	}
 			
-	protected Set<Integer> getAggregationValues(String aggregateAttribute) throws IOException {		
+	protected Set<Number> getAggregationValues(String aggregateAttribute) throws IOException {		
 		// get unique aggregation values
 		Function unique = filterFactory.function("Collection_Unique",
 				filterFactory.property(aggregateAttribute));
 		FeatureCollection<SimpleFeatureType, SimpleFeature> features = inputReader
-				.getFeatures(inputQuery);
+				.getFeatures(inputQuery);		
 
-		return (Set<Integer>) unique.evaluate(inputReader
+		return (Set<Number>) unique.evaluate(inputReader
 				.getFeatures(new Query(inputTypeName, Filter.INCLUDE)));				
 	}
 	
-        protected Set<BigDecimal> getAggregationBigValues(String aggregateAttribute) throws IOException {
-            // get unique aggregation values
-            Function unique = filterFactory.function("Collection_Unique",
-                    filterFactory.property(aggregateAttribute));
-            FeatureCollection<SimpleFeatureType, SimpleFeature> features = inputReader
-                    .getFeatures(inputQuery);
-    
-            Set<BigDecimal> set = (Set<BigDecimal>)unique.evaluate(features);
-            if(set == null){
-                set = new HashSet<BigDecimal>(); 
-            }
-            return set;
+    protected Set<BigDecimal> getAggregationBigValues(String aggregateAttribute) throws IOException {
+        // get unique aggregation values
+        Function unique = filterFactory.function("Collection_Unique",
+                filterFactory.property(aggregateAttribute));
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = inputReader
+                .getFeatures(inputQuery);
+
+        Set<BigDecimal> set = (Set<BigDecimal>)unique.evaluate(features);
+        if(set == null){
+            set = new HashSet<BigDecimal>(); 
         }
+        return set;
+    }
 	
 	
 	/**
@@ -290,7 +306,7 @@ public abstract class InputObject {
 	 */
 	protected int logFile(JDBCDataStore dataStore, 
 			int processo, int bersaglio, int partner, String codicePartner, String date, boolean update) throws IOException {
-		return MetadataIngestionHandler.logFile(dataStore,  processo, -1,
+		return metadataHandler.logFile(processo, -1,
 				partner, codicePartner, inputTypeName, date, false);
 	}
 	
@@ -308,7 +324,7 @@ public abstract class InputObject {
 		if(featureName == null) {
 			featureName = inputTypeName;
 		}
-		inputReader = MetadataIngestionHandler.createFeatureSource(dataStore, transaction,
+		inputReader = FeatureLoaderUtils.createFeatureSource(dataStore, transaction,
 				featureName);		
 		inputQuery = new Query(featureName);
 	        if(sequenceManager == null){
@@ -332,7 +348,11 @@ public abstract class InputObject {
 	}
 	
 	protected String getInputGeometryName(JDBCDataStore dataStore) throws IOException {
-		return dataStore.getSchema(inputTypeName).getGeometryDescriptor().getLocalName();
+		return getInputGeometryName(dataStore,inputTypeName);
+	}
+	
+	protected String getInputGeometryName(JDBCDataStore dataStore, String featureTypeName) throws IOException {
+		return dataStore.getSchema(featureTypeName).getGeometryDescriptor().getLocalName();
 	}
 	
 	/**
@@ -345,10 +365,10 @@ public abstract class InputObject {
 	 * @return
 	 * @throws IOException
 	 */
-	protected static FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureSource(
+	protected FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureSource(
 			JDBCDataStore dataStore, Transaction transaction, String typeName)
 			throws IOException {
-		return MetadataIngestionHandler.createFeatureSource(dataStore, transaction, typeName);
+		return FeatureLoaderUtils.createFeatureSource(dataStore, transaction, typeName);
 	}
 	
 	/**
@@ -362,6 +382,20 @@ public abstract class InputObject {
 		for(OutputObject obj : objects) {
 			obj.getSource().removeFeatures(filter);			
 		}
+	}
+	
+	/**
+	 * @param e
+	 * @return
+	 */
+	protected String getError(Exception e) {		
+		// TODO: human readble error
+		Throwable t = e;
+		while(t.getCause() != null) {
+			t=t.getCause();
+		}
+		
+		return t.getMessage().substring(0,Math.min(t.getMessage().length(), 1000));
 	}
 	
 	/**
@@ -452,24 +486,12 @@ public abstract class InputObject {
 	 * @return
 	 * @throws IOException 
 	 */
-	protected int nextId(Number id) throws IOException {
+	protected int nextId() throws IOException {
 	    return (int)sequenceManager.retrieveValue();
 		//return id.intValue() + (++readCount);
 	}
 	
-	/**
-	 * Returns the next value to use for the output feature id.
-	 * 
-	 * @Deprecated This method is became useless due to the usage of the sequence for id generation 
-	 * 
-	 * @param id
-	 * @return
-	 */
-	@Deprecated
-	protected int rollbackId() {		
-		return readCount--;
-	}
-	
+		
 	/**
 	 * Returns the main id of the imported object.
 	 * 
@@ -480,7 +502,7 @@ public abstract class InputObject {
 	 * @throws NumberFormatException 
 	 */
 	protected int getIdTematico(SimpleFeature inputFeature, Map mappings) throws NumberFormatException, IOException {
-		return Integer.parseInt(getMapping(inputFeature, mappings, "id_tematico_shape").toString());
+		return (int)Double.parseDouble(getMapping(inputFeature, mappings, "id_tematico_shape").toString());
 	}
 	
 	/**
@@ -532,11 +554,11 @@ public abstract class InputObject {
 	 * @param total
 	 * @param message
 	 */
-	protected void updateImportProgress(int total, String message) {
+	protected void updateImportProgress(int total, int errors, String message) {
 		if (inputCount % 100 == 0) {
 			listenerForwarder.progressing((float) inputCount , message);
 			if(LOGGER.isInfoEnabled()) {
-				LOGGER.info(message + ": "+inputCount + "/" + total);
+				LOGGER.info(message + ": "+(inputCount - errors) + "/" + total);
 			}
 		}
 	}
@@ -548,10 +570,13 @@ public abstract class InputObject {
 	 * @param total
 	 * @param message
 	 */
-	protected void importFinished(int total, String message) {		
+	protected void importFinished(int total, int errors, String message) {		
 		listenerForwarder.progressing((float) total , message);
 		if(LOGGER.isInfoEnabled()) {
-			LOGGER.info(message + ": "+inputCount + "/" + total);
+			LOGGER.info(message + ": "+(inputCount - errors)+ "/" + total);
+			if(errors > 0) {
+				LOGGER.info("Skipped: " + errors);
+			}
 		}		
 	}
 	
@@ -561,6 +586,10 @@ public abstract class InputObject {
 	 */
 	protected void setInputFilter(Filter filter) {
 		if(inputQuery != null) {
+			if(inputIterator != null) {
+				inputIterator.close();
+				inputIterator = null;
+			}
 			inputQuery.setFilter(filter);			
 		}
 	}
@@ -579,6 +608,29 @@ public abstract class InputObject {
 		
 		try {
 			DbUtils.dropFeatureType(datastoreParams, inputTypeName);
+			listenerForwarder.setTask("Table dropped");
+			if(LOGGER.isInfoEnabled()) {
+				LOGGER.info("Table dropped");
+			}
+		} catch (SQLException e) {
+			LOGGER.error("Error dropping table "+inputTypeName+": "+e.getMessage());
+		}
+	}
+	
+	/**
+	 * Drops the input feature.
+	 * 
+	 * @param datastoreParams
+	 * @throws IOException
+	 */
+	protected void dropInputFeature(JDBCDataStore dataStore) throws IOException {
+		listenerForwarder.setTask("Dropping table "+inputTypeName);
+		if(LOGGER.isInfoEnabled()) {
+			LOGGER.info("Dropping table "+inputTypeName);
+		}
+		
+		try {
+			DbUtils.dropFeatureType(dataStore, inputTypeName);
 			listenerForwarder.setTask("Table dropped");
 			if(LOGGER.isInfoEnabled()) {
 				LOGGER.info("Table dropped");

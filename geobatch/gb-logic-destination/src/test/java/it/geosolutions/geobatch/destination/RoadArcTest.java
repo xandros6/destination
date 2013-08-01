@@ -34,7 +34,7 @@ import org.junit.Test;
  *
  */
 public class RoadArcTest {
-
+/*
 	@Test  @Ignore
 	public void testImportArcs() throws IOException {
 		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
@@ -53,7 +53,7 @@ public class RoadArcTest {
 			}
 		}));
 		
-		arc.importArcs(cfg.getDataStore(), null, 1, false, false);
+		arc.importArcs(cfg.getDataStore(), null, 1, false, false, null);
 		
 	}
 	
@@ -97,7 +97,7 @@ public class RoadArcTest {
 			}
 		}));
 		
-		arc.importArcs(cfg.getDataStore(), null, 2, false, false);
+		arc.importArcs(cfg.getDataStore(), null, 2, false, false, null);
 		
 	}
 	 
@@ -119,7 +119,7 @@ public class RoadArcTest {
 			}
 		}));
 		
-		arc.importArcs(cfg.getDataStore(), null, 3, true, false);
+		arc.importArcs(cfg.getDataStore(), null, 3, true, false, null);
 		
-	}
+	}*/
 }

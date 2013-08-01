@@ -17,6 +17,7 @@
 package it.geosolutions.geobatch.destination.common;
 
 
+import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 
 import java.io.IOException;
@@ -40,15 +41,16 @@ public class OutputObject {
 	private SimpleFeatureType schema = null;
 	private SimpleFeatureBuilder builder = null;
 	private FeatureStore<SimpleFeatureType, SimpleFeature> source = null;
+	protected MetadataIngestionHandler metadataHandler;
 	
 	public OutputObject(JDBCDataStore dataStore, Transaction transaction, String name, String id) throws IOException {
 		this.name = name;
 		this.id = id;
 		
+		metadataHandler = new MetadataIngestionHandler(dataStore);
 		schema = dataStore.getSchema(name);
 		builder = new SimpleFeatureBuilder(schema);
-		source = MetadataIngestionHandler.createFeatureSource(
-				dataStore, transaction, name);			
+		source = FeatureLoaderUtils.createFeatureSource(dataStore, transaction, name);			
 	}
 
 	

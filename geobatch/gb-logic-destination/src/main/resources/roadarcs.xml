@@ -2,11 +2,15 @@
 <map>
 	<entry>      	
 		<string>nr_incidenti</string>
-		<string>INCIDENT</string>
+		<string>#{(INCIDENT == null or INCIDENT lt 0) ? 0 : INCIDENT}</string>
+	</entry>
+	<entry>      	
+		<string>nr_incidenti_elab</string>
+		<string>#{(INCIDENT == null or INCIDENT lt 0) ? 0 : INCIDENT}</string>
 	</entry>
 	<entry>      	
 		<string>nr_corsie</string>
-		<string>N_CORSIE</string>
+		<string>#{(N_CORSIE == null or N_CORSIE.toString() == '')? 0 : N_CORSIE}</string>
 	</entry>
 	<entry>      	
 		<string>id_tematico_shape</string>
@@ -14,23 +18,31 @@
 	</entry>
 	<entry>      	
 		<string>lunghezza</string>
-		<string>LUNGHEZZA</string>
+		<string>#{(LUNGHEZZA == null or LUNGHEZZA.toString() == '') ? 0 : LUNGHEZZA}</string>
 	</entry>
 	<entry>      	
 		<string>flg_nr_incidenti</string>
-		<string>FLG_N_INC</string>
+		<string>#{(FLG_N_INC == null or FLG_N_INC == '') ? null : FLG_N_INC.toUpperCase()}</string>
 	</entry>
 	<entry>      	
 		<string>flg_nr_corsie</string>
-		<string>FLG_N_CORS</string>
+		<string>#{(FLG_N_CORS == null or FLG_N_CORS == '') ? null : FLG_N_CORS.toUpperCase()}</string>
 	</entry>
 	<entry>      	
 		<string>flg_velocita</string>
-		<string>FLG_VELOC</string>
+		<string>#{(FLG_VELOC == null or FLG_VELOC == '') ? null : FLG_VELOC.toUpperCase()}</string>
 	</entry>
 	<entry>      	
 		<string>flg_densita_veicolare</string>
-		<string>FLG_TGM</string>
+		<string>#{(FLG_TGM == null or FLG_TGM == '') ? null : FLG_TGM.toUpperCase()}</string>
+	</entry>
+	<entry>      	
+		<string>densita_veicolare</string>
+		<string>#{(TGM == null or TGM.toString() == '') ? null : TGM}</string>
+	</entry>
+	<entry>      	
+		<string>velocita</string>
+		<string>#{(VELOCITA == null or VELOCITA.toString() == '') ? null : VELOCITA}</string>
 	</entry>
 	<entry>      	
 		<string>id_origine</string>

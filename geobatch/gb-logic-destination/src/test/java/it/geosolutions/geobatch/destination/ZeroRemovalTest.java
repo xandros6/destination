@@ -22,6 +22,7 @@ package it.geosolutions.geobatch.destination;
 import it.geosolutions.geobatch.destination.common.OutputObject;
 import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.commons.DestinationOnlineTestCase;
+import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.zeroremoval.ZeroRemovalComputation;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
@@ -35,8 +36,10 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
+import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.junit.Assert;
 import org.junit.Before;
@@ -68,7 +71,6 @@ public class ZeroRemovalTest extends DestinationOnlineTestCase{
         Double [] results = {0.0,72.66666666666667,963.6666666666666,53.666666666666664,0.8952380952380953,1.8952380952380952,2.895238095238095,3.895238095238095,4.895238095238096,0.6285714285714286,6.895238095238096};
         List<Double> resultsList = Arrays.asList(results);
         
-        ZeroRemovalComputation vulnerabilityComputation = new ZeroRemovalComputation(super.testTable, new ProgressListenerForwarder(null));
         Map<String, Serializable> datastoreParams = new HashMap<String, Serializable>();
         datastoreParams.put(JDBCDataStoreFactory.DBTYPE.key, "postgis");
         datastoreParams.put(JDBCDataStoreFactory.HOST.key, getFixture().getProperty("pg_host"));
@@ -77,10 +79,31 @@ public class ZeroRemovalTest extends DestinationOnlineTestCase{
         datastoreParams.put(JDBCDataStoreFactory.DATABASE.key, getFixture().getProperty("pg_database"));
         datastoreParams.put(JDBCDataStoreFactory.USER.key, getFixture().getProperty("pg_user"));
         datastoreParams.put(JDBCDataStoreFactory.PASSWD.key, getFixture().getProperty("pg_password"));
-        vulnerabilityComputation.removeZeros(datastoreParams, null, 1, 1);
-        List<Double> nr_incidenti_elab = FeatureLoaderUtils.loadFeatureAttributesGeneric(dataStore, testTable, "nr_incidenti_elab", true);
-        for(Double el : nr_incidenti_elab){
-            Assert.assertTrue(resultsList.contains(el));
+        JDBCDataStore dataStore = null;        
+        MetadataIngestionHandler metadataHandler = null;
+        try {
+        	
+        	dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);	        
+	        metadataHandler = new MetadataIngestionHandler(dataStore);
+			ZeroRemovalComputation vulnerabilityComputation = new ZeroRemovalComputation(
+					super.testTable, new ProgressListenerForwarder(null),
+					metadataHandler, dataStore);
+        
+	        vulnerabilityComputation.removeZeros(null, 1, null);
+	        List<Double> nr_incidenti_elab = FeatureLoaderUtils.loadFeatureAttributesGeneric(dataStore, testTable, "nr_incidenti_elab", true);
+	        for(Double el : nr_incidenti_elab){
+	            Assert.assertTrue(resultsList.contains(el));
+	        }
+        } catch(Exception e) {
+        	//
+        } finally {
+        	if(metadataHandler != null) {
+        		metadataHandler.dispose();
+        	}
+        	
+        	if(dataStore != null) {
+        		dataStore.dispose();
+        	}        	
         }
     }
     

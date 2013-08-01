@@ -16,6 +16,7 @@
  */
 package it.geosolutions.geobatch.destination.ingestion;
 
+import it.geosolutions.geobatch.destination.common.ImportType;
 import it.geosolutions.geobatch.destination.common.InputObject;
 import it.geosolutions.geobatch.destination.common.OutputObject;
 import it.geosolutions.geobatch.destination.common.utils.DbUtils;
@@ -30,36 +31,21 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
-import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.factory.Hints;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.expression.Function;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.expression.AccessException;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.PropertyAccessor;
-import org.springframework.expression.TypedValue;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
-
-import com.thoughtworks.xstream.XStream;
 
 
 /**
@@ -73,7 +59,7 @@ public class TargetIngestionProcess extends InputObject {
 	
 	private final static Logger LOGGER = LoggerFactory.getLogger(TargetIngestionProcess.class);
 	
-	private static Pattern typeNameParts  = Pattern.compile("^([A-Z]{2})_([A-Z]{2,3})-([A-Z]+)_([0-9]{8})_([0-9]{2})$");
+	private static Pattern typeNameParts  = Pattern.compile("^([A-Z]{2})[_-]([A-Z]{2,3})[_-]([A-Z]+)([_-][C|I])?[_-]([0-9]{8})[_-]([0-9]{2})$");
 	
 	private int partner;
 	private String codicePartner;
@@ -81,6 +67,7 @@ public class TargetIngestionProcess extends InputObject {
 	private int targetType;
 	private String date;
 	private String geometryType;
+	private ImportType importType;
 	
 	private static Properties targetTypes = new Properties();
 	private static Properties geometryTypes = new Properties();						
@@ -114,8 +101,10 @@ public class TargetIngestionProcess extends InputObject {
 	 * 
 	 * @param inputTypeName
 	 */
-	public TargetIngestionProcess(String inputTypeName, ProgressListenerForwarder listenerForwarder) {
-		super(inputTypeName, listenerForwarder);		
+	public TargetIngestionProcess(String inputTypeName,
+			ProgressListenerForwarder listenerForwarder,
+			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);		
 	}
 
 
@@ -135,10 +124,16 @@ public class TargetIngestionProcess extends InputObject {
 			targetMacroType = m.group(2);
 			// target detailed type id (from siig_t_bersaglio)
 			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());
+			// import type (completa / integrativa)
+			if(m.group(4) != null) {
+				importType = m.group(4).equalsIgnoreCase("I") ? ImportType.INTEGRATIVA : ImportType.COMPLETA;
+			} else {
+				importType = ImportType.COMPLETA;
+			}
 			// file date identifier
-			date = m.group(4);
+			date = m.group(5);
 			// geometry type (pt, pl or ln)
-			geometryType = geometryTypes.get(m.group(5)).toString();			
+			geometryType = geometryTypes.get(m.group(6)).toString();			
 			
 			// final part of the target geo table name (siig_geo_<suffix>) 
 			geoSuffix = (targetMacroType.equals("BU") ? "bersaglio_umano" : "bers_non_umano") + "_" + geometryType;
@@ -164,12 +159,11 @@ public class TargetIngestionProcess extends InputObject {
 	 * @param crs
 	 * @throws IOException
 	 */
-	public void importTarget(Map<String, Serializable> datastoreParams,
-			CoordinateReferenceSystem crs, boolean dropInput) throws IOException {
+	public void importTarget(CoordinateReferenceSystem crs, boolean dropInput) throws IOException {
 		
 		reset();
 		if(isValid()) {
-			JDBCDataStore dataStore = null;					
+			
 			
 			crs = checkCrs(crs);			
 			
@@ -178,7 +172,7 @@ public class TargetIngestionProcess extends InputObject {
 			
 			int errors = 0;
 			try {												
-				dataStore = connectToDataStore(datastoreParams);
+				
 				
 				process = createProcess(dataStore);
 				// write log for the imported file
@@ -202,7 +196,7 @@ public class TargetIngestionProcess extends InputObject {
 							
 				OutputObject[] outputObjects = new OutputObject[] {nonGeoObject, geoObject};
 				
-				BigDecimal maxId = null;
+				//BigDecimal maxId = null;
 				
 				try {
 
@@ -239,12 +233,12 @@ public class TargetIngestionProcess extends InputObject {
 					// remove geo records
 					geoObject.getWriter().removeFeatures(removeFilter);
 					
-					maxId = (BigDecimal)getOutputId(geoObject);
+					//maxId = (BigDecimal)getOutputId(geoObject);
 					
 					transaction.commit();	
 				} catch (IOException e) {
 					errors++;	
-					MetadataIngestionHandler.logError(dataStore, trace, errors, "Error removing old data", getError(e), 0);					
+					metadataHandler.logError(trace, errors, "Error removing old data", getError(e), 0);					
 					transaction.rollback();					
 					throw e;
 				} finally {
@@ -258,7 +252,7 @@ public class TargetIngestionProcess extends InputObject {
 					SimpleFeature inputFeature = null;
 					while( (inputFeature = readInput()) != null) {
 										
-						int id = nextId(maxId);	
+						int id = nextId();	
 						int idTematico = normalizeIdTematico(getMapping(inputFeature, (Map)attributeMappings.get(targetType), "id_tematico"));
 						
 						Transaction rowTransaction = new DefaultTransaction();
@@ -277,12 +271,11 @@ public class TargetIngestionProcess extends InputObject {
 							
 							rowTransaction.commit();
 							
-							updateImportProgress(total, "Importing data in " + geoTypeName + "/" + outTypeName);
+							updateImportProgress(total, errors, "Importing data in " + geoTypeName + "/" + outTypeName);
 						} catch(Exception e) {						
 							errors++;
-							rollbackId();
 							rowTransaction.rollback();
-							MetadataIngestionHandler.logError(dataStore, trace, errors,
+							metadataHandler.logError(trace, errors,
 									"Error writing output feature", getError(e),
 									idTematico);
 						} finally {				
@@ -290,8 +283,8 @@ public class TargetIngestionProcess extends InputObject {
 						}
 																
 					}
-					importFinished(total, "Data imported in " + geoTypeName + "/" + outTypeName);
-					MetadataIngestionHandler.updateLogFile(dataStore, trace, total, errors, "A");
+					importFinished(total, errors, "Data imported in " + geoTypeName + "/" + outTypeName);
+					metadataHandler.updateLogFile(trace, total, errors, true);
 					
 				} finally {
 					closeInputReader();
@@ -299,40 +292,23 @@ public class TargetIngestionProcess extends InputObject {
 				
 			} catch (IOException e) {
 				errors++;	
-				MetadataIngestionHandler.logError(dataStore, trace, errors, "Error importing data", getError(e), 0);				
+				metadataHandler.logError(trace, errors, "Error importing data", getError(e), 0);				
 				throw e;
 			} finally {
 				if(dropInput) {
-					dropInputFeature(datastoreParams);
+					dropInputFeature(dataStore);
 				}
 				
 				if(process != -1) {
 					// close current process phase
-					MetadataIngestionHandler.closeProcessPhase(dataStore, process, "A");
+					metadataHandler.closeProcessPhase(process, "A");
 				}
-				
-				if(dataStore != null) {
-					dataStore.dispose();
-				}				
+							
 			}
 		}
 			
 	}
-
-	/**
-	 * @param e
-	 * @return
-	 */
-	private String getError(Exception e) {		
-		// TODO: human readble error
-		Throwable t = e;
-		while(t.getCause() != null) {
-			t=t.getCause();
-		}
-		
-		return t.getMessage().substring(0,Math.min(t.getMessage().length(), 1000));
-	}
-
+	
 	/**
 	 * Add a new record or update the existing one for non-geo table 
 	 *  
@@ -518,7 +494,8 @@ public class TargetIngestionProcess extends InputObject {
 			}
 		}
 		
-		SimpleFeature geoFeature = geoFeatureBuilder.buildFeature(null);
+		SimpleFeature geoFeature = geoFeatureBuilder.buildFeature("" + id);
+		geoFeature.getUserData().put(Hints.USE_PROVIDED_FID, true); 
 		geoObject.getWriter().addFeatures(DataUtilities
 				.collection(geoFeature));
 	}

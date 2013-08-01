@@ -15,5 +15,8 @@
       <constructor-arg index="0" ref="catalog"/>
     </bean>
 
+	<bean id="riskSimulator" class="it.geosolutions.process.gs.RiskSimulator">
+      <constructor-arg index="0" ref="catalog"/>
+    </bean>
 
 </beans>

@@ -18,6 +18,7 @@ package it.geosolutions.geobatch.destination.ingestion;
 
 
 import it.geosolutions.geobatch.destination.common.utils.DbUtils;
+import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -40,7 +41,12 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 public class MetadataIngestionHandler {
 	
-	public static class Process {
+	private SequenceManager processSequenceManager;
+	private SequenceManager traceSequenceManager;
+	
+	JDBCDataStore dataStore;
+	
+	public class Process {
 		int id = 0;
 		int maxTrace = 0;
 		int maxError = 0;
@@ -78,6 +84,19 @@ public class MetadataIngestionHandler {
 		
 	}
 	
+	
+	
+	/**
+	 * @param dataStore
+	 */
+	public MetadataIngestionHandler(JDBCDataStore dataStore) {
+		super();
+		this.dataStore = dataStore;
+		
+		processSequenceManager = new SequenceManager(dataStore, "process_seq");
+		traceSequenceManager = new SequenceManager(dataStore, "trace_seq");		
+	}
+
 	/**	
 	 * Creates a new process in the metadata table.
 	 * 
@@ -85,13 +104,15 @@ public class MetadataIngestionHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	public static int createProcess(JDBCDataStore dataStore) throws IOException {
+	public int createProcess() throws IOException {
+		
 		Transaction transaction = null;	
 		Connection conn = null;
 		try {			
 			transaction = new DefaultTransaction();
 			conn = dataStore.getConnection(transaction);
-			int processo = DbUtils.getNewId(conn, transaction, "siig_t_processo", "id_processo");		
+			int processo = (int)processSequenceManager.retrieveValue();
+			//DbUtils.getNewId(conn, transaction, "siig_t_processo", "id_processo");		
 			String sql = "INSERT INTO siig_t_processo(id_processo,data_creazione) values(" +processo+ ",now())";
 			
 			DbUtils.executeSql(conn, transaction, sql, true);
@@ -121,7 +142,7 @@ public class MetadataIngestionHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	public static Process getProcessData(JDBCDataStore dataStore, String inputTypeName) throws IOException {
+	public Process getProcessData(String inputTypeName) throws IOException {
 		Transaction transaction = null;	
 		
 		try {			
@@ -159,8 +180,7 @@ public class MetadataIngestionHandler {
 	 * @param phase
 	 * @throws IOException
 	 */
-	public static void closeProcessPhase(JDBCDataStore dataStore,
-			int processo, String phase) throws IOException {		
+	public void closeProcessPhase(int processo, String phase) throws IOException {		
 		try {												
 			String sql = "UPDATE siig_t_processo SET data_chiusura_"+phase.toLowerCase()+"=now() where id_processo="+processo;
 			
@@ -185,14 +205,14 @@ public class MetadataIngestionHandler {
 	 * @return
 	 * @throws IOException
 	 */
-	public static int logFile(JDBCDataStore dataStore, 
-			int processo, int bersaglio, int partner, String codicePartner, String typeName, String date, boolean update) throws IOException {
+	public int logFile(int processo, int bersaglio, int partner, String codicePartner, String typeName, String date, boolean update) throws IOException {
 		Transaction transaction = null;	
 		Connection conn = null;
 		try {			
 			transaction = new DefaultTransaction();
 			conn = dataStore.getConnection(transaction);
-			int tracciamento = DbUtils.getNewId(conn, transaction, "siig_t_tracciamento", "id_tracciamento");		
+			//int tracciamento = DbUtils.getNewId(conn, transaction, "siig_t_tracciamento", "id_tracciamento");
+			int tracciamento = (int)traceSequenceManager.retrieveValue();
 						
 			String sql = "INSERT INTO siig_t_tracciamento(id_tracciamento,fk_processo,fk_bersaglio,fk_partner,codice_partner,nome_file,data,";
 			sql       += "nr_rec_shape,nr_rec_storage,nr_rec_scartati,nr_rec_scartati_siig,data_imp_storage,data_elab,flg_tipo_imp)";
@@ -227,7 +247,7 @@ public class MetadataIngestionHandler {
 	 * @param idTematico
 	 * @throws IOException 
 	 */
-	public static void logError(JDBCDataStore dataStore, int trace, int progr,
+	public void logError(int trace, int progr,
 			String codiceLog, String error, int idTematico) throws IOException {
 		Transaction transaction = null;	
 		Connection conn = null;
@@ -262,8 +282,8 @@ public class MetadataIngestionHandler {
 	 * @param errors
 	 * @throws IOException 
 	 */
-	public static void updateLogFile(JDBCDataStore dataStore, int trace, int total,
-			int errors, String phase) throws IOException {
+	public void updateLogFile(int trace, int total,
+			int errors, boolean updateTotals) throws IOException {
 		Transaction transaction = null;	
 		Connection conn = null;
 		try {			
@@ -271,7 +291,7 @@ public class MetadataIngestionHandler {
 			conn = dataStore.getConnection(transaction);				
 		
 			String sql;
-			if(phase.equalsIgnoreCase("A")) {
+			if(updateTotals) {
 				sql= "UPDATE siig_t_tracciamento SET nr_rec_shape=" + total			
 					+ ",nr_rec_storage=" + (total - errors)
 					+ ",nr_rec_scartati=" + errors + "WHERE id_tracciamento="
@@ -298,25 +318,23 @@ public class MetadataIngestionHandler {
 			}
 		}
 	}
-	
-	
-	
+
 	/**
-	 * Creates a FeatureSource for the given typeName on the given DataStore.
-	 * Optionally the source is bound to a transaction, if not null.
 	 * 
-	 * @param dataStore
-	 * @param transaction
-	 * @param typeName
-	 * @return
-	 * @throws IOException
 	 */
-	public static FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureSource(
-			JDBCDataStore dataStore, Transaction transaction, String typeName)
-			throws IOException {
-		FeatureStore<SimpleFeatureType, SimpleFeature> geoFeatureWriter = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
-				.getFeatureSource(typeName);
-		geoFeatureWriter.setTransaction(transaction);
-		return geoFeatureWriter;
+	public void dispose() {
+		if(processSequenceManager != null) {
+			processSequenceManager.disposeManager();
+			processSequenceManager = null;
+		}
+		
+		if(traceSequenceManager != null) {
+			traceSequenceManager.disposeManager();
+			traceSequenceManager = null;
+		}
 	}
+	
+	
+	
+	
 }

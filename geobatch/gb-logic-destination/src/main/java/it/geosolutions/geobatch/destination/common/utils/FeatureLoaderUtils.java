@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
@@ -193,4 +194,23 @@ public class FeatureLoaderUtils {
         }
         return attributes;
     }
+    
+    /**
+	 * Creates a FeatureSource for the given typeName on the given DataStore.
+	 * Optionally the source is bound to a transaction, if not null.
+	 * 
+	 * @param dataStore
+	 * @param transaction
+	 * @param typeName
+	 * @return
+	 * @throws IOException
+	 */
+	public static FeatureStore<SimpleFeatureType, SimpleFeature> createFeatureSource(JDBCDataStore dataStore, 
+			Transaction transaction, String typeName)
+			throws IOException {
+		FeatureStore<SimpleFeatureType, SimpleFeature> geoFeatureWriter = (FeatureStore<SimpleFeatureType, SimpleFeature>) dataStore
+				.getFeatureSource(typeName);
+		geoFeatureWriter.setTransaction(transaction);
+		return geoFeatureWriter;
+	}
 }

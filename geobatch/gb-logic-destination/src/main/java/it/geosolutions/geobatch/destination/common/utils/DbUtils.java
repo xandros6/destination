@@ -49,6 +49,20 @@ public class DbUtils {
 	 * @throws SQLException 
 	 * @throws IOException 
 	 */
+	public static void dropFeatureType(JDBCDataStore dataStore, String typeName) throws IOException, SQLException {
+		// the GeoTools DataStore interface doesn't implement an action to drop a feature,
+		// so we need to use the sql connection directly
+		executeSql(dataStore, null, "DROP TABLE \"" + typeName + "\" CASCADE", true);
+	}
+	
+	/**
+	 * Drops a feature from the given DataStore.
+	 * 
+	 * @param datastoreParams
+	 * @param typeName
+	 * @throws SQLException 
+	 * @throws IOException 
+	 */
 	public static void dropFeatureType(Map<String, Serializable> datastoreParams, String typeName) throws IOException, SQLException {
 		// the GeoTools DataStore interface doesn't implement an action to drop a feature,
 		// so we need to use the sql connection directly

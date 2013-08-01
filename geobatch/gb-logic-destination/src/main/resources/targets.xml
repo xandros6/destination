@@ -250,7 +250,7 @@
       	</entry>
       	<entry>      	
       		<string>fk_classe_clc</string>
-      		<string>FK_CLC</string>
+      		<string>#{FK_CLC == 0 ? null : FK_CLC}</string>
       	</entry>
       	<entry>      	
       		<string>superficie</string>
@@ -268,7 +268,7 @@
       	</entry>
       	<entry>      	
       		<string>fk_classe_clc</string>
-      		<string>FK_CLC</string>
+      		<string>#{FK_CLC == 0 ? null : FK_CLC}</string>
       	</entry>
       	<entry>      	
       		<string>superficie</string>
@@ -326,7 +326,7 @@
       <map>
      	<entry>      	
       		<string>id_tematico</string>
-      		<string>ID_TIPO</string>
+      		<string>ID_TEMA</string>
       	</entry>
 		<entry>      	
 			<string>denominazione_it</string>
@@ -421,7 +421,7 @@
       	</entry>
       	<entry>      	
       		<string>fk_classe_clc</string>
-      		<string>FK_CLC</string>
+      		<string>#{FK_CLC == 0 ? null : FK_CLC}</string>
       	</entry>
       	<entry>      	
       		<string>toponimo_completo</string>

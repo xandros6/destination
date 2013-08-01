@@ -37,8 +37,7 @@ import org.slf4j.LoggerFactory;
 public class SequenceManager {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(SequenceManager.class);
-    
-    private Transaction transaction = null;
+        
     private JDBCDataStore datastore = null;
     private String seqName = null;
     
@@ -47,8 +46,7 @@ public class SequenceManager {
             seqName = seqName.replaceAll("-", "_");
             seqName = seqName.replaceAll("\\.", "_");
             seqName = seqName.toLowerCase();
-            createSequence(dataStore, seqName);
-            this.transaction = new DefaultTransaction();
+            createSequence(dataStore, seqName);            
             this.datastore = dataStore;
             this.seqName = seqName;
         } catch (IOException e) {
@@ -62,7 +60,7 @@ public class SequenceManager {
         Long id = null;
         try {
             sql = "SELECT nextval('" + this.seqName + "')";
-            id = (Long)DbUtils.executeScalar(datastore, transaction, sql);
+            id = (Long)DbUtils.executeScalar(datastore, null, sql);
         } catch (SQLException e) {
             throw new IOException(e);
         } 
@@ -70,14 +68,7 @@ public class SequenceManager {
     }
     
     public void disposeManager(){
-          datastore = null;
-          if (transaction != null) {
-              try {
-                transaction.close();
-            } catch (IOException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-          }
+          datastore = null;          
     }
 
     private boolean createSequence(JDBCDataStore dataStore, String seqName)
@@ -94,6 +85,7 @@ public class SequenceManager {
             sql = "CREATE SEQUENCE " + seqName;
             DbUtils.executeSql(conn, transaction, sql, true, true);
         } catch (SQLException e) {
+        	// existing sequence
             if ("42P07".equals(e.getSQLState())) {
                 return false;
             } else {

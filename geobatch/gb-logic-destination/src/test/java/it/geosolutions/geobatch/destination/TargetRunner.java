@@ -16,6 +16,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
@@ -24,6 +25,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.geotools.data.DataStoreFinder;
+import org.geotools.jdbc.JDBCDataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,18 +40,16 @@ public class TargetRunner{
     
     private class TargetThread implements Runnable {
 
-        TargetIngestionProcess targetIngestion;
-        Map<String, Serializable> datastoreParams;
+        TargetIngestionProcess targetIngestion;        
         
-        public TargetThread(TargetIngestionProcess targetIngestion, Map<String, Serializable> datastoreParams) {
-            this.targetIngestion = targetIngestion;
-            this.datastoreParams = datastoreParams;
+        public TargetThread(TargetIngestionProcess targetIngestion) {
+            this.targetIngestion = targetIngestion;            
         }
 
         @Override
         public void run() {
             try {
-                targetIngestion.importTarget(datastoreParams, null, false);
+                targetIngestion.importTarget(null, false);
             } catch (IOException e) {
                 LOGGER.error(e.getMessage(), e);
             }
@@ -61,23 +62,53 @@ public class TargetRunner{
         datastoreParams.put("schema", "siig_p");
         datastoreParams.put("passwd", "siig_p");
         datastoreParams.put("dbtype", "postgis");
-        datastoreParams.put("host", "192.168.88.132");
+        datastoreParams.put("host", "localhost");
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
         
-        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("RP_BU-ACOMM_20130424_02",
-                new ProgressListenerForwarder(null));
-        TargetIngestionProcess targetIngestion2 = new TargetIngestionProcess("RP_BU-ASAN_20130424_02",
-                new ProgressListenerForwarder(null));
-        TargetRunner vtest = new TargetRunner();
-        
-        TargetThread vt1 = vtest.new TargetThread(targetIngestion1, datastoreParams);
-        Thread t1 = new Thread(vt1);
-        t1.start();
-        
-        TargetThread vt2 = vtest.new TargetThread(targetIngestion2, datastoreParams);
-        Thread t2 = new Thread(vt2);
-        t2.start();
+        JDBCDataStore dataStore1 = null;
+        JDBCDataStore dataStore2 = null;
+        MetadataIngestionHandler metadataHandler1 = null;
+        MetadataIngestionHandler metadataHandler2 = null;
+        try {
+        	dataStore1 = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);
+	        dataStore2 = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);
+	        metadataHandler1 = new MetadataIngestionHandler(dataStore1);
+	        metadataHandler2 = new MetadataIngestionHandler(dataStore2);
+	        
+	        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("RL_BU-PRES_C_20130624_02",
+	                new ProgressListenerForwarder(null), metadataHandler1, dataStore1);
+	        TargetIngestionProcess targetIngestion2 = new TargetIngestionProcess("RL_BU-ASAN_C_20130624_02",
+	                new ProgressListenerForwarder(null), metadataHandler2, dataStore2);
+	        TargetRunner vtest = new TargetRunner();
+	        
+	        TargetThread vt1 = vtest.new TargetThread(targetIngestion1);
+	        Thread t1 = new Thread(vt1);
+	        t1.start();
+	        
+	        TargetThread vt2 = vtest.new TargetThread(targetIngestion2);
+	        Thread t2 = new Thread(vt2);
+	        t2.start();
+	        
+	        t1.join();
+	        t2.join();
+        } catch(Exception e) {
+        	LOGGER.error(e.getMessage());
+        } finally {
+        	if(metadataHandler1 != null) {
+        		metadataHandler1.dispose();
+        	}
+        	if(metadataHandler2 != null) {
+        		metadataHandler1.dispose();
+        	}
+        	
+        	if(dataStore1 != null) {
+        		dataStore1.dispose();
+        	}
+        	if(dataStore2 != null) {
+        		dataStore2.dispose();
+        	}
+        }
     }
 }

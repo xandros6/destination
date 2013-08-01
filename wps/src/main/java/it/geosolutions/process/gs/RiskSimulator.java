@@ -54,7 +54,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-@DescribeProcess(title = "RiskCalculator", description = "Dynamically calculates risk on road arcs.")
+@DescribeProcess(title = "RiskSimulator", description = "Dynamically calculates risk on road arcs.")
 public class RiskSimulator extends RiskCalculatorBase {
 	private static final Logger LOGGER = Logging.getLogger(RiskSimulator.class);	
 	
@@ -66,7 +66,7 @@ public class RiskSimulator extends RiskCalculatorBase {
 	}
 
 	@DescribeResult(description = "Risk calculus result")
-	public SimpleFeatureCollection execute(
+	public SimpleFeatureCollection execute(	
 			@DescribeParameter(name = "features", description = "Input feature collection") SimpleFeatureCollection features,
 			@DescribeParameter(name = "store", description = "risk data store name", min = 0) String storeName,
 			@DescribeParameter(name = "precision", description = "output value precision (decimals)", min = 0) Integer precision,
@@ -178,9 +178,9 @@ public class RiskSimulator extends RiskCalculatorBase {
 						temp.put(id.intValue(), fb.buildFeature(id + ""));
 						FormulaUtils.calculateSimulationFormulaValuesOnSingleArc(
 								conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
-								materials, scenarios, entities, severeness, fpfield, target, deletedTargets, 
+								materials, scenarios, entities, severeness, fpfield, target, null, 
 								temp, precision,
-								cff, psc, padr, pis);								
+								null, psc, null, null);								
 						result.addAll(temp.values());
 						temp = new HashMap<Number, SimpleFeature>();								
 					}
