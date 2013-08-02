@@ -534,20 +534,22 @@ public class FormulaUtils {
 	 */
 	private static String replaceSimulationTargets(String targets, String sql,
 			Map<Integer, Map<Integer, Double>> changedTargets) {
-		Matcher m = searchTargetConditional.matcher(sql);
-		while(m.find()) {
-			int target = Integer.parseInt(m.group(2));
-			if(FormulaUtils.checkTarget(target, targets) && changedTargets.containsKey(target)) {
-				String subQuery = "";
-				Map<Integer, Double> distances = changedTargets.get(target);
-				for(int distance : distances.keySet()) {
-					double value = distances.get(distance);
-					subQuery += " WHEN id_distanza="+distance+" THEN "+doubleFormat.format(value);
+		if(changedTargets != null) {
+			Matcher m = searchTargetConditional.matcher(sql);
+			while(m.find()) {
+				int target = Integer.parseInt(m.group(2));
+				if(FormulaUtils.checkTarget(target, targets) && changedTargets.containsKey(target)) {
+					String subQuery = "";
+					Map<Integer, Double> distances = changedTargets.get(target);
+					for(int distance : distances.keySet()) {
+						double value = distances.get(distance);
+						subQuery += " WHEN id_distanza="+distance+" THEN "+doubleFormat.format(value);
+					}
+					String simulated = m.group(0).replace("%simulazione(bersaglio)%", "(CASE"+subQuery+" ELSE 0 END)");				
+					sql = sql.replace(m.group(0), simulated);
 				}
-				String simulated = m.group(0).replace("%simulazione(bersaglio)%", "(CASE"+subQuery+" ELSE 0 END)");				
-				sql = sql.replace(m.group(0), simulated);
+				
 			}
-			
 		}
 		return sql.replaceAll("%simulazione\\(bersaglio\\)%", "0");
 	}

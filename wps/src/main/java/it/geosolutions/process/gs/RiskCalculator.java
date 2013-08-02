@@ -149,7 +149,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 			@DescribeParameter(name = "psc", description = "optional List (_ delimited) of csv id_sostanza,psc values to use on the simulation", min = 0) String psc,
 			@DescribeParameter(name = "padr", description = "optional List (_ delimited) of csv id_geo_arco,id_sostanza,padr values to use on the simulation", min = 0) String padr,
 			@DescribeParameter(name = "pis", description = "optional List (_ delimited) of csv id_geo_arco,pis values to use on the simulation", min = 0) String pis,
-			@DescribeParameter(name = "pis", description = "optional list of distances for the simulation processing", min = 0) String distances
+			@DescribeParameter(name = "distances", description = "optional list of distances for the simulation processing", min = 0) String distances
 
 		) throws IOException, SQLException {
 		if(processing == 3) {
@@ -299,9 +299,11 @@ public class RiskCalculator extends RiskCalculatorBase {
 						
 						// final calculus for remaining items not in batch size
 						LOGGER.info("Calculating remaining items");
-						FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
-								.substring(1), fk_partner, materials, scenarios, entities,
-								severeness, fpfield, target, temp, precision);
+						if(ids.length() > 0) {
+							FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
+									.substring(1), fk_partner, materials, scenarios, entities,
+									severeness, fpfield, target, temp, precision);
+						}
 						
 						result.addAll(temp.values());
 					} finally {
