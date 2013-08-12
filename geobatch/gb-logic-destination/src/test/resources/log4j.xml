@@ -11,8 +11,14 @@
 		</layout>
 	</appender>
 
+
+	<logger name="org.geotools">
+		<level value="debug" />
+		<!--<level value="info" />  -->
+	</logger>
+	
 	<logger name="it.geosolutions">
-		<level value="info" />
+		<level value="debug" />
 		<!--<level value="info" />  -->
 	</logger>
 
