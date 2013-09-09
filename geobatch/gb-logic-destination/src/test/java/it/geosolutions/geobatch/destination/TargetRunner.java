@@ -62,7 +62,7 @@ public class TargetRunner{
         datastoreParams.put("schema", "siig_p");
         datastoreParams.put("passwd", "siig_p");
         datastoreParams.put("dbtype", "postgis");
-        datastoreParams.put("host", "localhost");
+        datastoreParams.put("host", "192.168.1.31");
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
@@ -73,26 +73,26 @@ public class TargetRunner{
         MetadataIngestionHandler metadataHandler2 = null;
         try {
         	dataStore1 = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);
-	        dataStore2 = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);
+	        //dataStore2 = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);
 	        metadataHandler1 = new MetadataIngestionHandler(dataStore1);
-	        metadataHandler2 = new MetadataIngestionHandler(dataStore2);
+	        //metadataHandler2 = new MetadataIngestionHandler(dataStore2);
 	        
-	        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("RL_BU-PRES_C_20130624_02",
+	        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("BZ_BU-PTUR_C_20130604_02",
 	                new ProgressListenerForwarder(null), metadataHandler1, dataStore1);
-	        TargetIngestionProcess targetIngestion2 = new TargetIngestionProcess("RL_BU-ASAN_C_20130624_02",
-	                new ProgressListenerForwarder(null), metadataHandler2, dataStore2);
+	        /*TargetIngestionProcess targetIngestion2 = new TargetIngestionProcess("RL_BU-ASAN_C_20130624_02",
+	                new ProgressListenerForwarder(null), metadataHandler2, dataStore2);*/
 	        TargetRunner vtest = new TargetRunner();
 	        
 	        TargetThread vt1 = vtest.new TargetThread(targetIngestion1);
 	        Thread t1 = new Thread(vt1);
 	        t1.start();
 	        
-	        TargetThread vt2 = vtest.new TargetThread(targetIngestion2);
+	        /*TargetThread vt2 = vtest.new TargetThread(targetIngestion2);
 	        Thread t2 = new Thread(vt2);
-	        t2.start();
+	        t2.start();*/
 	        
 	        t1.join();
-	        t2.join();
+	        //t2.join();
         } catch(Exception e) {
         	LOGGER.error(e.getMessage());
         } finally {

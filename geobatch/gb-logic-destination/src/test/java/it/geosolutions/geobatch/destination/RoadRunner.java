@@ -61,7 +61,7 @@ public class RoadRunner{
         MetadataIngestionHandler metadataHandler = null;
         try {
         	
-        	String inputFeature = "RL_C_GRAFO_20130613";
+        	String inputFeature = "BZ_C_Grafo_20130807";
         	//String inputFeature = "AO_C_Grafo_20130704";
         	
         	dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);	        
@@ -70,10 +70,10 @@ public class RoadRunner{
 	        ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(inputFeature,
 	                new ProgressListenerForwarder(null), metadataHandler, dataStore);
 	        
-	        /*arcIngestion.importArcs(null, 1, false, false, null);
+	        //arcIngestion.importArcs(null, 1, false, false, null);
 	        
 			arcIngestion.importArcs(null, 2, false, false, null);
-	        arcIngestion.importArcs(null, 3, false, false, null);
+	        /*arcIngestion.importArcs(null, 3, false, false, null);
 	        arcIngestion.importArcs(null, 3, true, false, "A");
 	        
 			ZeroRemovalComputation zeroComputation = new ZeroRemovalComputation(
@@ -92,7 +92,7 @@ public class RoadRunner{
 	        
 	        vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
 	        vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
-	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);*/
+	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);
 			
 	        RiskComputation riskComputation = new RiskComputation(
 	        		inputFeature,
@@ -103,7 +103,7 @@ public class RoadRunner{
 	        
 	        riskComputation.prefetchRiskAtLevel(3, 1, 1, 26, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", null);
 	        riskComputation.prefetchRiskAtLevel(3, 2, 1, 26, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", null);
-	        riskComputation.prefetchRiskAtLevel(3, 3, 1, 29, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", "B");
+	        riskComputation.prefetchRiskAtLevel(3, 3, 1, 29, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", "B");*/
 	        
         } catch(Exception e) {
         	LOGGER.error(e.getMessage());

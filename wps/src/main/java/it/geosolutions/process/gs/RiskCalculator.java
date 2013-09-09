@@ -22,6 +22,8 @@ import it.geosolutions.destination.utils.FormulaUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,17 +143,39 @@ public class RiskCalculator extends RiskCalculatorBase {
 			@DescribeParameter(name = "scenarios", description = "ids of the scenarios to use in calculation") String scenarios,
 			@DescribeParameter(name = "entities", description = "ids of the entities to use in calculation") String entities,
 			@DescribeParameter(name = "severeness", description = "ids of the severeness to use in calculation") String severeness,
-			@DescribeParameter(name = "fp", description = "fields to use for fp calculation", min = 0) String fpfield,
-			
-			@DescribeParameter(name = "changedTargets", description = "optional field containing csv list of targets to be removed, added, changed", min = 0) String changedTargets,
+			@DescribeParameter(name = "fp", description = "fields to use for fp calculation", min = 0) String fpfield,			
+			@DescribeParameter(name = "changedTargets", description = "optional field containing csv list of targets to be removed, added, changed or an id for the ProcessingRepository storing the same data", min = 0) String changedTargets,			
 			
 			@DescribeParameter(name = "cff", description = "optional List (_ delimited) of csv id_geo_arco,id_bersaglo,cff values to use on the simulation", min = 0) String cff,
 			@DescribeParameter(name = "psc", description = "optional List (_ delimited) of csv id_sostanza,psc values to use on the simulation", min = 0) String psc,
 			@DescribeParameter(name = "padr", description = "optional List (_ delimited) of csv id_geo_arco,id_sostanza,padr values to use on the simulation", min = 0) String padr,
 			@DescribeParameter(name = "pis", description = "optional List (_ delimited) of csv id_geo_arco,pis values to use on the simulation", min = 0) String pis,
-			@DescribeParameter(name = "distances", description = "optional list of distances for the simulation processing", min = 0) String distances
+			@DescribeParameter(name = "distances", description = "optional list of distances for the simulation processing", min = 0) String distances,
+			
+			@DescribeParameter(name = "damageArea", description = "optional field containing damage area geometry or an id for the ProcessingRepository storing the same data", min = 0) String damageArea
 
 		) throws IOException, SQLException {
+		// building DataStore connection using Catalog/storeName or connection input parameters
+		JDBCDataStore dataStore = null;
+		if(catalog != null && storeName != null) {
+			LOGGER.info("Loading DataStore " + storeName + " from Catalog");
+			DataStoreInfo dataStoreInfo = catalog.getDataStoreByName(storeName);
+			if(dataStoreInfo == null) {
+				LOGGER.severe("DataStore not found");
+				throw new IOException("DataStore not found: " + storeName);
+			}
+			dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
+		} else if(connectionParams != null) {
+			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(getConnectionParameters(connectionParams));
+		} else {
+			throw new IOException(
+					"DataStore connection not configured, either catalog, storeName or connectionParams are not available");
+		}
+		
+		if(features == null) {
+			throw new ProcessException("Missing input feature");
+		}
+		
 		if(processing == 3) {
 			
 			List<String> pscs = new ArrayList<String>();
@@ -173,7 +197,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 			List<TargetInfo> simulationTargets = new ArrayList<TargetInfo>();
 			if(changedTargets != null && !changedTargets.equals("")) {
 				try {
-					loadSimulationTargets(simulationTargets, changedTargets);
+					loadSimulationTargets(dataStore, simulationTargets, changedTargets);
 				} catch (ParseException e) {
 					throw new ProcessException("Error reading targets WKT", e);
 				}				
@@ -182,144 +206,148 @@ public class RiskCalculator extends RiskCalculatorBase {
 			if(distances != null && !distances.equals("")) {
 				loadDistances(distancesList, distances);
 			}
-			return simulate(features, storeName, precision, connectionParams,
+			return calculateRisk(features, dataStore, storeName, precision, connectionParams,
 					processing, formula, target, materials, scenarios,
-					entities, severeness, fpfield, simulationTargets, cffs, pscs,
+					entities, severeness, fpfield, 1, true, null, null, simulationTargets, cffs, pscs,
 					padrs, piss, distancesList);
+		} else if(processing == 4){
+			try {
+				Geometry damageAreaGeometry = loadDamageArea(dataStore, damageArea);
+				Map<Integer, Double> damageValues = calculateDamageValues(dataStore, damageAreaGeometry, target);
+				return calculateRisk(features, dataStore, storeName, precision, connectionParams,
+						processing, formula, target, materials, scenarios,
+						entities, severeness, fpfield, 1, false, damageAreaGeometry, damageValues, null, null, null,
+						null, null, null);
+			} catch (ParseException e) {
+				throw new ProcessException("Error reading targets WKT", e);
+			}
+			
 		} else {
-			if(features == null) {
-				throw new ProcessException("Missing input feature");
-			}
-			
-			// building DataStore connection using Catalog/storeName or connection input parameters
-			JDBCDataStore dataStore = null;
-			if(catalog != null && storeName != null) {
-				LOGGER.info("Loading DataStore " + storeName + " from Catalog");
-				DataStoreInfo dataStoreInfo = catalog.getDataStoreByName(storeName);
-				if(dataStoreInfo == null) {
-					LOGGER.severe("DataStore not found");
-					throw new IOException("DataStore not found: " + storeName);
-				}
-				dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
-			} else if(connectionParams != null) {
-				dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(getConnectionParameters(connectionParams));
-			} else {
-				throw new IOException(
-						"DataStore connection not configured, either catalog, storeName or connectionParams are not available");
-			}
-			
+	
 			if(batch == null) {
 				batch = 10000;
 			}
-			if(precision == null) {
-				precision = 3;
-			}
 			
-			DefaultTransaction transaction = new DefaultTransaction();
-			Connection conn = null;
-			try {
-				 conn = dataStore.getConnection(transaction);
-				 
-				// output FeatureType (risk)
-				//  - id_geo_arco
-				//  - geometria
-				//  - rischio1
-				//  - rischio2
-				SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();									
-				tb.add("id_geo_arco", features.getSchema().getDescriptor("id_geo_arco").getType().getBinding());
-				tb.add("geometria", MultiLineString.class,features.getSchema().getGeometryDescriptor().getCoordinateReferenceSystem());
-		        tb.add("rischio1", Double.class);			
-		        tb.add("rischio2", Double.class);
-		        // fake layer name (risk) used for WPS output. Layer risk must be defined in GeoServer
-		        // catalog
-		        tb.setName(new NameImpl(features.getSchema().getName().getNamespaceURI(), "risk"));	        
-		        SimpleFeatureType ft = tb.buildFeatureType();
-		        
-		        // feature level (1, 2, 3)
-		        int level = FormulaUtils.getLevel(features);	       
-		        
-		        LOGGER.info("Doing calculus for level " + level);
-		        
-		        Formula formulaDescriptor = Formula.load(conn, processing, formula, target);
-		        if(formulaDescriptor == null) {
-		        	throw new ProcessException("Unable to load formula " + formula);
-		        }
-				if ((!formulaDescriptor.hasGrid() && level == 3)
-						|| (!formulaDescriptor.hasNoGrid() && level < 3)) {
-		        	LOGGER.info("Formula not supported on this level, returning empty collection");				
-					return new EmptyFeatureCollection(ft);
-		        } else {
-		        	// iterator on source
-		        	SimpleFeatureIterator iter = features.features();
-		        	
-		        	// result builder
-			        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(ft);
-					ListFeatureCollection result = new ListFeatureCollection(ft);
-					int count = 0;				
-					Double[] risk = new Double[] { 0.0, 0.0 };										
-					
-					// iterate source features
-					try {
-						// we will calculate risk in batch of arcs
-						// we store each feature of the batch in a map
-						// indexed by id					
-						Map<Number, SimpleFeature> temp = new HashMap<Number, SimpleFeature>();
-						// ids will store the list of id of each batch
-						// used to build risk query
-						StringBuilder ids = new StringBuilder();
-						String fk_partner = null;
-						while(iter.hasNext()) {
-							SimpleFeature feature = iter.next();
-							Number id = (Number)feature.getAttribute("id_geo_arco");
-							fb.add(id);
-							fb.add(feature.getDefaultGeometry());
-							if(formulaDescriptor.takeFromSource()) {
-								risk[0] = ((Number)feature.getAttribute("rischio1")).doubleValue();
-								risk[1] = ((Number)feature.getAttribute("rischio2")).doubleValue();
-							} 
-							fb.add(risk[0]);
-							fb.add(risk[1]);
-							
-							
-							// calculate risk here only if it depends from arcs
-							ids.append(","+id);
-							temp.put(id.intValue(), fb.buildFeature(id + ""));
-							count++;
-							// calculate batch items a time 
-							if(count % batch == 0) {
-								LOGGER.info("Calculated " + count + " values");
-								FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
-										.substring(1), fk_partner, materials, scenarios,
-										entities, severeness, fpfield, target, temp, precision);								
-								result.addAll(temp.values());
-								ids = new StringBuilder();
-								temp = new HashMap<Number, SimpleFeature>();								
-							}								
-						}
+			return calculateRisk(features, dataStore, storeName, precision, connectionParams,
+					processing, formula, target, materials, scenarios,
+					entities, severeness, fpfield, batch, false, null, null, null, null, null,
+					null, null, null);
 						
-						// final calculus for remaining items not in batch size
-						LOGGER.info("Calculating remaining items");
-						if(ids.length() > 0) {
-							FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
-									.substring(1), fk_partner, materials, scenarios, entities,
-									severeness, fpfield, target, temp, precision);
-						}
-						
-						result.addAll(temp.values());
-					} finally {
-						iter.close();
-					}
-					return result;
-		        }
-	 			
-			} finally {				
-				transaction.close();
-				if(conn != null) {
-					conn.close();
-				}
-			}
 		}
 		
+	}
+
+	/**
+	 * @param dataStore
+	 * @param damageArea
+	 * @param target
+	 * @return
+	 * @throws IOException 
+	 * @throws SQLException 
+	 */
+	public static Map<Integer, Double> calculateDamageValues(
+			JDBCDataStore dataStore, Geometry damageArea, int target) throws IOException, SQLException {
+		String wkt = damageArea.toText();
+		DefaultTransaction transaction = new DefaultTransaction();
+		Connection conn = null;
+		Map<Integer, Double> damageValues = new HashMap<Integer, Double>();
+		try {
+			 conn = dataStore.getConnection(transaction);
+			 
+			 if(FormulaUtils.isSimpleTarget(target)) {
+				 if(FormulaUtils.checkTarget(target, FormulaUtils.humanTargetsList)) {
+					 addDamageValuesByField(damageValues, conn, target + "", wkt);
+				 } else {
+					 addDamageValuesByArea(damageValues, conn, target + "", wkt);
+				 }
+				 
+			 } else if(FormulaUtils.isAllHumanTargets(target)) {
+				 addDamageValuesByField(damageValues, conn, FormulaUtils.humanTargetsList, wkt);
+			 } else if(FormulaUtils.isAllNotHumanTargets(target)) {
+				 addDamageValuesByArea(damageValues, conn, FormulaUtils.notHumanTargetsList, wkt);
+			 } else {
+				 addDamageValuesByField(damageValues, conn, FormulaUtils.humanTargetsList, wkt);
+				 addDamageValuesByArea(damageValues, conn, FormulaUtils.notHumanTargetsList, wkt);
+			 }
+			 
+			 return damageValues;
+		} catch(SQLException e) {
+			throw new ProcessException(e);
+		} finally {
+			transaction.close();
+			if(conn != null) {
+				conn.close();
+			}
+		}
+	}
+
+	/**
+	 * @param damageValues
+	 * @param conn
+	 * @param strings
+	 * @throws SQLException 
+	 */
+	private static void addDamageValuesByArea(
+			Map<Integer, Double> damageValues, Connection conn,
+			String targets, String wkt) throws SQLException {
+		
+		String sql = "select id_bersaglio,ST_Area(ST_Intersection(geometria,ST_GeomFromText('" + wkt + "','32632'))) from v_geo_bersagli_ambientali where st_intersects(geometria,ST_GeomFromText('" + wkt + "','32632')) and id_bersaglio in(" + targets + ")";
+		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		
+		try {
+			stmt = conn.prepareStatement(sql);
+			
+			rs = stmt.executeQuery();				
+			while(rs.next()) {
+				Integer idBersaglio = rs.getInt(1);
+				Double area = rs.getDouble(2);
+				if(damageValues.containsKey(idBersaglio)) {
+					Double oldArea = damageValues.get(idBersaglio);
+					damageValues.put(idBersaglio, oldArea + area);
+				} else {
+					damageValues.put(idBersaglio, area);
+				}
+			}
+			
+		} finally {
+			if(rs != null) {
+				rs.close();				
+			}
+			if(stmt != null) {
+				stmt.close();
+			}
+			
+		}
+	}
+
+	/**
+	 * @param damageValues
+	 * @param conn
+	 * @param strings
+	 */
+	private static void addDamageValuesByField(
+			Map<Integer, Double> damageValues, Connection conn,
+			String targets, String wkt) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	/**
+	 * @param dataStore
+	 * @param damageArea
+	 * @return
+	 * @throws SQLException 
+	 * @throws IOException 
+	 * @throws ParseException 
+	 */
+	private Geometry loadDamageArea(JDBCDataStore dataStore, String damageArea) throws IOException, SQLException, ParseException {
+		if(damageArea.matches("^[0-9]+$")) {
+			int id = Integer.parseInt(damageArea);
+			damageArea = ProcessingRepository.loadData(dataStore, -1, id);
+		} 
+		return wktReader.read(damageArea);		
 	}
 
 	/**
@@ -336,10 +364,17 @@ public class RiskCalculator extends RiskCalculatorBase {
 	 * @param simulationTargets
 	 * @param changedTargets
 	 * @throws ParseException 
+	 * @throws SQLException 
+	 * @throws IOException 
 	 */
 	private void loadSimulationTargets(
+			JDBCDataStore dataStore,
 			List<TargetInfo> valuesMap,
-			String valuesList) throws ParseException {
+			String valuesList) throws ParseException, IOException, SQLException {
+		if(valuesList.matches("^[0-9]+$")) {
+			int id = Integer.parseInt(valuesList);
+			valuesList = ProcessingRepository.loadData(dataStore, -1, id);
+		} 
 		for(String record : valuesList.split("_")) {
 			String[] parts = record.split(",");
 			int id = Integer.parseInt(parts[0]);
@@ -352,6 +387,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 				valuesMap.add(new TargetInfo(id,wktReader.read(geometry),value));
 			}
 		}	
+		  
 	}
 
 	/**
@@ -387,8 +423,9 @@ public class RiskCalculator extends RiskCalculatorBase {
 		}		
 	}
 
-	private SimpleFeatureCollection simulate(	
+	private SimpleFeatureCollection calculateRisk(	
 			SimpleFeatureCollection features,
+			JDBCDataStore dataStore,
 			String storeName,
 			Integer precision,
 			String connectionParams,
@@ -400,6 +437,10 @@ public class RiskCalculator extends RiskCalculatorBase {
 			String entities,
 			String severeness,
 			String fpfield,
+			int batch,
+			boolean simulation,
+			Geometry damageArea,
+			Map<Integer, Double> damageValues,
 			List<TargetInfo> changedTargets,
 			Map<Integer, Map<Integer, Double>> cffs,
 			List<String> psc,
@@ -407,23 +448,6 @@ public class RiskCalculator extends RiskCalculatorBase {
 			Map<Integer, Double> piss,
 			List<Integer> distances
 		) throws IOException, SQLException {
-		
-		// building DataStore connection using Catalog/storeName or connection input parameters
-		JDBCDataStore dataStore = null;
-		if(catalog != null && storeName != null) {
-			LOGGER.info("Loading DataStore " + storeName + " from Catalog");
-			DataStoreInfo dataStoreInfo = catalog.getDataStoreByName(storeName);
-			if(dataStoreInfo == null) {
-				LOGGER.severe("DataStore not found");
-				throw new IOException("DataStore not found: " + storeName);
-			}
-			dataStore = (JDBCDataStore)dataStoreInfo.getDataStore(null);
-		} else if(connectionParams != null) {
-			dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(getConnectionParameters(connectionParams));
-		} else {
-			throw new IOException(
-					"DataStore connection not configured, either catalog, storeName or connectionParams are not available");
-		}
 		
 		if(precision == null) {
 			precision = 3;
@@ -456,6 +480,10 @@ public class RiskCalculator extends RiskCalculatorBase {
 	        
 	        Formula formulaDescriptor = Formula.load(conn, processing, formula, target);
 	        
+	        if(formulaDescriptor == null) {
+	        	throw new ProcessException("Unable to load formula " + formula);
+	        }
+	        
 			if ((!formulaDescriptor.hasGrid() && level == 3)
 					|| (!formulaDescriptor.hasNoGrid() && level < 3)) {
 	        	LOGGER.info("Formula not supported on this level, returning empty collection");				
@@ -467,13 +495,8 @@ public class RiskCalculator extends RiskCalculatorBase {
 	        	// result builder
 		        SimpleFeatureBuilder fb = new SimpleFeatureBuilder(ft);
 				ListFeatureCollection result = new ListFeatureCollection(ft);
+				int count = 0;
 				Double[] risk = new Double[] { 0.0, 0.0 };
-				
-				/*if(!formulaDescriptor.useArcs()) {
-					risk = getRisk(conn, level, formulaDescriptor, materials, scenarios, entities, severeness, target);
-				}*/
-				
-				
 				
 				// iterate source features
 				try {
@@ -481,11 +504,13 @@ public class RiskCalculator extends RiskCalculatorBase {
 					// we store each feature of the batch in a map
 					// indexed by id					
 					Map<Number, SimpleFeature> temp = new HashMap<Number, SimpleFeature>();
+					StringBuilder ids = new StringBuilder();
+					String fk_partner = null;
 					
 					while(iter.hasNext()) {
 						SimpleFeature feature = iter.next();
 						Number id = (Number)feature.getAttribute("id_geo_arco");
-						String fk_partner = (String)feature.getAttribute("fk_partner");
+						fk_partner = (String)feature.getAttribute("fk_partner");
 						fb.add(id);
 						fb.add(feature.getDefaultGeometry());
 						if(formulaDescriptor.takeFromSource()) {
@@ -494,53 +519,93 @@ public class RiskCalculator extends RiskCalculatorBase {
 						} 
 						fb.add(risk[0]);
 						fb.add(risk[1]);
-						
-						
-						temp.put(id.intValue(), fb.buildFeature(id + ""));
-						Double pis = piss.get(id.intValue());
-						Map<Integer, Double> padr = padrs.get(id.intValue()); 
-						Map<Integer, Double> cff = cffs.get(id.intValue());
-						
-						Map<Integer, Map<Integer, Double>> simulationTargets  = new HashMap<Integer, Map<Integer, Double>>();
-						
-						
-						if(!changedTargets.isEmpty()) {
-							for(int distance : distances) {
-								Geometry buffer = BufferUtils.iterativeBuffer((Geometry)feature.getDefaultGeometry(), (double)distance, 100);
-								for(TargetInfo targetInfo : changedTargets) {
-									if(targetInfo.getGeometry() != null) {
-										Geometry intersection = buffer.intersection(targetInfo.getGeometry());
-										if(intersection != null && intersection.getArea()>0) {
-											Map<Integer, Double> distancesMap = simulationTargets.get(targetInfo.getType());
-											if(distancesMap == null) {
-												distancesMap = new HashMap<Integer, Double>();
-												simulationTargets.put(targetInfo.getType(), distancesMap);
+												
+						temp.put(id.intValue(), fb.buildFeature(id + ""));						
+							
+						if(simulation) {
+							Double pis = piss.get(id.intValue());
+							Map<Integer, Double> padr = padrs.get(id.intValue()); 
+							Map<Integer, Double> cff = cffs.get(id.intValue());
+							
+							Map<Integer, Map<Integer, Double>> simulationTargets  = new HashMap<Integer, Map<Integer, Double>>();
+							
+							
+							if(!changedTargets.isEmpty()) {
+								for(int distance : distances) {
+									Geometry buffer = BufferUtils.iterativeBuffer((Geometry)feature.getDefaultGeometry(), (double)distance, 100);
+									for(TargetInfo targetInfo : changedTargets) {
+										if(targetInfo.getGeometry() != null) {
+											Geometry intersection = buffer.intersection(targetInfo.getGeometry());
+											if(intersection != null && intersection.getArea()>0) {
+												Map<Integer, Double> distancesMap = simulationTargets.get(targetInfo.getType());
+												if(distancesMap == null) {
+													distancesMap = new HashMap<Integer, Double>();
+													simulationTargets.put(targetInfo.getType(), distancesMap);
+												}
+												double value = 0.0;
+												if(targetInfo.isHuman()) {
+													value = intersection.getArea() / targetInfo.getGeometry().getArea() * targetInfo.getValue();
+												} else {
+													value = intersection.getArea();
+												}
+												if(targetInfo.isRemoved()) {
+													value = - value;
+												}
+												distancesMap.put(distance, value);
 											}
-											double value = 0.0;
-											if(targetInfo.isHuman()) {
-												value = intersection.getArea() / targetInfo.getGeometry().getArea() * targetInfo.getValue();
-											} else {
-												value = intersection.getArea();
-											}
-											if(targetInfo.isRemoved()) {
-												value = - value;
-											}
-											distancesMap.put(distance, value);
 										}
 									}
 								}
 							}
+							
+							FormulaUtils.calculateSimulationFormulaValuesOnSingleArc(
+									conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
+									materials, scenarios, entities, severeness, fpfield, target, simulationTargets, 
+									temp, precision,
+									cff, psc, padr, pis, null);
+							
+							result.addAll(temp.values());
+							temp = new HashMap<Number, SimpleFeature>();	
+						} else if(damageArea != null){
+							Geometry arcGeometry = (Geometry)feature.getDefaultGeometry();
+							if(arcGeometry != null && arcGeometry.intersects(damageArea)) {
+								FormulaUtils.calculateSimulationFormulaValuesOnSingleArc(
+										conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
+										materials, scenarios, entities, severeness, fpfield, target, null, 
+										temp, precision,
+										null, null, null, null, damageValues);
+								result.addAll(temp.values());								
+							}
+							temp = new HashMap<Number, SimpleFeature>();
+						} else {							
+							ids.append(","+id);
+							count++;
+							// calculate batch items a time 
+							if(count % batch == 0) {
+								LOGGER.info("Calculated " + count + " values");
+								FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
+										.substring(1), fk_partner, materials, scenarios,
+										entities, severeness, fpfield, target, temp, precision);								
+								result.addAll(temp.values());
+								ids = new StringBuilder();
+								temp = new HashMap<Number, SimpleFeature>();								
+							}
 						}
-						
-						FormulaUtils.calculateSimulationFormulaValuesOnSingleArc(
-								conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
-								materials, scenarios, entities, severeness, fpfield, target, simulationTargets, 
-								temp, precision,
-								cff, psc, padr, pis);								
-						result.addAll(temp.values());
-						temp = new HashMap<Number, SimpleFeature>();								
+													
 					}
+					
+					// final calculus for remaining items not in batch size
+					LOGGER.info("Calculating remaining items");
+					if(ids.length() > 0) {
+						FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
+								.substring(1), fk_partner, materials, scenarios, entities,
+								severeness, fpfield, target, temp, precision);
+					}					
+					result.addAll(temp.values());
+					
 					LOGGER.info("Calculated " + result.size() + " values");
+					
+					
 				} finally {
 					iter.close();
 				}

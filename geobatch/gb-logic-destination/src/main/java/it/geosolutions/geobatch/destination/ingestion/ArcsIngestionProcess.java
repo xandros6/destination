@@ -935,6 +935,9 @@ public class ArcsIngestionProcess extends InputObject {
                             String el = cffAttributeSplitted[count].replace(",", ".");
                             double cffElement = Double.parseDouble(el);
                             featureBuilder.reset();
+                            
+                            String idBersaglio = bersaglio.getProperty(Integer.toString(count+1));
+                            
                             // compiles the attributes from target and read feature data, using mappings
                             // to match input attributes with output ones
                             for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
@@ -943,7 +946,7 @@ public class ArcsIngestionProcess extends InputObject {
                                     } else if(attr.getLocalName().equals("cff")) {
                                             featureBuilder.add(cffElement);
                                     } else if(attr.getLocalName().equals("id_bersaglio")) {
-                                            featureBuilder.add(bersaglio.getProperty(Integer.toString(count)));
+                                            featureBuilder.add(idBersaglio);
                                     } else if(attr.getLocalName().equals("fk_partner")) {
                                             featureBuilder.add(partner+"");
                                     } else {
@@ -952,7 +955,7 @@ public class ArcsIngestionProcess extends InputObject {
                             }
 //                            String fid2 = el.replaceAll("\\,", "");
 //                            fid2 = el.replaceAll("\\.", "");
-                            String featureid = id + "." + count;
+                            String featureid = id + "." + idBersaglio;
                             SimpleFeature feature = featureBuilder.buildFeature(featureid);
                             feature.getUserData().put(Hints.USE_PROVIDED_FID, true);                        
                             

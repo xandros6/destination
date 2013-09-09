@@ -1,6 +1,7 @@
 package it.geosolutions.geobatch.destination;
 
 import static org.junit.Assert.assertEquals;
+import it.geosolutions.geobatch.destination.common.utils.DbUtils;
 import it.geosolutions.geobatch.destination.datamigration.ProductionUpdater;
 import it.geosolutions.geobatch.destination.datamigration.configuration.ProductionUpdaterConfiguration;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
@@ -14,6 +15,7 @@ import java.util.Map;
 
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
+import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -373,10 +375,13 @@ public class ProductionUpdaterTest{
 	}
 
 	private void clear_destination(String table) throws Exception{
-		JDBCDataStore sourceDataStore = (JDBCDataStore) DataStoreFinder.getDataStore(productionUpdaterConfiguration.getOutputFeature().getDataStore());
-		SimpleFeatureStore store = (SimpleFeatureStore) sourceDataStore.getFeatureSource(table);
-		store.setTransaction(Transaction.AUTO_COMMIT);					
-		store.removeFeatures(Filter.INCLUDE);
+		JDBCDataStore sourceDataStore = (JDBCDataStore) DataStoreFinder.getDataStore(productionUpdaterConfiguration.getOutputFeature().getDataStore());		
+		DefaultTransaction transaction = new DefaultTransaction();
+		try {
+			DbUtils.executeSql(sourceDataStore.getConnection(transaction), transaction, "delete from " + table, true);
+		} finally {
+			transaction.close();
+		}		
 	}
 
 	private void clear_source(String table) throws Exception{

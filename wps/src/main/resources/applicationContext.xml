@@ -13,9 +13,9 @@
     
     <bean id="riskCalculatorSimple" class="it.geosolutions.process.gs.RiskCalculatorSimple">
       <constructor-arg index="0" ref="catalog"/>
-    </bean>
+    </bean>	
 
-	<bean id="riskSimulator" class="it.geosolutions.process.gs.RiskSimulator">
+	<bean id="processingRepository" class="it.geosolutions.process.gs.ProcessingRepository">
       <constructor-arg index="0" ref="catalog"/>
     </bean>
 
