@@ -293,6 +293,17 @@ public class RiskCalculator extends RiskCalculatorBase {
 		
 		String sql = "select id_bersaglio,ST_Area(ST_Intersection(geometria,ST_GeomFromText('" + wkt + "','32632'))) from v_geo_bersagli_ambientali where st_intersects(geometria,ST_GeomFromText('" + wkt + "','32632')) and id_bersaglio in(" + targets + ")";
 		
+		addDamageValue(damageValues, conn, sql);
+	}
+
+	/**
+	 * @param damageValues
+	 * @param conn
+	 * @param sql
+	 * @throws SQLException
+	 */
+	private static void addDamageValue(Map<Integer, Double> damageValues,
+			Connection conn, String sql) throws SQLException {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		
@@ -302,12 +313,12 @@ public class RiskCalculator extends RiskCalculatorBase {
 			rs = stmt.executeQuery();				
 			while(rs.next()) {
 				Integer idBersaglio = rs.getInt(1);
-				Double area = rs.getDouble(2);
+				Double value = rs.getDouble(2);
 				if(damageValues.containsKey(idBersaglio)) {
-					Double oldArea = damageValues.get(idBersaglio);
-					damageValues.put(idBersaglio, oldArea + area);
+					Double oldValue = damageValues.get(idBersaglio);
+					damageValues.put(idBersaglio, oldValue + value);
 				} else {
-					damageValues.put(idBersaglio, area);
+					damageValues.put(idBersaglio, value);
 				}
 			}
 			
@@ -326,12 +337,14 @@ public class RiskCalculator extends RiskCalculatorBase {
 	 * @param damageValues
 	 * @param conn
 	 * @param strings
+	 * @throws SQLException 
 	 */
 	private static void addDamageValuesByField(
 			Map<Integer, Double> damageValues, Connection conn,
-			String targets, String wkt) {
-		// TODO Auto-generated method stub
+			String targets, String wkt) throws SQLException {
+		String sql = "select id_bersaglio,umani from v_geo_bersagli_umani where st_intersects(geometria,ST_GeomFromText('" + wkt + "','32632')) and id_bersaglio in(" + targets + ")";
 		
+		addDamageValue(damageValues, conn, sql);
 	}
 
 	/**

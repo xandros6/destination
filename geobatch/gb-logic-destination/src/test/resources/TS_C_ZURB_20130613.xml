@@ -60,7 +60,7 @@
 			</entry>
 			<entry>
 				<string>database</string>
-				<string>destination_production</string>
+				<string>destination_prod</string>
 			</entry>
 			<entry>
 				<string>schema</string>

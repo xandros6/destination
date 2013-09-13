@@ -107,7 +107,7 @@ alter table siig_t_file
 create table siig_t_save (
        id_save              numeric(6,0) not null,
        fk_utente            numeric(6,0) not null,
-       xml_richiesta        xml null,
+       xml_richiesta        text null,
        data_aggiornamento   timestamp without time zone null,
        nome_elaborazione    character varying(100) null,
        flg_rigenerabile     character varying(1) null,

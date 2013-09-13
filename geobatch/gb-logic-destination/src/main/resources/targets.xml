@@ -12,6 +12,10 @@
       		<string>residenti</string>
       		<string>RESIDENTI</string>
       	</entry>
+      	<entry>      	
+      		<string>flg_nr_res</string>
+      		<string>FLG_N_RES</string>
+      	</entry>
       </map>
     </entry>
     <entry>
