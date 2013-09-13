@@ -67,6 +67,10 @@
 			<artifactId>gt-sample-data</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-shapefile</artifactId>
+		</dependency>
+		<dependency>
             <groupId>it.geosololutions</groupId>
             <artifactId>destination-utils</artifactId>                
         </dependency>
