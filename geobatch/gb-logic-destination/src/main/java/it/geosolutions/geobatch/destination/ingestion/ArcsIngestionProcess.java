@@ -436,7 +436,7 @@ public class ArcsIngestionProcess extends InputObject {
 				if(aggregateGeo == null) {								
 					if(geo == null) {
 						geo = (Geometry)inputFeature.getDefaultGeometry();
-					} else {
+					} else if(inputFeature.getDefaultGeometry() != null){
 						geo = geo.union((Geometry)inputFeature.getDefaultGeometry());
 					}
 				} else {
@@ -505,7 +505,7 @@ public class ArcsIngestionProcess extends InputObject {
 					double[] cffs = extractMultipleValuesDouble(inputFeature,
 							"CFF", cff.length);
 					for (int i = 0; i < cff.length; i++) {
-						cff[i] += cffs[i];
+						cff[i] += cffs[i] * currentLunghezza.intValue();
 					}
 				}
 				
@@ -530,7 +530,7 @@ public class ArcsIngestionProcess extends InputObject {
 							flgVelocCounter.getMax(), inputFeature);
 					addAggregateDissestoFeature(outputObjects[1], id,
 							lunghezza, pterr, inputFeature);
-					addAggregateCFFFeature(outputObjects[2], id, cff,
+					addAggregateCFFFeature(outputObjects[2], id, lunghezza, cff,
 							inputFeature);
 					// no need for aggregation until paddr will be a constant
 					addSostanzaFeature(outputObjects[3], id, inputFeature,
@@ -692,7 +692,7 @@ public class ArcsIngestionProcess extends InputObject {
 	}
 	
 	private void addAggregateCFFFeature(OutputObject cffObject,
-                int id, double cff[], SimpleFeature inputFeature) throws IOException {
+                int id, int lunghezza, double cff[], SimpleFeature inputFeature) throws IOException {
             
             SimpleFeatureBuilder featureBuilder = cffObject.getBuilder();
             for(int count=0; count < cff.length; count++) {
@@ -704,7 +704,7 @@ public class ArcsIngestionProcess extends InputObject {
                             for(AttributeDescriptor attr : cffObject.getSchema().getAttributeDescriptors()) {
                                     if(attr.getLocalName().equals("cff")) {
                                             // compute the aritmetic average
-                                            featureBuilder.add(cffElement/cff.length);
+                                            featureBuilder.add(cffElement/lunghezza);
                                     }else if(attr.getLocalName().equals("fk_partner")) {
                                             featureBuilder.add(partner+"");
                                     } else {
