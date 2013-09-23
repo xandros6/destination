@@ -77,7 +77,7 @@ public class TargetRunner{
 	        metadataHandler1 = new MetadataIngestionHandler(dataStore1);
 	        //metadataHandler2 = new MetadataIngestionHandler(dataStore2);
 	        
-	        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("BZ_BU-PRES_C_20130903_01",
+	        TargetIngestionProcess targetIngestion1 = new TargetIngestionProcess("RL_BNU-ABOSC_C_20130909_02",
 	                new ProgressListenerForwarder(null), metadataHandler1, dataStore1);
 	        /*TargetIngestionProcess targetIngestion2 = new TargetIngestionProcess("RL_BU-ASAN_C_20130624_02",
 	                new ProgressListenerForwarder(null), metadataHandler2, dataStore2);*/

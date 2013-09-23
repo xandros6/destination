@@ -52,7 +52,7 @@ public class RoadRunner{
         datastoreParams.put("schema", "siig_p");
         datastoreParams.put("passwd", "siig_p");
         datastoreParams.put("dbtype", "postgis");
-        datastoreParams.put("host", "192.168.1.31");
+        datastoreParams.put("host", "localhost");
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
@@ -61,8 +61,9 @@ public class RoadRunner{
         MetadataIngestionHandler metadataHandler = null;
         try {
         	
-        	String inputFeature = "BZ_C_Grafo_20130807";
+        	//String inputFeature = "RL_C_Grafo_20130918";
         	//String inputFeature = "AO_C_Grafo_20130704";
+        	String inputFeature = "BZ_C_Grafo_20130919";
         	
         	dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);	        
 	        metadataHandler = new MetadataIngestionHandler(dataStore);
@@ -72,26 +73,26 @@ public class RoadRunner{
 	        
 	        //arcIngestion.importArcs(null, 1, false, false, null);
 	        
-			arcIngestion.importArcs(null, 2, false, false, null);
-	        /*arcIngestion.importArcs(null, 3, false, false, null);
-	        arcIngestion.importArcs(null, 3, true, false, "A");
-	        
+	        arcIngestion.importArcs(null, 2, false, false, null);
+	        //arcIngestion.importArcs(null, 3, false, false, null);
+	        //arcIngestion.importArcs(null, 3, true, false, "A");
+	        /*
 			ZeroRemovalComputation zeroComputation = new ZeroRemovalComputation(
 					inputFeature, new ProgressListenerForwarder(null),
 					metadataHandler, dataStore);
 	        
 	        
-	        zeroComputation.removeZeros(null, 1, null);
-	        zeroComputation.removeZeros(null, 2, null);
-	        zeroComputation.removeZeros(null, 3, null);
+	        //zeroComputation.removeZeros(null, 1, null);
+	        //zeroComputation.removeZeros(null, 2, null);
+	        //zeroComputation.removeZeros(null, 3, null);
 	        
 	        JAI.getDefaultInstance().getTileCache().setMemoryCapacity(1024*1024*1024);
 	        
 	        VulnerabilityComputation vulnerability = new VulnerabilityComputation(inputFeature, 
 	        		new ProgressListenerForwarder(null), metadataHandler, dataStore);
 	        
-	        vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
-	        vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
+	        //vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
+	        //vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
 	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);
 			
 	        RiskComputation riskComputation = new RiskComputation(
