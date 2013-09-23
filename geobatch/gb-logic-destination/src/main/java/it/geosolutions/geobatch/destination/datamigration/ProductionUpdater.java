@@ -56,13 +56,16 @@ public class ProductionUpdater extends InputObject{
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ProductionUpdater.class);
 
-	private static Pattern TYPE_NAME_PARTS = Pattern.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");
+	private static Pattern TYPE_NAME_PARTS_ARCS = Pattern.compile("^([A-Z]{2})_([A-Z]{1})-([A-Za-z]+)_([0-9]{8})$");
+	private static Pattern TYPE_NAME_PARTS_TARGETS  = Pattern.compile("^([A-Z]{2})[_-]([A-Z]{2,3})[_-]([A-Z]+)([_-][C|I])?[_-]([0-9]{8})[_-]([0-9]{2})$");
 	private static Properties targetTypes = new Properties();
 
 	private Ds2dsConfiguration ds2dsConfiguration;
 	private String codicePartner;
 	private int partner;
 	private int targetType;
+	private boolean filterByTarget = true;
+	private boolean removeFeatures = true;
 
 	static {	
 		// load mappings from resources
@@ -73,6 +76,24 @@ public class ProductionUpdater extends InputObject{
 		}
 	}
 
+	
+	
+	/**
+	 * @param filterByTarget the filterByTarget to set
+	 */
+	public void setFilterByTarget(boolean filterByTarget) {
+		this.filterByTarget = filterByTarget;
+	}
+	
+	/**
+	 * @param removeFeatures the removeFeatures to set
+	 */
+	public void setRemoveFeatures(boolean removeFeatures) {
+		this.removeFeatures = removeFeatures;
+	}
+
+
+
 	public ProductionUpdater(String inputTypeName,
 			ProgressListenerForwarder listenerForwarder,
 			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
@@ -82,12 +103,22 @@ public class ProductionUpdater extends InputObject{
 
 	@Override
 	protected boolean parseTypeName(String typeName) {
-		Matcher m = TYPE_NAME_PARTS.matcher(typeName);
+		Matcher m = TYPE_NAME_PARTS_ARCS.matcher(typeName);
 		if(m.matches()) {
 			// partner alphanumerical abbreviation (from siig_t_partner)
 			codicePartner = m.group(1);
 			// partner numerical id (from siig_t_partner)
 			partner = Integer.parseInt(partners.get(codicePartner).toString());			
+			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());
+			return true;
+		}
+		m = TYPE_NAME_PARTS_TARGETS.matcher(typeName);
+		if(m.matches()) {
+			// partner alphanumerical abbreviation (from siig_t_partner)
+			codicePartner = m.group(1);
+			// partner numerical id (from siig_t_partner)
+			partner = Integer.parseInt(partners.get(codicePartner).toString());		
+			// target detailed type id (from siig_t_bersaglio)
 			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());
 			return true;
 		}
@@ -161,7 +192,7 @@ public class ProductionUpdater extends InputObject{
 
 	private Queue<EventObject> getEvents() throws URISyntaxException {
 		Queue<EventObject> events = new LinkedList<EventObject>();
-		FileSystemEvent event = new FileSystemEvent(new File(this.getClass().getClassLoader().getResource("dummyInput.xml").toURI()) , FileSystemEventType.FILE_ADDED);
+		FileSystemEvent event = new FileSystemEvent(new File("dummyInput.run") , FileSystemEventType.FILE_ADDED);
 		events.add(event);
 		return events;
 	}
@@ -186,74 +217,80 @@ public class ProductionUpdater extends InputObject{
 
 		Map<String, Serializable> destinationDataStoreConfig = this.ds2dsConfiguration.getOutputFeature().getDataStore();
 		DataStore destinationDataStore = DataStoreFinder.getDataStore(destinationDataStoreConfig);
-		this.ds2dsConfiguration.setEcqlFilter("id_partner = " + partner + " AND id_bersaglio = " + targetType);
+		if(filterByTarget) {
+			this.ds2dsConfiguration.setEcqlFilter("id_partner = " + partner + " AND id_bersaglio = " + targetType);
+		} else {
+			this.ds2dsConfiguration.setEcqlFilter("id_partner = " + partner);
+		}
 
 		/*
 		 * Delete all features
 		 */
-		for(UpdaterFeature f : targetFeature.getFeatures()){
-
-			String fn = f.getFeatureName();
-			String pr = f.getFeatureParentRelation();
-
-			Filter filter = CQL.toFilter(this.ds2dsConfiguration.getEcqlFilter());
-			// Feature hasn't id_partner, join with the parent relation is needed to delete entry 
-			if(pr != null){
-
-				Connection connection = DriverManager.getConnection("jdbc:postgresql://"+destinationDataStoreConfig.get("host")+":"+destinationDataStoreConfig.get("port")+"/"+destinationDataStoreConfig.get("database"),destinationDataStoreConfig.get("user").toString(), destinationDataStoreConfig.get("passwd").toString());
-
-				DatabaseMetaData metaData = connection.getMetaData();
-
-				ResultSet foreignKeys = metaData.getImportedKeys(connection.getCatalog(), null, pr);
-
-				boolean fkFound = false;
-				String fkTableName = "";
-				String fkColumnName = "";
-				String pkTableName = "";
-				String pkColumnName = "";
-
-				//Retrieve information about FK
-				while (foreignKeys.next()) {
-					fkTableName = foreignKeys.getString("FKTABLE_NAME");
-					fkColumnName = foreignKeys.getString("FKCOLUMN_NAME");
-					pkTableName = foreignKeys.getString("PKTABLE_NAME");
-					pkColumnName = foreignKeys.getString("PKCOLUMN_NAME");
-					if(pkTableName.equals(fn) && fkTableName.equals(pr)){
-						fkFound = true;
-						break;
-
+		if(removeFeatures) {
+			for(UpdaterFeature f : targetFeature.getFeatures()){
+	
+				String fn = f.getFeatureName();
+				String pr = f.getFeatureParentRelation();
+	
+				Filter filter = CQL.toFilter(this.ds2dsConfiguration.getEcqlFilter());
+				// Feature hasn't id_partner, join with the parent relation is needed to delete entry 
+				if(pr != null){
+	
+					Connection connection = DriverManager.getConnection("jdbc:postgresql://"+destinationDataStoreConfig.get("host")+":"+destinationDataStoreConfig.get("port")+"/"+destinationDataStoreConfig.get("database"),destinationDataStoreConfig.get("user").toString(), destinationDataStoreConfig.get("passwd").toString());
+	
+					DatabaseMetaData metaData = connection.getMetaData();
+	
+					ResultSet foreignKeys = metaData.getImportedKeys(connection.getCatalog(), null, pr);
+	
+					boolean fkFound = false;
+					String fkTableName = "";
+					String fkColumnName = "";
+					String pkTableName = "";
+					String pkColumnName = "";
+	
+					//Retrieve information about FK
+					while (foreignKeys.next()) {
+						fkTableName = foreignKeys.getString("FKTABLE_NAME");
+						fkColumnName = foreignKeys.getString("FKCOLUMN_NAME");
+						pkTableName = foreignKeys.getString("PKTABLE_NAME");
+						pkColumnName = foreignKeys.getString("PKCOLUMN_NAME");
+						if(pkTableName.equals(fn) && fkTableName.equals(pr)){
+							fkFound = true;
+							break;
+	
+						}
+					}
+					connection.close();
+	
+					if(fkFound){
+	
+						//Retrieve IDs of primary feature to delete related to those extracted by EcqlFilter on related feature
+						FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
+	
+						Query query = new Query(fkTableName,filter);
+						FeatureReader<SimpleFeatureType, SimpleFeature> reader = destinationDataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
+						Set<FeatureId> featureIds = new HashSet<FeatureId>();
+						while (reader.hasNext()) {
+							SimpleFeature feature = reader.next();
+							String  fk = feature.getAttribute(fkColumnName).toString();
+							featureIds.add(ff.featureId(pkTableName + "." + fk));
+						}
+						reader.close();
+						Id fids = ff.id(featureIds);
+	
+						//Delete features by IDs
+						SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(pkTableName);
+						store.setTransaction(Transaction.AUTO_COMMIT);					
+						store.removeFeatures(fids);
 					}
 				}
-				connection.close();
-
-				if(fkFound){
-
-					//Retrieve IDs of primary feature to delete related to those extracted by EcqlFilter on related feature
-					FilterFactory ff = CommonFactoryFinder.getFilterFactory(null);
-
-					Query query = new Query(fkTableName,filter);
-					FeatureReader<SimpleFeatureType, SimpleFeature> reader = destinationDataStore.getFeatureReader(query, Transaction.AUTO_COMMIT);
-					Set<FeatureId> featureIds = new HashSet<FeatureId>();
-					while (reader.hasNext()) {
-						SimpleFeature feature = reader.next();
-						String  fk = feature.getAttribute(fkColumnName).toString();
-						featureIds.add(ff.featureId(pkTableName + "." + fk));
-					}
-					reader.close();
-					Id fids = ff.id(featureIds);
-
-					//Delete features by IDs
-					SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(pkTableName);
+	
+				//Delete parent records
+				else{
+					SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fn);
 					store.setTransaction(Transaction.AUTO_COMMIT);					
-					store.removeFeatures(fids);
+					store.removeFeatures(filter);
 				}
-			}
-
-			//Delete parent records
-			else{
-				SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fn);
-				store.setTransaction(Transaction.AUTO_COMMIT);					
-				store.removeFeatures(filter);
 			}
 		}
 
@@ -282,29 +319,31 @@ public class ProductionUpdater extends InputObject{
 
 		Map<String, Serializable> destinationDataStoreConfig = this.ds2dsConfiguration.getOutputFeature().getDataStore();
 		DataStore destinationDataStore = DataStoreFinder.getDataStore(destinationDataStoreConfig);
-
+		this.ds2dsConfiguration.setEcqlFilter("fk_partner = " + partner);
 		/*
 		 * Delete all features
 		 */
-		for(UpdaterFeature f : arcFeature.getFeatures()){
-
-			String fn = f.getFeatureName();
-			String pr = f.getFeatureParentRelation();
-			this.ds2dsConfiguration.setEcqlFilter("fk_partner = " + partner);
-			//Delete all using cascade on FK
-			if(pr == null){
-				Transaction transaction = new DefaultTransaction("removeFeature");
-				SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fn);
-				Filter filter = CQL.toFilter(this.ds2dsConfiguration.getEcqlFilter());
-				store.setTransaction(transaction);					
-				try {
-					store.removeFeatures(filter);
-					transaction.commit();
-				} catch (Exception eek) {
-					LOGGER.error(eek.getMessage(),eek);
-					transaction.rollback();
-				}finally{
-					transaction.close();
+		if(removeFeatures) {
+			for(UpdaterFeature f : arcFeature.getFeatures()){
+	
+				String fn = f.getFeatureName();
+				String pr = f.getFeatureParentRelation();
+				this.ds2dsConfiguration.setEcqlFilter("fk_partner = " + partner);
+				//Delete all using cascade on FK
+				if(pr == null){
+					Transaction transaction = new DefaultTransaction("removeFeature");
+					SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fn);
+					Filter filter = CQL.toFilter(this.ds2dsConfiguration.getEcqlFilter());
+					store.setTransaction(transaction);					
+					try {
+						store.removeFeatures(filter);
+						transaction.commit();
+					} catch (Exception eek) {
+						LOGGER.error(eek.getMessage(),eek);
+						transaction.rollback();
+					}finally{
+						transaction.close();
+					}
 				}
 			}
 		}

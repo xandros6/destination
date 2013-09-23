@@ -21,11 +21,7 @@
 		<featureParentRelation>siig_t_bersaglio_non_umano</featureParentRelation>
 	</feature>
 
-	<feature>
-		<target>true</target>
-		<featureName>siig_geo_bersaglio_umano_pl</featureName>
-		<featureParentRelation>siig_t_bersaglio_non_umano</featureParentRelation>
-	</feature>
+	
 	<feature>
 		<target>true</target>
 		<featureName>siig_geo_bersaglio_umano_pl</featureName>
@@ -46,7 +42,7 @@
 		<featureName>siig_t_bersaglio_umano</featureName>
 	</feature>
 
-<!-- ARCHI DI STRADA -->
+<!-- ARCHI DI STRADA --> 
 
 	<feature>
 		<featureName>siig_r_arco_1_dissesto</featureName>
@@ -96,7 +92,7 @@
 		<featureName>siig_r_tipovei_geoarco3</featureName>
 		<featureParentRelation>siig_geo_pl_arco_3</featureParentRelation>
 	</feature>	
-	
+
 <!-- VULNERABILITA -->
 
 	<feature>
@@ -108,7 +104,7 @@
 		<featureParentRelation>siig_geo_ln_arco_2</featureParentRelation>
 	</feature>	
 	<feature>
-	<featureName>siig_t_vulnerabilita_3</featureName>
+		<featureName>siig_t_vulnerabilita_3</featureName>
 		<featureParentRelation>siig_geo_pl_arco_3</featureParentRelation>
 	</feature>
 
@@ -128,7 +124,6 @@
 	</feature>
 
 <!-- ARCHI -->
-
 	<feature>
 		<featureName>siig_geo_ln_arco_1</featureName>
 	</feature>
@@ -141,5 +136,4 @@
 	<feature>
 		<featureName>siig_geo_pl_arco_3</featureName>
 	</feature>
-	
 </features>
