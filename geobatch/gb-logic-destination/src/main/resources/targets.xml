@@ -132,7 +132,7 @@
       	</entry>
       	<entry>      	
       		<string>flg_nr_addetti_h</string>
-      		<string>FLG_N_ADD</string>
+      		<string>#{FLG_N_ADD == '' ? null : FLG_N_ADD}</string>
       	</entry>
       </map>
     </entry>
@@ -178,7 +178,7 @@
       	</entry>
       	<entry>      	
       		<string>flg_nr_addetti_scuole</string>
-      		<string>FLG_N_ADD</string>
+      		<string>#{FLG_N_ADD == '' ? null : FLG_N_ADD}</string>
       	</entry>
       </map>
     </entry>
@@ -240,7 +240,7 @@
       	</entry>
       	<entry>      	
       		<string>flg_nr_addetti_comm</string>
-      		<string>FLG_N_ADD</string>
+      		<string>#{FLG_N_ADD == '' ? null : FLG_N_ADD}</string>
       	</entry>
       </map>      
     </entry>
