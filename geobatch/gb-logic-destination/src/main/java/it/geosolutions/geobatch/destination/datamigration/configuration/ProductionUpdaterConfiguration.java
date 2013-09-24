@@ -21,6 +21,8 @@ package it.geosolutions.geobatch.destination.datamigration.configuration;
 
 import it.geosolutions.geobatch.actions.ds2ds.Ds2dsConfiguration;
 
+import java.io.InputStream;
+
 import com.thoughtworks.xstream.XStream;
 
 
@@ -34,8 +36,11 @@ public class ProductionUpdaterConfiguration extends Ds2dsConfiguration{
 	private static final XStream xstream = new XStream();
     
     static {
-            xstream.alias("feature", ProductionUpdaterConfiguration.class);                           
-            xstream.omitField(ProductionUpdaterConfiguration.class, "coordinateReferenceSystem");                             
+		xstream.alias("ProductionUpdaterConfiguration", ProductionUpdaterConfiguration.class);                                                     
+	}
+
+	public static ProductionUpdaterConfiguration fromXML(InputStream inputXML) {
+		return (ProductionUpdaterConfiguration) xstream.fromXML(inputXML);                
     }
     
  }

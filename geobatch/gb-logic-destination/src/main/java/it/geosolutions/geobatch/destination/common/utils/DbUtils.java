@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Map;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
@@ -49,10 +50,12 @@ public class DbUtils {
 	 * @throws SQLException 
 	 * @throws IOException 
 	 */
-	public static void dropFeatureType(JDBCDataStore dataStore, String typeName) throws IOException, SQLException {
+	public static void dropFeatureType(DataStore dataStore, String typeName) throws IOException, SQLException {
 		// the GeoTools DataStore interface doesn't implement an action to drop a feature,
 		// so we need to use the sql connection directly
-		executeSql(dataStore, null, "DROP TABLE \"" + typeName + "\" CASCADE", true);
+		if(dataStore instanceof JDBCDataStore){
+			executeSql((JDBCDataStore)dataStore, null, "DROP TABLE \"" + typeName + "\" CASCADE", true);
+		}
 	}
 	
 	/**

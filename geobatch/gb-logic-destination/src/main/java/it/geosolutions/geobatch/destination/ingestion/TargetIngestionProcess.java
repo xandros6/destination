@@ -31,6 +31,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Query;
@@ -174,9 +175,9 @@ public class TargetIngestionProcess extends InputObject {
 			try {												
 				
 				
-				process = createProcess(dataStore);
+				process = createProcess();
 				// write log for the imported file
-				trace = logFile(dataStore,  process, targetType,
+				trace = logFile(process, targetType,
 						partner, codicePartner, date, false);
 
 				// setup input reader								
@@ -407,7 +408,7 @@ public class TargetIngestionProcess extends InputObject {
 	 * @return
 	 * @throws IOException
 	 */
-	private boolean isAnUpdate(JDBCDataStore dataStore, Transaction transaction) throws IOException {		
+	private boolean isAnUpdate(DataStore dataStore, Transaction transaction) throws IOException {		
 		// targets having multi geometry types
 		if(hasAlternativeGeo(targetType)) {					
 			String alternativeGeo = ""; 
@@ -428,7 +429,9 @@ public class TargetIngestionProcess extends InputObject {
 			// check if an import for the other existing geo has already been executed
 			String alternativeTypeName = getAlternativeTypeName(alternativeGeo);
 			try {
-				return !DbUtils.executeScalar(dataStore, transaction, "SELECT COUNT(*) FROM siig_t_tracciamento where nome_file='"+alternativeTypeName+"'").equals(new Long(0));
+				if(dataStore instanceof JDBCDataStore){
+					return !DbUtils.executeScalar((JDBCDataStore)dataStore, transaction, "SELECT COUNT(*) FROM siig_t_tracciamento where nome_file='"+alternativeTypeName+"'").equals(new Long(0));
+				}
 			} catch (SQLException e) {
 				throw new IOException(e);
 			}
