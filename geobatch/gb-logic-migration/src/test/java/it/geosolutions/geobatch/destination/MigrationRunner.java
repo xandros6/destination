@@ -16,11 +16,11 @@
  */
 package it.geosolutions.geobatch.destination;
 
+import it.geosolutions.geobatch.actions.ds2ds.Ds2dsConfiguration;
 import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
 import it.geosolutions.geobatch.destination.datamigration.ProductionUpdater;
 import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures;
 import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures.UpdaterFeature;
-import it.geosolutions.geobatch.destination.datamigration.configuration.ProductionUpdaterConfiguration;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
@@ -69,7 +69,7 @@ public class MigrationRunner {
         outDatastoreParams.put("user", "siig_p");
         outDatastoreParams.put("database", "destination");
         
-        ProductionUpdaterConfiguration cfg = new ProductionUpdaterConfiguration("miragte", "migrate", "migrate");
+        Ds2dsConfiguration cfg = new Ds2dsConfiguration("miragte", "migrate", "migrate");
         
         try {
 			CoordinateReferenceSystem crs = CRS.decode("EPSG:32632");

@@ -6,7 +6,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>it.geosolutions.geobatch.destination</groupId>
+    <groupId>it.geosolutions.destination.geobatch</groupId>
     <artifactId>gb-destination</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
@@ -50,6 +50,25 @@
   <!-- =========================================================== -->
   <dependencies>
     <!-- ============================== -->
+    <!-- DESTINATION -->
+    <!-- ============================== -->
+    
+    <!-- shall be included by related action module -->
+    <dependency>
+      <groupId>it.geosolutions.destination.geobatch</groupId>
+      <artifactId>gb-destination-ingestion</artifactId>
+    </dependency>
+    <!-- shall be included by related action module -->
+    <dependency>
+      <groupId>it.geosolutions.destination.geobatch</groupId>
+      <artifactId>gb-destination-migration</artifactId>
+    </dependency>
+
+    <dependency>
+        <groupId>it.geosolutions.destination.geobatch</groupId>
+        <artifactId>gb-destination-ingestion-actions</artifactId>
+    </dependency>
+    <!-- ============================== -->
     <!-- GeoBatch -->
     <!-- ============================== -->
     <dependency>
@@ -63,13 +82,6 @@
     <dependency>
       <groupId>it.geosolutions.geobatch</groupId>
       <artifactId>gb-dao-xstream</artifactId>
-    </dependency>
-    <!-- ============================== -->
-    <!-- DESTINATION -->
-    <!-- ============================== -->
-    <dependency>
-      <groupId>it.geosolutions.geobatch.destination</groupId>
-      <artifactId>gb-logic-destination</artifactId>
     </dependency>
     <!-- ============================== -->
     <!-- log4j -->

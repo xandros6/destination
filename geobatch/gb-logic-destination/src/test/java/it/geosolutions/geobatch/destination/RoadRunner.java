@@ -71,28 +71,29 @@ public class RoadRunner{
 	        ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(inputFeature,
 	                new ProgressListenerForwarder(null), metadataHandler, dataStore);
 	        
-	        //arcIngestion.importArcs(null, 1, false, false, null);
+	        arcIngestion.importArcs(null, 1, false, false, null);
 	        
 	        arcIngestion.importArcs(null, 2, false, false, null);
-	        //arcIngestion.importArcs(null, 3, false, false, null);
-	        //arcIngestion.importArcs(null, 3, true, false, "A");
-	        /*
+	        arcIngestion.importArcs(null, 3, false, false, null);
+	        arcIngestion.importArcs(null, 3, true, false, "A");
+
+            // Spalmatore
 			ZeroRemovalComputation zeroComputation = new ZeroRemovalComputation(
 					inputFeature, new ProgressListenerForwarder(null),
 					metadataHandler, dataStore);
 	        
 	        
-	        //zeroComputation.removeZeros(null, 1, null);
-	        //zeroComputation.removeZeros(null, 2, null);
-	        //zeroComputation.removeZeros(null, 3, null);
+	        zeroComputation.removeZeros(null, 1, null);
+	        zeroComputation.removeZeros(null, 2, null);
+	        zeroComputation.removeZeros(null, 3, null);
 	        
 	        JAI.getDefaultInstance().getTileCache().setMemoryCapacity(1024*1024*1024);
 	        
 	        VulnerabilityComputation vulnerability = new VulnerabilityComputation(inputFeature, 
 	        		new ProgressListenerForwarder(null), metadataHandler, dataStore);
 	        
-	        //vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
-	        //vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
+	        vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
+	        vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
 	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);
 			
 	        RiskComputation riskComputation = new RiskComputation(
@@ -104,7 +105,7 @@ public class RoadRunner{
 	        
 	        riskComputation.prefetchRiskAtLevel(3, 1, 1, 26, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", null);
 	        riskComputation.prefetchRiskAtLevel(3, 2, 1, 26, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", null);
-	        riskComputation.prefetchRiskAtLevel(3, 3, 1, 29, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", "B");*/
+	        riskComputation.prefetchRiskAtLevel(3, 3, 1, 29, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", "B");
 	        
         } catch(Exception e) {
         	LOGGER.error(e.getMessage());

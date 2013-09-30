@@ -7,7 +7,6 @@ import it.geosolutions.geobatch.actions.ds2ds.Ds2dsConfiguration;
 import it.geosolutions.geobatch.catalog.Identifiable;
 import it.geosolutions.geobatch.destination.common.InputObject;
 import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures.UpdaterFeature;
-import it.geosolutions.geobatch.destination.datamigration.configuration.ProductionUpdaterConfiguration;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
 import it.geosolutions.geobatch.flow.event.IProgressListener;
@@ -382,7 +381,7 @@ public class ProductionUpdater extends InputObject{
 		action.execute(getEvents());
 	}
 
-	public void setDs2DsConfiguration(ProductionUpdaterConfiguration productionUpdaterConfiguration) {
+	public void setDs2DsConfiguration(Ds2dsConfiguration productionUpdaterConfiguration) {
 		this.ds2dsConfiguration = productionUpdaterConfiguration;		
 	}
 

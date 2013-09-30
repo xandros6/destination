@@ -15,7 +15,7 @@
     <!-- =========================================================== -->
     <!--     Project Description                                     -->
     <!-- =========================================================== -->
-    <groupId>it.geosolutions.geobatch.destination</groupId>
+    <groupId>it.geosolutions.destination.geobatch</groupId>
     <artifactId>gb-destination</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -47,7 +47,6 @@
 	<gb.version>1.4-SNAPSHOT</gb.version>
         <gt.version>8-SNAPSHOT</gt.version>
         <destination.version>1.0-SNAPSHOT</destination.version>
-        <log4j.version>1.2.16</log4j.version>
         <jetty.version>6.1.8</jetty.version>
         <javaassist.version>3.13.0-GA</javaassist.version>
         <junit.version>4.10</junit.version>
@@ -73,13 +72,32 @@
     <dependencyManagement>
         <dependencies>
             <!-- =========================================================== -->
-            <!-- Utils -->
+            <!-- Other DESTINATION modules -->
             <!-- =========================================================== -->
             <dependency>
-                <groupId>it.geosololutions</groupId>
+                <groupId>it.geosolutions.destination.geobatch</groupId>
+                <artifactId>gb-destination-ingestion</artifactId>
+                <version>${destination.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>it.geosolutions.destination.geobatch</groupId>
+                <artifactId>gb-destination-ingestion-actions</artifactId>
+                <version>${destination.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>it.geosolutions.destination.geobatch</groupId>
+                <artifactId>gb-destination-migration</artifactId>
+                <version>${destination.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>it.geosolutions.destination</groupId>
                 <artifactId>destination-utils</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
+
             <!-- =========================================================== -->
             <!-- GeoBatch -->
             <!-- =========================================================== -->
@@ -90,7 +108,17 @@
             </dependency>
             <dependency>
                 <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-core-model</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
                 <artifactId>gb-fs-catalog</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-fsm-core</artifactId>
                 <version>${gb.version}</version>
             </dependency>
             <dependency>      
@@ -140,13 +168,10 @@
                 <artifactId>gb-dao-xstream</artifactId>
                 <version>${gb.version}</version>
             </dependency>
-            <!-- =========================================================== -->
-            <!-- Other DESTINATION modules -->
-            <!-- =========================================================== -->
             <dependency>
-                <groupId>it.geosolutions.geobatch.destination</groupId>
-                <artifactId>gb-logic-destination</artifactId>
-                <version>${destination.version}</version>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-alias-registry</artifactId>
+                <version>${gb.version}</version>
             </dependency>
             
             <!-- =========================================================== -->
@@ -199,13 +224,27 @@
                 <version>${gt.version}</version>
                 <scope>test</scope>
             </dependency>
+
             <!-- ============================== -->
-            <!-- log4j -->
+            <!-- Logging -->
             <!-- ============================== -->
+
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
-                <version>${log4j.version}</version>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-api</artifactId>
+              <version>1.6.6</version>
+            </dependency>
+
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>slf4j-log4j12</artifactId>
+              <version>1.6.6</version>
+            </dependency>
+
+            <dependency>
+              <groupId>log4j</groupId>
+              <artifactId>log4j</artifactId>
+              <version>1.2.17</version>
             </dependency>
             <!-- ============================== -->
             <!-- Test: JETTY -->
@@ -442,7 +481,9 @@
     <!-- =========================================================== -->
     <modules>
         <module>gb-logic-destination</module>
+        <module>gb-logic-migration</module>
         <module>gb-application-destination</module>
+        <module>ingestion-actions</module>
     </modules>
 
 <!--
@@ -528,4 +569,5 @@
             </modules>
         </profile>
     </profiles>
+
 </project>

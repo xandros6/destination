@@ -19,7 +19,6 @@ package it.geosolutions.geobatch.destination.ingestion;
 import it.geosolutions.geobatch.destination.common.InputObject;
 import it.geosolutions.geobatch.destination.common.OutputObject;
 import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
-import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import it.geosolutions.geobatch.flow.event.ProgressListener;
 
 /**
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
@@ -122,7 +122,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @param inputTypeName
 	 */
 	public ArcsIngestionProcess(String inputTypeName,
-			ProgressListenerForwarder listenerForwarder,
+			ProgressListener listenerForwarder,
 			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);		
 	}
@@ -215,34 +215,24 @@ public class ArcsIngestionProcess extends InputObject {
 				// setup the MAIN geo output object
 				// The mainGeoObject is that one is used for compute also the other outputObjects
 				// For aggregation level 1 and 2 is that one related to table siig_geo_ln_arco_X but for aggregation 3 on grid is siig_geo_pl_arco_X 
-				String geoName = getTypeName((onGrid ? geoTypeNamePl
-						: geoTypeName), aggregationLevel);
-				OutputObject mainGeoObject = new OutputObject(dataStore,
-						transaction, geoName, geoId);
+				String geoName = getTypeName((onGrid ? geoTypeNamePl : geoTypeName), aggregationLevel);
+				OutputObject mainGeoObject = new OutputObject(dataStore, transaction, geoName, geoId);
 				
 				// setup vehicle output object
-				String vehicleName = getTypeName(byVehicleTypeName,
-						aggregationLevel);
-				OutputObject vehicleObject = new OutputObject(dataStore,
-						transaction, vehicleName, "");
+				String vehicleName = getTypeName(byVehicleTypeName, aggregationLevel);
+				OutputObject vehicleObject = new OutputObject(dataStore, transaction, vehicleName, "");
 								
 				// setup dissesto output object
-				String dissestoName = getTypeName(dissestoTypeName,
-						aggregationLevel);
-				OutputObject dissestoObject = new OutputObject(dataStore,
-						transaction, dissestoName, "");
+				String dissestoName = getTypeName(dissestoTypeName, aggregationLevel);
+				OutputObject dissestoObject = new OutputObject(dataStore, transaction, dissestoName, "");
 				
 				// setup CFF output object
-				String tipobersName = getTypeName(tipobersTypeName,
-						aggregationLevel);
-				OutputObject tipobersObject = new OutputObject(dataStore,
-						transaction, tipobersName, "");
+				String tipobersName = getTypeName(tipobersTypeName, aggregationLevel);
+				OutputObject tipobersObject = new OutputObject(dataStore, transaction, tipobersName, "");
 
 				// setup sostanza output object
-				String tiposostName = getTypeName(sostanzaArcoTypeName,
-						aggregationLevel);
-				OutputObject tiposostObject = new OutputObject(dataStore,
-						transaction, tiposostName, "");
+				String tiposostName = getTypeName(sostanzaArcoTypeName, aggregationLevel);
+				OutputObject tiposostObject = new OutputObject(dataStore, transaction, tiposostName, "");
                                 
 				// list of all the output objects
 				OutputObject[] outputObjects = new OutputObject[] {vehicleObject,

@@ -3,7 +3,6 @@ package it.geosolutions.geobatch.destination;
 import static org.junit.Assert.assertEquals;
 import it.geosolutions.geobatch.destination.common.utils.DbUtils;
 import it.geosolutions.geobatch.destination.datamigration.ProductionUpdater;
-import it.geosolutions.geobatch.destination.datamigration.configuration.ProductionUpdaterConfiguration;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
@@ -36,11 +35,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
+import it.geosolutions.geobatch.actions.ds2ds.Ds2dsConfiguration;
 
 public class ProductionUpdaterTest{
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProductionUpdaterTest.class);
-	private ProductionUpdaterConfiguration productionUpdaterConfiguration;
+	private Ds2dsConfiguration productionUpdaterConfiguration;
 
 	static{
 		try {
@@ -53,9 +53,9 @@ public class ProductionUpdaterTest{
 	@Before
 	public void before() throws Exception { 
 		XStream xstream = new XStream();
-		xstream.alias("ProductionUpdaterConfiguration", ProductionUpdaterConfiguration.class);	
+		xstream.alias("ProductionUpdaterConfiguration", Ds2dsConfiguration.class);
 		File configurationFile = new File("src/test/resources/TS_C_ZURB_20130613.xml");
-		this.productionUpdaterConfiguration = (ProductionUpdaterConfiguration)xstream.fromXML(configurationFile);
+		this.productionUpdaterConfiguration = (Ds2dsConfiguration)xstream.fromXML(configurationFile);
 		clearAll();
 	};
 

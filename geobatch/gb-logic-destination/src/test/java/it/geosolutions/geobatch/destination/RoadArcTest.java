@@ -16,7 +16,7 @@
  */
 package it.geosolutions.geobatch.destination;
 
-import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
+//import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
 import it.geosolutions.geobatch.catalog.Identifiable;
 import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;

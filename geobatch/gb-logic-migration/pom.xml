@@ -14,14 +14,14 @@ Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ==================
     <!-- Module Description -->
     <!-- =========================================================== -->
     <groupId>it.geosolutions.destination.geobatch</groupId>
-    <artifactId>gb-destination-ingestion</artifactId>
+    <artifactId>gb-destination-migration</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
-    <name>GeoBatch Destination - Ingestion logic</name>
+    <name>GeoBatch Destination - Migration logic</name>
     <description>
-        Destination ingestion logic used through scripting action
+        Destination migration logic
     </description>
 
     <!-- =========================================================== -->
@@ -32,6 +32,11 @@ Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ==================
         <dependency>
             <groupId>it.geosolutions.destination</groupId>
             <artifactId>destination-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>it.geosolutions.destination.geobatch</groupId>
+            <artifactId>gb-destination-ingestion</artifactId>
         </dependency>
 
         <!-- =========================================================== -->
@@ -48,10 +53,10 @@ Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ==================
             <artifactId>gb-fsm-core</artifactId>
         </dependency>
 
-<!--        <dependency>
+        <dependency>
             <groupId>it.geosolutions.geobatch</groupId>
             <artifactId>gb-action-ds2ds</artifactId>
-        </dependency>-->
+        </dependency>
 
         <!-- =========================================================== -->
         <!-- GeoTools -->
@@ -105,7 +110,6 @@ Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ==================
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-			<version>4.11</version>
             <scope>test</scope>
         </dependency>
         

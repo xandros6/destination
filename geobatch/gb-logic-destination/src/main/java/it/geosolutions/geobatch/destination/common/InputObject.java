@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -57,6 +56,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.thoughtworks.xstream.XStream;
+import it.geosolutions.geobatch.flow.event.ProgressListener;
 
 /**
  * Base object for the ingestion processes model.
@@ -87,8 +87,8 @@ public abstract class InputObject {
 	private SequenceManager sequenceManager;
 	
 	//
-	private String inputTypeName = "";	
-	private ProgressListenerForwarder listenerForwarder=null;
+	private String inputTypeName = "";
+	private ProgressListener listenerForwarder=null;
 	
 	private boolean valid = false;
 	
@@ -107,7 +107,7 @@ public abstract class InputObject {
 	 * @param inputTypeName
 	 */
 	public InputObject(String inputTypeName,
-			ProgressListenerForwarder listenerForwarder,
+			ProgressListener listener,
 			MetadataIngestionHandler metadataHandler,
 			JDBCDataStore dataStore) {
 		super();
@@ -556,7 +556,8 @@ public abstract class InputObject {
 	 */
 	protected void updateImportProgress(int total, int errors, String message) {
 		if (inputCount % 100 == 0) {
-			listenerForwarder.progressing((float) inputCount , message);
+			listenerForwarder.setProgress((float) inputCount);
+			listenerForwarder.setTask(message);
 			if(LOGGER.isInfoEnabled()) {
 				LOGGER.info(message + ": "+(inputCount - errors) + "/" + total);
 			}
@@ -571,7 +572,8 @@ public abstract class InputObject {
 	 * @param message
 	 */
 	protected void importFinished(int total, int errors, String message) {		
-		listenerForwarder.progressing((float) total , message);
+        listenerForwarder.setProgress((float)total);
+        listenerForwarder.setTask(message);
 		if(LOGGER.isInfoEnabled()) {
 			LOGGER.info(message + ": "+(inputCount - errors)+ "/" + total);
 			if(errors > 0) {
