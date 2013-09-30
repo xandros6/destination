@@ -3,15 +3,11 @@ package it.geosolutions.geobatch.destination;
 import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.streetuser.StreetUserComputation;
-import it.geosolutions.geobatch.destination.streetuser.configuration.StreetUserConfiguration;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
@@ -19,7 +15,6 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.memory.MemoryDataStore;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.util.logging.Logging;
 import org.junit.Assert;
@@ -27,16 +22,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.FilterFactory2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StreetUserTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StreetUserTest.class);
-	private StreetUserConfiguration streetUserConfiguration;
 	private String typeName;
-	private Map<String, Serializable> dbParams;
 	private DataStore dataStore;
 
 	static{
@@ -52,9 +44,7 @@ public class StreetUserTest {
 	@Before
 	public void before() throws Exception { 
 		File inputXML = new File("src/test/resources/streetUserInput.xml");
-		this.streetUserConfiguration = StreetUserConfiguration.fromXML(new FileInputStream(inputXML));
 		//typeName = streetUserConfiguration.getTypeName();
-		dbParams = streetUserConfiguration.getDataStore();
 		typeName = "RP_C_ZURB_20130613";
 
 
@@ -246,15 +236,15 @@ public class StreetUserTest {
 		/*
 		 * CALCOLI X TEST ( 2 archi perpendicolari)
 		 * 
-		 * feature_1_2 (interessata) -> densitàLeggeri=56  velocitàMediaLeggeri=50, densitàPesanti=16 , velocitàMediaPesanti=50, nCorsie=1
+		 * feature_1_2 (interessata) -> densitï¿½Leggeri=56  velocitï¿½MediaLeggeri=50, densitï¿½Pesanti=16 , velocitï¿½MediaPesanti=50, nCorsie=1
 		 * distanza = 50 -> Ls_1_2 = 100; Ls_1_3 = 100
 		 * scneario = 1 -> tempo di coda = 500
 		 * 
 		 * feature_1_2: 
-		 * nTerritoriali_1_2_leggeri = densitàL * Ls_1_2 = 56 * 100 = 5600
-		 * nTerritoriali_1_2_pesanti = densitàP * Ls_1_2 = 16 * 100 = 1600
-		 * nCoda_1_2_leggeri = densitàL * Vl_1_2 * Tc = 56 * 50 * (500/3600) = 388.88
-		 * nCoda_1_2_pesanti = densitàP * Vp_1_2 * Tc = 16 * 50 * (500/3600) = 111.11
+		 * nTerritoriali_1_2_leggeri = densitï¿½L * Ls_1_2 = 56 * 100 = 5600
+		 * nTerritoriali_1_2_pesanti = densitï¿½P * Ls_1_2 = 16 * 100 = 1600
+		 * nCoda_1_2_leggeri = densitï¿½L * Vl_1_2 * Tc = 56 * 50 * (500/3600) = 388.88
+		 * nCoda_1_2_pesanti = densitï¿½P * Vp_1_2 * Tc = 16 * 50 * (500/3600) = 111.11
 		 * nCoinvolti_1_2_leggeri = nTerritoriali_1_2_leggeri +  nCoda_1_2_leggeri = 5600 + 388.88 = 5988.88
 		 * nCoinvolti_1_2_pesanti = nTerritoriali_1_2_pesanti + + nCoda_1_2_pesanti = 1600 + 111.11 = 1711.11
 		 * storage = 150 * nCorsie * length = 150 * 1 * 100 = 15000
@@ -262,11 +252,11 @@ public class StreetUserTest {
 		 * storage/2 > nCoinvolti_1_2_pesanti -> nCoinvolti_1_2_pesanti = 1711.11
 		 * N_UTENTI_SEDE = nCoinvolti_1_2_leggeri * coeff_occupazione_l + nCoinvolti_1_2_pesanti * coeff_occupazione_p = 5988.88 * 1.5 + 1711.11 * 1.1 = 8983.32 + 1882.221 = 10865.541
 		 * 
-		 * feature_1_3 -> densitàLeggeri=9  velocitàMediaLeggeri=50, densitàPesanti=8 , velocitàMediaPesanti=50, nCorsie=1
-		 * nTerritoriali_1_3_leggeri = densitàL * Ls_1_3 = 9 * 100 = 900
-		 * nTerritoriali_1_3_pesanti = densitàP * Ls_1_3 = 8 * 100 = 800
-		 * nTransito_1_3_leggeri = densitàL * Ls_1_3 * Tc = 9 * 50 * (500/3600) = 62.50
-		 * nTransito_1_3_pesanti = densitàP * Ls_1_3 * Tc = 8 * 50 * (500/3600) = 55.55
+		 * feature_1_3 -> densitï¿½Leggeri=9  velocitï¿½MediaLeggeri=50, densitï¿½Pesanti=8 , velocitï¿½MediaPesanti=50, nCorsie=1
+		 * nTerritoriali_1_3_leggeri = densitï¿½L * Ls_1_3 = 9 * 100 = 900
+		 * nTerritoriali_1_3_pesanti = densitï¿½P * Ls_1_3 = 8 * 100 = 800
+		 * nTransito_1_3_leggeri = densitï¿½L * Ls_1_3 * Tc = 9 * 50 * (500/3600) = 62.50
+		 * nTransito_1_3_pesanti = densitï¿½P * Ls_1_3 * Tc = 8 * 50 * (500/3600) = 55.55
 		 * nCoinvolti_1_3_leggeri = nTerritoriali_1_3_leggeri +  nTransito_1_3_leggeri = 962.50
 		 * nCoinvolti_1_3_pesanti = nTerritoriali_1_3_pesanti + nTransito_1_3_pesanti = 855.55
 		 * N_UTENTI_BERSAGLIO = nCoinvolti_1_3_leggeri * coeff_occupazione_l + nCoinvolti_1_3_pesanti * coeff_occupazione_p = 962.50 * 1.5 + 855.55 * 1.1 = 1443.75 + 941.105 = 2384.855
