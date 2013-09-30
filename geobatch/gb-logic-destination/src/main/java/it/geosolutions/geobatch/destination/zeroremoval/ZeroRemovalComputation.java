@@ -174,7 +174,7 @@ public class ZeroRemovalComputation extends InputObject {
 			int errors = 0;
 			
 			// existing process
-			MetadataIngestionHandler.Process importData = getProcessData(dataStore);
+			MetadataIngestionHandler.Process importData = getProcessData();
 			process = importData.getId();
 			trace = importData.getMaxTrace();
 			errors = importData.getMaxError();

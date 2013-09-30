@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureSource;
@@ -194,13 +195,13 @@ public class ArcsIngestionProcess extends InputObject {
 				// create or retrieve metadata for ingestion
 				if(aggregationLevel == 1) {
 					// new process
-					process = createProcess(dataStore);
+					process = createProcess();
 					// write log for the imported file
-					trace = logFile(dataStore,  process, NO_TARGET,
+					trace = logFile(process, NO_TARGET,
 							partner, codicePartner, date, false);
 				} else {
 					// existing process
-					MetadataIngestionHandler.Process importData = getProcessData(dataStore);
+					MetadataIngestionHandler.Process importData = getProcessData();
 					process = importData.getId();
 					trace = importData.getMaxTrace();
 					errors = importData.getMaxError();
@@ -309,7 +310,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @return
 	 * @throws IOException 
 	 */
-	private int aggregateArcsOnGrid(int trace, JDBCDataStore dataStore,
+	private int aggregateArcsOnGrid(int trace, DataStore dataStore,
 			OutputObject[] outputObjects, int total, int errors, int startErrors,
 			String outputName, int aggregationLevel) throws IOException {
 		try {
@@ -354,7 +355,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @throws IOException 
 	 * 
 	 */
-	private int aggregateArcs(int trace, JDBCDataStore dataStore,
+	private int aggregateArcs(int trace, DataStore dataStore,
 			OutputObject[] outputObjects, int total, int errors, int startErrors,
 			String outputName, int aggregationLevel, boolean computeOnlyGeoFeature) throws IOException {
 		String aggregationAttribute = aggregation.getProperty(aggregationLevel + "");
@@ -401,7 +402,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @return
 	 * @throws IOException
 	 */
-	private int aggregateStep(int trace, JDBCDataStore dataStore,
+	private int aggregateStep(int trace, DataStore dataStore,
 			OutputObject[] outputObjects, int total, int errors,
 			int startErrors, String outputName, int id, int idTematico,
 			FeatureIterator<SimpleFeature> iterator, Geometry aggregateGeo,
@@ -728,7 +729,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @return
 	 * @throws IOException
 	 */
-	private int writeOutputObjects(int trace, JDBCDataStore dataStore,
+	private int writeOutputObjects(int trace, DataStore dataStore,
 			OutputObject[] outputObjects, int total, int errors,
 			String outputName, SimpleFeature inputFeature, int id,
 			int idTematico) throws IOException {
@@ -762,7 +763,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @throws IOException 
 	 * 
 	 */
-	private int importWithoutAggregation(int trace, JDBCDataStore dataStore,
+	private int importWithoutAggregation(int trace, DataStore dataStore,
 			OutputObject[] outputObjects, int total, int errors,
 			String outputName) throws IOException {
 		try {
@@ -958,7 +959,7 @@ public class ArcsIngestionProcess extends InputObject {
 	}
 	
         private void addSostanzaFeature(OutputObject sostanzaObject, int id,
-                SimpleFeature inputFeature, List<String> sostanze, JDBCDataStore datastore)
+                SimpleFeature inputFeature, List<String> sostanze, DataStore datastore)
                 throws IOException {
     
             SimpleFeatureBuilder featureBuilder = sostanzaObject.getBuilder();

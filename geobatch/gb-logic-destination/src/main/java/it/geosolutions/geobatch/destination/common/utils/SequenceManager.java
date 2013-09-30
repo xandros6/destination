@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
 import org.geotools.jdbc.JDBCDataStore;
@@ -41,18 +42,20 @@ public class SequenceManager {
     private JDBCDataStore datastore = null;
     private String seqName = null;
     
-    public SequenceManager(JDBCDataStore dataStore, String seqName){
+	public SequenceManager(DataStore dataStore, String seqName){
+		if(dataStore instanceof JDBCDataStore){
+			this.datastore = (JDBCDataStore)dataStore;
         try {
             seqName = seqName.replaceAll("-", "_");
             seqName = seqName.replaceAll("\\.", "_");
             seqName = seqName.toLowerCase();
-            createSequence(dataStore, seqName);            
-            this.datastore = dataStore;
+				createSequence(this.datastore, seqName);    
             this.seqName = seqName;
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
         }
     }
+	}
     
     public long retrieveValue() throws IOException {
 

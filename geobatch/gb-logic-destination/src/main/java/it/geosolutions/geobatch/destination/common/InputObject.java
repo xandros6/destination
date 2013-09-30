@@ -21,7 +21,6 @@ import it.geosolutions.geobatch.destination.common.utils.FeatureLoaderUtils;
 import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
-import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
@@ -99,7 +99,7 @@ public abstract class InputObject {
 	int readCount = 0;
 	
 	protected MetadataIngestionHandler metadataHandler;
-	protected JDBCDataStore dataStore;
+	protected DataStore dataStore;
 	
 	/**
 	 * Initializes an IngestionObject handler for the given input feature.
@@ -109,7 +109,7 @@ public abstract class InputObject {
 	public InputObject(String inputTypeName,
 			ProgressListener listener,
 			MetadataIngestionHandler metadataHandler,
-			JDBCDataStore dataStore) {
+			DataStore dataStore) {
 		super();
 		this.inputTypeName = inputTypeName;
 		this.listenerForwarder = listenerForwarder;
@@ -248,8 +248,11 @@ public abstract class InputObject {
 	 * @return
 	 * @throws IOException 
 	 */
-	protected int createProcess(JDBCDataStore dataStore) throws IOException {
+	protected int createProcess() throws IOException {
+		if(metadataHandler != null){
 		return metadataHandler.createProcess();
+	}
+		return 0;
 	}
 	
 	/**
@@ -260,8 +263,11 @@ public abstract class InputObject {
 	 * @return
 	 * @throws IOException 
 	 */
-	protected MetadataIngestionHandler.Process getProcessData(JDBCDataStore dataStore) throws IOException {
+	protected MetadataIngestionHandler.Process getProcessData() throws IOException {
+		if(metadataHandler != null){
 		return metadataHandler.getProcessData(inputTypeName);
+	}
+		return null;
 	}
 			
 	protected Set<Number> getAggregationValues(String aggregateAttribute) throws IOException {		
@@ -304,10 +310,12 @@ public abstract class InputObject {
 	 * @return
 	 * @throws IOException
 	 */
-	protected int logFile(JDBCDataStore dataStore, 
-			int processo, int bersaglio, int partner, String codicePartner, String date, boolean update) throws IOException {
+	protected int logFile(int processo, int bersaglio, int partner, String codicePartner, String date, boolean update) throws IOException {
+		if(metadataHandler != null){
 		return metadataHandler.logFile(processo, -1,
 				partner, codicePartner, inputTypeName, date, false);
+	}
+		return 0;
 	}
 	
 	/**
@@ -319,7 +327,7 @@ public abstract class InputObject {
 	 * @throws IOException
 	 */
 	protected FeatureStore<SimpleFeatureType, SimpleFeature> createInputReader(
-			JDBCDataStore dataStore, Transaction transaction, String featureName)
+			DataStore dataStore, Transaction transaction, String featureName)
 			throws IOException {
 		if(featureName == null) {
 			featureName = inputTypeName;
@@ -347,11 +355,11 @@ public abstract class InputObject {
 		}
 	}
 	
-	protected String getInputGeometryName(JDBCDataStore dataStore) throws IOException {
+	protected String getInputGeometryName(DataStore dataStore) throws IOException {
 		return getInputGeometryName(dataStore,inputTypeName);
 	}
 	
-	protected String getInputGeometryName(JDBCDataStore dataStore, String featureTypeName) throws IOException {
+	protected String getInputGeometryName(DataStore dataStore, String featureTypeName) throws IOException {
 		return dataStore.getSchema(featureTypeName).getGeometryDescriptor().getLocalName();
 	}
 	
@@ -625,7 +633,7 @@ public abstract class InputObject {
 	 * @param datastoreParams
 	 * @throws IOException
 	 */
-	protected void dropInputFeature(JDBCDataStore dataStore) throws IOException {
+	protected void dropInputFeature(DataStore dataStore) throws IOException {
 		listenerForwarder.setTask("Dropping table "+inputTypeName);
 		if(LOGGER.isInfoEnabled()) {
 			LOGGER.info("Dropping table "+inputTypeName);

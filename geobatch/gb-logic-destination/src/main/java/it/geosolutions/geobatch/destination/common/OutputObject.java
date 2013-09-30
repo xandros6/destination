@@ -22,6 +22,7 @@ import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 
 import java.io.IOException;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -43,7 +44,7 @@ public class OutputObject {
 	private FeatureStore<SimpleFeatureType, SimpleFeature> source = null;
 	protected MetadataIngestionHandler metadataHandler;
 	
-	public OutputObject(JDBCDataStore dataStore, Transaction transaction, String name, String id) throws IOException {
+	public OutputObject(DataStore dataStore, Transaction transaction, String name, String id) throws IOException {
 		this.name = name;
 		this.id = id;
 		

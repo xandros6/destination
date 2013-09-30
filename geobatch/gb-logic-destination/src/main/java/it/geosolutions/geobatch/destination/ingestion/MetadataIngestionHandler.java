@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
@@ -89,12 +90,13 @@ public class MetadataIngestionHandler {
 	/**
 	 * @param dataStore
 	 */
-	public MetadataIngestionHandler(JDBCDataStore dataStore) {
+	public MetadataIngestionHandler(DataStore dataStore) {
 		super();
-		this.dataStore = dataStore;
-		
-		processSequenceManager = new SequenceManager(dataStore, "process_seq");
-		traceSequenceManager = new SequenceManager(dataStore, "trace_seq");		
+		if(dataStore instanceof JDBCDataStore){
+			this.dataStore =  (JDBCDataStore)dataStore;	
+			processSequenceManager = new SequenceManager(this.dataStore, "process_seq");
+			traceSequenceManager = new SequenceManager(this.dataStore, "trace_seq");		
+		}
 	}
 
 	/**	
