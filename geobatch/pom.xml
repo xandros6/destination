@@ -480,10 +480,12 @@
     <!--     Modules for the build in approximate dependency order   -->
     <!-- =========================================================== -->
     <modules>
-        <module>gb-logic-destination</module>
-        <module>gb-logic-migration</module>
-        <module>gb-application-destination</module>
+        <module>ingestion-logic</module>
+        <module>migration-logic</module>
+
         <module>ingestion-actions</module>
+
+        <module>webapp</module>
     </modules>
 
 <!--
