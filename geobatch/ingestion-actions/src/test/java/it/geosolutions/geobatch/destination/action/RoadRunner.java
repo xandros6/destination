@@ -14,7 +14,7 @@
  *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *    Lesser General Public License for more details.
  */
-package it.geosolutions.geobatch.destination;
+package it.geosolutions.geobatch.destination.action;
 
 import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
@@ -53,7 +53,7 @@ public class RoadRunner{
         datastoreParams.put("schema", "siig_p");
         datastoreParams.put("passwd", "siig_p");
         datastoreParams.put("dbtype", "postgis");
-        datastoreParams.put("host", "localhost");
+        datastoreParams.put("host", "192.168.1.31");
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
@@ -95,8 +95,17 @@ public class RoadRunner{
 	        
 	        vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
 	        vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
-	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);
+	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);*/
 			
+			StreetUserComputation streetUserComputation = new StreetUserComputation(inputFeature,
+					new ProgressListenerForwarder(null),
+					metadataHandler,
+					dataStore);
+	        
+	        //streetUserComputation.execute(1);
+	        //streetUserComputation.execute(2);
+	        streetUserComputation.execute(3);
+			/*
 	        RiskComputation riskComputation = new RiskComputation(
 	        		inputFeature,
 					new ProgressListenerForwarder(null),
@@ -109,14 +118,7 @@ public class RoadRunner{
 	        riskComputation.prefetchRiskAtLevel(3, 3, 1, 29, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", "B");
 	        */
 	        
-	        StreetUserComputation streetUserComputation = new StreetUserComputation(inputFeature,
-					new ProgressListenerForwarder(null),
-					metadataHandler,
-					dataStore);
 	        
-	        streetUserComputation.execute(1);
-	        /*streetUserComputation.execute(2);
-	        streetUserComputation.execute(3);*/
         } catch(Exception e) {
         	LOGGER.error(e.getMessage());
         } finally {

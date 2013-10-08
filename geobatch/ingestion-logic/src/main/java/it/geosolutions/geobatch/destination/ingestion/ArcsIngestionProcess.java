@@ -67,7 +67,7 @@ public class ArcsIngestionProcess extends InputObject {
 	private String date;
 	
 	public static Properties aggregation = new Properties();
-	public static Properties bersaglio = new Properties();
+	public static Properties bersaglio = new Properties();	
 		
 	private String gridTypeName = "siig_geo_grid";
 	
@@ -253,7 +253,8 @@ public class ArcsIngestionProcess extends InputObject {
 					
 					transaction.commit();	
 				} catch (IOException e) {
-					errors++;						
+					LOGGER.error(e.getMessage(),e);
+					errors++;					
 					metadataHandler.logError(trace, errors, "Error removing old data", getError(e), 0);					
 					transaction.rollback();					
 					throw e;
@@ -279,7 +280,8 @@ public class ArcsIngestionProcess extends InputObject {
 				}
 				metadataHandler.updateLogFile(trace, total, errors, aggregationLevel == 1);
 			} catch (IOException e) {
-				errors++;	
+				LOGGER.error(e.getMessage(),e);
+				errors++;				
 				metadataHandler.logError(trace, errors, "Error importing data", getError(e), 0);				
 				throw e;
 			} finally {
@@ -416,6 +418,7 @@ public class ArcsIngestionProcess extends InputObject {
 		int[] tgm = new int[] {0, 0};
 		int[] velocita = new int[] {0, 0};
 		double[] cff = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		double[] padr = new double[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 		ElementsCounter flgTgmCounter = new ElementsCounter();
 		ElementsCounter flgVelocCounter = new ElementsCounter();
 		ElementsCounter flgCorsieCounter = new ElementsCounter();
@@ -498,9 +501,16 @@ public class ArcsIngestionProcess extends InputObject {
 					for (int i = 0; i < cff.length; i++) {
 						cff[i] += cffs[i] * currentLunghezza.intValue();
 					}
+					// padr
+					double[] padrs = extractMultipleValuesDouble(inputFeature,
+							"PADR", padr.length);
+					for (int i = 0; i < padrs.length; i++) {
+						padr[i] += padrs[i] * currentLunghezza.intValue();
+					}
 				}
 				
-			} catch(Exception e) {						
+			} catch(Exception e) {
+				LOGGER.error(e.getMessage(),e);
 				errors++;
 				metadataHandler.logError(trace, errors,
 						"Error writing output feature", getError(e),
@@ -523,16 +533,15 @@ public class ArcsIngestionProcess extends InputObject {
 							lunghezza, pterr, inputFeature);
 					addAggregateCFFFeature(outputObjects[2], id, lunghezza, cff,
 							inputFeature);
-					// no need for aggregation until paddr will be a constant
-					addSostanzaFeature(outputObjects[3], id, inputFeature,
-							FeatureLoaderUtils.loadFeatureAttributes(dataStore,
-									sostanzaTypeName, "id_sostanza", false),
-							dataStore);
+					addAggregatePADRFeature(outputObjects[3], id, lunghezza,
+							padr, inputFeature);
+					
 				}
 				rowTransaction.commit();
 				
 				updateImportProgress(total, errors - startErrors, "Importing data in " + outputName);
-			} catch(Exception e) {						
+			} catch(Exception e) {
+				LOGGER.error(e.getMessage(),e);
 				errors++;								
 				rowTransaction.rollback();
 				metadataHandler.logError(trace, errors,
@@ -545,6 +554,43 @@ public class ArcsIngestionProcess extends InputObject {
 		return errors;
 	}
 
+	private void addAggregatePADRFeature(OutputObject padrObject, int id,
+			int lunghezza, double padr[], SimpleFeature inputFeature)
+			throws IOException {
+		
+		SimpleFeatureBuilder featureBuilder = padrObject.getBuilder();
+		for (int count = 0; count < padr.length; count++) {
+			try {
+				double padrElement = padr[count];
+				featureBuilder.reset();
+				// compiles the attributes from target and read feature data,
+				// using mappings
+				// to match input attributes with output ones
+				for (AttributeDescriptor attr : padrObject.getSchema()
+						.getAttributeDescriptors()) {
+					if (attr.getLocalName().equals("padr")) {
+						// compute the aritmetic average
+						featureBuilder.add(padrElement / lunghezza);
+					} else if (attr.getLocalName().equals("fk_partner")) {
+						featureBuilder.add(partner + "");
+					} else {
+						featureBuilder.add(null);
+					}
+				}
+
+				String idSostanza = (count+1)+"";
+				String featureid = id + "." + idSostanza;
+				SimpleFeature feature = featureBuilder.buildFeature(featureid);
+				feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
+
+				padrObject.getWriter().addFeatures(
+						DataUtilities.collection(feature));
+			} catch (NumberFormatException e) {
+
+			}
+		}
+	}
+	
 	/**
 	 * @param outputObject
 	 * @param id
@@ -741,12 +787,13 @@ public class ArcsIngestionProcess extends InputObject {
 			addVehicleFeature(outputObjects[0], id, inputFeature);
 			addDissestoFeature(outputObjects[1], id, inputFeature);
 			addCFFFeature(outputObjects[2], id, inputFeature);
-			addSostanzaFeature(outputObjects[3], id, inputFeature, FeatureLoaderUtils.loadFeatureAttributes(dataStore, sostanzaTypeName, "id_sostanza", false), dataStore);
+			addSostanzaFeature(outputObjects[3], id, inputFeature, dataStore);
 			
 			rowTransaction.commit();
 			
 			updateImportProgress(total, errors, "Importing data in " + outputName);
-		} catch(Exception e) {						
+		} catch(Exception e) {
+			LOGGER.error(e.getMessage(),e);
 			errors++;			
 			rowTransaction.rollback();
 			metadataHandler.logError(trace, errors,
@@ -860,7 +907,7 @@ public class ArcsIngestionProcess extends InputObject {
         		return new double[valueNumber];
         	}
             String[] svalues = inputFeature.getAttribute(attributeName).toString().split("\\|");                            
-            double[] values = new double[13];
+            double[] values = new double[valueNumber];
             
             for(int count=0; count < svalues.length; count++) {
                     try {
@@ -958,33 +1005,48 @@ public class ArcsIngestionProcess extends InputObject {
             }
 	}
 	
-        private void addSostanzaFeature(OutputObject sostanzaObject, int id,
-                SimpleFeature inputFeature, List<String> sostanze, DataStore datastore)
-                throws IOException {
-    
-            SimpleFeatureBuilder featureBuilder = sostanzaObject.getBuilder();
-    
-            for (String id_sostanza : sostanze) {
-                for (AttributeDescriptor attr : sostanzaObject.getSchema().getAttributeDescriptors()) {
-                    if (attr.getLocalName().equals(geoId)) {
-                        featureBuilder.add(id);
-                    } else if (attr.getLocalName().equals("id_sostanza")) {
-                        featureBuilder.add(id_sostanza);
-                    } else if (attr.getLocalName().equals("padr")) {
-                        featureBuilder.add(PADDR_WORKAROUTD_VALUE);
-                    } else if (attr.getLocalName().equals("fk_partner")) {
-                        featureBuilder.add(partner + "");
-                    } else {
-                        featureBuilder.add(null);
-                    }
-                }
-                String featureid = id + "." + id_sostanza;
-                SimpleFeature feature = featureBuilder.buildFeature(featureid);
-                feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
-    
-                sostanzaObject.getWriter().addFeatures(DataUtilities.collection(feature));
-            }
-        }
+	private void addSostanzaFeature(OutputObject sostanzaObject, int id,
+			SimpleFeature inputFeature,
+			DataStore datastore) throws IOException {
+
+		SimpleFeatureBuilder featureBuilder = sostanzaObject.getBuilder();
+		Object padrAttribute = inputFeature.getAttribute("PADR");
+		String[] padrAttributeSplitted = padrAttribute == null ? new String[] {}
+				: padrAttribute.toString().split("\\|");
+
+		for (int count = 0; count < padrAttributeSplitted.length; count++) {
+			try {
+				String el = padrAttributeSplitted[count].replace(",", ".");
+				double padrElement = Double.parseDouble(el);
+				featureBuilder.reset();
+				String id_sostanza = (count+1)+"";
+				// for (String id_sostanza : sostanze) {
+				for (AttributeDescriptor attr : sostanzaObject.getSchema()
+						.getAttributeDescriptors()) {
+					if (attr.getLocalName().equals(geoId)) {
+						featureBuilder.add(id);
+					} else if (attr.getLocalName().equals("id_sostanza")) {
+						featureBuilder.add(id_sostanza);
+					} else if (attr.getLocalName().equals("padr")) {
+						featureBuilder.add(padrElement);
+					} else if (attr.getLocalName().equals("fk_partner")) {
+						featureBuilder.add(partner + "");
+					} else {
+						featureBuilder.add(null);
+					}
+				}
+				String featureid = id + "." + id_sostanza;
+				SimpleFeature feature = featureBuilder.buildFeature(featureid);
+				feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
+
+				sostanzaObject.getWriter().addFeatures(
+						DataUtilities.collection(feature));
+				// }
+			} catch (NumberFormatException e) {
+
+			}
+		}
+	}
 	
 	
 	

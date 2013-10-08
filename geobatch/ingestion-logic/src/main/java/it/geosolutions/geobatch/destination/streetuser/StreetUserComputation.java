@@ -21,6 +21,7 @@ import org.geotools.data.FeatureStore;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
@@ -89,9 +90,14 @@ public class StreetUserComputation extends InputObject {
 			SimpleFeature sf = inputIterator.next();
 			LOGGER.debug("Scenario <" + sf.getAttribute("tipologia") + "> found ");
 			StreetScenario scenario = new StreetScenario();
-			scenario.setIdScenario((Integer) sf.getAttribute("id_scenario"));		
+			scenario.setIdScenario(((Number) sf.getAttribute("id_scenario")).intValue());		
 			scenario.setDescrizioneScenario((String) sf.getAttribute("tipologia"));
-			scenario.setTempoDiCoda(((Integer) sf.getAttribute("tempo_di_coda")) / SECONDS_IN_HOUR);
+			if(sf.getAttribute("tempo_di_coda") == null) {
+				scenario.setTempoDiCoda(1.0);
+			} else {
+				scenario.setTempoDiCoda((((Number) sf.getAttribute("tempo_di_coda")).doubleValue()) / SECONDS_IN_HOUR);
+			}
+			
 			scenari.add(scenario);
 
 		}
@@ -114,12 +120,12 @@ public class StreetUserComputation extends InputObject {
 
 		inputReader = FeatureLoaderUtils.createFeatureSource(dataStore, Transaction.AUTO_COMMIT,"siig_t_vulnerabilita_" + aggregationLevel);
 		inputQuery = new Query("siig_t_vulnerabilita_" + aggregationLevel);
-		inputQuery.setFilter(filterFactory.equals(filterFactory.property("fk_partner"),filterFactory.literal(partner)));
+		inputQuery.setFilter(filterFactory.equals(filterFactory.property("fk_partner"),filterFactory.literal(partner+"")));
 		inputIterator = inputReader.getFeatures(inputQuery).features();
 		while(inputIterator.hasNext()) {
 			SimpleFeature sf = inputIterator.next();
-			Integer idGeoArco = (Integer) sf.getAttribute("id_geo_arco");
-			Integer idDistanza = (Integer) sf.getAttribute("id_distanza");
+			Integer idGeoArco = ((Number) sf.getAttribute("id_geo_arco")).intValue();
+			Integer idDistanza = ((Number) sf.getAttribute("id_distanza")).intValue();
 			StreetDistance distanza = distanze.get(idDistanza);
 			if(distanza != null){
 				computeArcoDistanza(idGeoArco,distanza,scenari,aggregationLevel);
@@ -134,13 +140,12 @@ public class StreetUserComputation extends InputObject {
 		try{
 			FeatureStore<SimpleFeatureType, SimpleFeature> inputReader = FeatureLoaderUtils.createFeatureSource(dataStore, Transaction.AUTO_COMMIT,"siig_geo_ln_arco_" + aggregationLevel);
 			Query inputQuery = new Query("siig_geo_ln_arco_" + aggregationLevel);
-			inputQuery.setFilter(filterFactory.equals(filterFactory.property("fk_partner"),filterFactory.literal(partner)));
+			inputQuery.setFilter(filterFactory.equals(filterFactory.property("id_geo_arco"),filterFactory.literal(idGeoArco)));
 			inputIterator = inputReader.getFeatures(inputQuery).features();
-			while(inputIterator.hasNext()) {
+			if(inputIterator.hasNext()) {
 				SimpleFeature sf = inputIterator.next();
-				LOGGER.debug("Feature found : " + sf.toString());		
-				Integer id = (Integer) sf.getAttribute("id_geo_arco");
-				StreetUser streetUser = new StreetUser(id,(Geometry) sf.getDefaultGeometry(),distanza);
+				LOGGER.debug("Feature found : " + sf.toString());				
+				StreetUser streetUser = new StreetUser(idGeoArco,(Geometry) sf.getDefaultGeometry(),distanza);
 				retrieveStreetInBuffer(streetUser.getDistance(),streetUser,aggregationLevel);
 				computeVeicles(streetUser,scenari);		
 				computeUsers(streetUser,scenari);
@@ -163,8 +168,8 @@ public class StreetUserComputation extends InputObject {
 			inputIterator = inputReader.getFeatures(inputQuery).features();
 			while(inputIterator.hasNext()) {
 				SimpleFeature sf = inputIterator.next();
-				Integer key = (Integer) sf.getAttribute("id_distanza");
-				Integer distanza = (Integer) sf.getAttribute("distanza");
+				Integer key = ((Number) sf.getAttribute("id_distanza")).intValue();
+				Integer distanza = ((Number) sf.getAttribute("distanza")).intValue();
 				distanze.put(key, new StreetDistance(key, distanza));				
 			}
 		} catch (Exception e) {
@@ -234,9 +239,10 @@ public class StreetUserComputation extends InputObject {
 	}
 
 	private void persistStreetUsersData(Integer idArco, Integer distanza, Integer idScenario, Double utentiSede, Double utentiBersaglio, SimpleFeatureStore featureStore) throws Exception {
-		String id = distanza + "," + idArco  + "," + idScenario;
+		String id = idScenario+"."+idArco+"."+distanza;
 		final SimpleFeature feature = DataUtilities.createFeature(StreetUserComputation.siig_r_scen_vuln_X,
-				"id"+id+"="+distanza+"|"+idArco+"|"+idScenario+"|"+formatter.format(utentiBersaglio)+"|"+formatter.format(utentiSede));
+				id+"="+distanza+"|"+idArco+"|"+idScenario+"|"+formatter.format(utentiBersaglio)+"|"+formatter.format(utentiSede));
+		feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
 		featureStore.addFeatures((DataUtilities.collection(new ArrayList<SimpleFeature>() {{add(feature);}})));
 	}
 
@@ -298,9 +304,9 @@ public class StreetUserComputation extends InputObject {
 			while(inputIterator.hasNext()) {
 				SimpleFeature sf = inputIterator.next();
 				Geometry intersection = bufferGeometry.intersection( (Geometry) sf.getDefaultGeometry() );
-				Integer streetId = (Integer) sf.getAttribute("id_geo_arco");
+				Integer streetId = ((Number) sf.getAttribute("id_geo_arco")).intValue();
 				Boolean isOriginStreet = (streetId.intValue() == streetUser.getIdArco().intValue());
-				Integer nCorsie = (Integer) sf.getAttribute("nr_corsie");
+				Integer nCorsie = ((Number) sf.getAttribute("nr_corsie")).intValue();
 				Double storage = computeVeicleStorage(intersection.getLength(),nCorsie);
 				StreetInfo si = new StreetInfo(sf,intersection,isOriginStreet,storage);	
 				retrieveStreetInfo(si,aggregationLevel);
@@ -319,7 +325,7 @@ public class StreetUserComputation extends InputObject {
 	private void retrieveStreetInfo(StreetInfo ss, int aggregationLevel){
 		FeatureIterator<SimpleFeature> inputIterator = null;
 		try {
-			Integer id_geo_arco = (Integer) ss.getOriginFeature().getAttribute("id_geo_arco");
+			Integer id_geo_arco = ((Number) ss.getOriginFeature().getAttribute("id_geo_arco")).intValue();
 			FeatureStore<SimpleFeatureType, SimpleFeature> inputReader = FeatureLoaderUtils.createFeatureSource(dataStore, Transaction.AUTO_COMMIT,"siig_r_tipovei_geoarco" + aggregationLevel);
 			Query inputQuery = new Query("siig_r_tipovei_geoarco" + aggregationLevel);
 			inputQuery.setFilter(filterFactory.and(
@@ -330,9 +336,10 @@ public class StreetUserComputation extends InputObject {
 			while(inputIterator.hasNext()) {
 				SimpleFeature sf = inputIterator.next();
 				StreetVeicle veicle = new StreetVeicle();
-				veicle.setType( (Integer) sf.getAttribute("id_tipo_veicolo"));
-				veicle.setDensity((Integer) sf.getAttribute("densita_veicolare"));
-				veicle.setMeanVelocity((Integer) sf.getAttribute("velocita_media"));
+				veicle.setType( ((Number) sf.getAttribute("id_tipo_veicolo")).intValue());				
+				int speed = ((Number) sf.getAttribute("velocita_media")).intValue() * 1000;
+				veicle.setMeanVelocity(speed);
+				veicle.setDensity(((Number) sf.getAttribute("densita_veicolare")).doubleValue() / speed / 24);
 				retrieveVeicleInfo(veicle);
 				ss.addVeicleType(veicle);
 			}
@@ -355,7 +362,7 @@ public class StreetUserComputation extends InputObject {
 			if(inputIterator.hasNext()) {
 				SimpleFeature sf = inputIterator.next();
 				veicle.setTypeDescription((String) sf.getAttribute("tipo_veicolo_it"));
-				veicle.setOccupationCoeff((Double) sf.getAttribute("coeff_occupazione"));
+				veicle.setOccupationCoeff(((Number) sf.getAttribute("coeff_occupazione")).doubleValue());
 			}
 		} catch (Exception e) {
 			LOGGER.error(e.getMessage(),e);

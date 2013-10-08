@@ -108,6 +108,20 @@
 		<featureParentRelation>siig_geo_pl_arco_3</featureParentRelation>
 	</feature>
 
+<!-- UTENTI STRADA -->  
+   <feature>
+    <featureName>siig_r_scen_vuln_1</featureName>
+    <featureParentRelation>siig_geo_ln_arco_1</featureParentRelation>
+  </feature>
+  <feature>
+    <featureName>siig_r_scen_vuln_2</featureName>
+    <featureParentRelation>siig_geo_ln_arco_2</featureParentRelation>
+  </feature>
+  <feature>
+    <featureName>siig_r_scen_vuln_3</featureName>
+    <featureParentRelation>siig_geo_pl_arco_3</featureParentRelation>
+  </feature>
+
 <!-- PRECALCOLO -->
 
 	<feature>

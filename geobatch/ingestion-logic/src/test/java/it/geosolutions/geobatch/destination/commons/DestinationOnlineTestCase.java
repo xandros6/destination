@@ -67,7 +67,7 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
     protected OutputObject vulnerabilityObj;
     protected Transaction outTransaction;
     protected String tableName;
-    
+    protected Boolean removeAfter = true;
     /**
      * The table where to copy the schema
      */
@@ -110,6 +110,9 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
             
             vulnerabilityObj = new OutputObject(dataStore, outTransaction, testTable, VulnerabilityComputation.GEOID);
             loadFeature(vulnerabilityObj);
+        }catch(Exception e) {
+            LOGGER.error(e.getMessage(),e);
+            assumeTrue(false);
         }
         finally{
             if(outTransaction != null){
@@ -130,7 +133,9 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
         if(outTransaction != null){
             outTransaction.close();
         }
-        removeTable();
+        if(removeAfter){
+        	removeTable();
+        }
         if(dataStore != null){
             dataStore.dispose();
             dataStore = null;
@@ -236,7 +241,7 @@ public abstract class DestinationOnlineTestCase extends OnlineTestSupport {
         try{
             c = dataStore.getConnection(t);
             stmt = c.createStatement();
-            String sql = "DROP TABLE " +  dataStore.getDatabaseSchema() + "." + testTable;
+            String sql = "DROP TABLE IF EXISTS " +  dataStore.getDatabaseSchema() + "." + testTable;
             stmt.executeUpdate(sql);
         }
         catch(SQLException e){

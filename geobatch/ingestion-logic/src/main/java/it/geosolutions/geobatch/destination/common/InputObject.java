@@ -112,7 +112,7 @@ public abstract class InputObject {
 			DataStore dataStore) {
 		super();
 		this.inputTypeName = inputTypeName;
-		this.listenerForwarder = listenerForwarder;
+		this.listenerForwarder = listener;
 		this.dataStore = dataStore;
 		this.metadataHandler = metadataHandler;
 		this.valid = this.parseTypeName(inputTypeName);
