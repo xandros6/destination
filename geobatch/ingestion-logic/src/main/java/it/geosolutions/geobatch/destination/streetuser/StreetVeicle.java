@@ -7,7 +7,7 @@ public class StreetVeicle {
 	
 	private Integer type;
 	private String typeDescription;
-	private Double density;
+	private Integer density;
 	private Integer meanVelocity;
 	private Double occupationCoeff;
 	private Map<StreetScenario,ComputedData> scenarioComputedData = new HashMap<StreetScenario, ComputedData>();
@@ -18,10 +18,10 @@ public class StreetVeicle {
 	public void setType(Integer type) {
 		this.type = type;
 	}
-	public Double getDensity() {
+	public Integer getDensity() {
 		return density;
 	}
-	public void setDensity(Double density) {
+	public void setDensity(Integer density) {
 		this.density = density;
 	}
 	public Integer getMeanVelocity() {
