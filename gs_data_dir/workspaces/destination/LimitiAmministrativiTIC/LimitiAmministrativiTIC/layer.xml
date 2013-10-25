@@ -1,0 +1,16 @@
+<layer>
+  <name>LimitiAmministrativiTIC</name>
+  <id>LayerInfoImpl--3508b0d7:13caa127a3e:-7ffe</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--570ae188:124761b8d78:-7fe2</id>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl--3508b0d7:13caa127a3e:-7fff</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

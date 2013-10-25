@@ -1,0 +1,16 @@
+<layer>
+  <name>beni_culturali_pt</name>
+  <id>LayerInfoImpl-26788935:1410d939bed:-1e1</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-26788935:1410d647fae:5408</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-26788935:1410d939bed:-1e2</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

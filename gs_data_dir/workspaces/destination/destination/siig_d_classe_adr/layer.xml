@@ -1,0 +1,13 @@
+<layer>
+  <name>siig_d_classe_adr</name>
+  <id>LayerInfoImpl-6ee463f7:13df975c9c6:-3f72</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-6ee463f7:13df975c9c6:-3f73</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

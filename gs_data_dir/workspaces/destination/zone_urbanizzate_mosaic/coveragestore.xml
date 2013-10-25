@@ -1,0 +1,11 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl--38c05adb:1419c644a17:-121b</id>
+  <name>zone_urbanizzate_mosaic</name>
+  <type>ImageMosaic</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:coverages/destination/zone_urbanizzate</url>
+</coverageStore>

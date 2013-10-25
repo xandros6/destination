@@ -1,0 +1,11 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl--1f33ec41:1418319eacf:-7fff</id>
+  <name>aree_agricole_mosaic</name>
+  <type>ImageMosaic</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:coverages/destination/aree_agricole</url>
+</coverageStore>

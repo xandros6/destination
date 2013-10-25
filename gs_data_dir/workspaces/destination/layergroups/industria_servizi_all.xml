@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--529052f4:13d6830255c:-32c8</id>
+  <name>industria_servizi_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--529052f4:13d6830255c:-32ca</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-494d950f:13ed56219f2:-7ffd</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c644a17:-1acc</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-7fff</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-26788935:1410d546ba6:-7fff</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--529052f4:13d6830255c:-32c9</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>-229472.61739094055</minx>
+    <maxx>882958.7472207035</maxx>
+    <miny>384282.2012033171</miny>
+    <maxy>5237804.701504792</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">industria_servizi_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Industry and Service Employees</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Addetti industria e servizi</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>employés Industrie et services</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Industrie und Dienstleistungen</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

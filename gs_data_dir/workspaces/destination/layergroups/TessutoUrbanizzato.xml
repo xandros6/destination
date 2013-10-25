@@ -1,0 +1,69 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--e78c94c:13cb5732574:-5027</id>
+  <name>TessutoUrbanizzato</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-5031</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-502e</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-502b</id>
+    </layer>
+  </layers>
+  <styles>
+    <style/>
+    <style/>
+    <style/>
+  </styles>
+  <bounds>
+    <minx>313327.0</minx>
+    <maxx>4988085.929428586</maxx>
+    <miny>1443410.9559716904</miny>
+    <maxy>5164155.8695</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">TessutoUrbanizzato</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>urbanized area</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Tessuto Urbanizzato</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>zone urbanisée</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Urbanisierte Gebiete</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

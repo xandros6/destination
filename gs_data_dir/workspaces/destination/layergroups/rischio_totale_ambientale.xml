@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-7108c48e:13d2049d06d:-7fe1</id>
+  <name>rischio_totale_ambientale</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl-7108c48e:13d2049d06d:-7ffd</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-7108c48e:13d2049d06d:-7fe5</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-7108c48e:13d2049d06d:-7d31</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-60c7ceb8:13dd951fd01:1261</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-60c7ceb8:13dd951fd01:1262</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-60c7ceb8:13dd951fd01:1263</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>307521.6551252864</minx>
+    <maxx>776105.5917718211</maxx>
+    <miny>4876225.320709771</miny>
+    <maxy>5222566.596034277</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">rischio_totale_ambientale</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Total Environment Risk</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Rischio Totale Ambientale</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>risque environnemental total</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Gesamtheit der Umweltrisiken</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

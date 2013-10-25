@@ -1,0 +1,41 @@
+<featureType>
+  <id>FeatureTypeInfoImpl--6cd101db:13ec0d0fcfd:-7ffc</id>
+  <name>siig_t_variabile</name>
+  <nativeName>siig_t_variabile</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
+  </namespace>
+  <title>siig_t_variabile</title>
+  <keywords>
+    <string>features</string>
+    <string>siig_t_variabile</string>
+  </keywords>
+  <srs>EPSG:32632</srs>
+  <nativeBoundingBox>
+    <minx>-1.0</minx>
+    <maxx>0.0</maxx>
+    <miny>-1.0</miny>
+    <maxy>0.0</maxy>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>4.511247156296258</minx>
+    <maxx>4.51125611529294</maxx>
+    <miny>-9.0193758094E-6</miny>
+    <maxy>0.0</maxy>
+    <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
+  DATUM[&quot;WGS84&quot;, &#xd;
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
+  PRIMEM[&quot;Greenwich&quot;, 0.0], &#xd;
+  UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+  AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <advertised>true</advertised>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl--3970ff67:13c00cf828a:-7fef</id>
+  </store>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+</featureType>

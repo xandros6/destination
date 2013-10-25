@@ -1,0 +1,16 @@
+<layer>
+  <name>acque_sotterranee_pl</name>
+  <id>LayerInfoImpl--7e711dd1:13d160851b0:-7ff6</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--67fd9ceb:13ccdbc5905:-47e4</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--7e711dd1:13d160851b0:-7ff7</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

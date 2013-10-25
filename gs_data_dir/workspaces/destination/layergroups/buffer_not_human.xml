@@ -1,0 +1,69 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-24346e05:13d598ba09f:-4a2f</id>
+  <name>buffer_not_human</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--6bb16c1e:13d1c38eee9:-7ffd</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-24346e05:13d598ba09f:-5fb5</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-229a69a5:13c1e8f59b1:-7fe8</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-4a30</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>438053.0240717551</minx>
+    <maxx>445666.25837243785</maxx>
+    <miny>4952984.336357996</miny>
+    <maxy>4962686.559477547</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">buffer_not_human</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Environmental Damage Areas</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Aree di Danno Ambientale</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>Zones de dommages à l'environnement</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Umweltkatastrophe Areas</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

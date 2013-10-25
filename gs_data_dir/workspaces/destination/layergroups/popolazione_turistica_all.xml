@@ -1,0 +1,69 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--529052f4:13d6830255c:-753a</id>
+  <name>popolazione_turistica_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--529052f4:13d6830255c:-3dfa</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c644a17:-1227</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13cce29f144:-4bf9</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--529052f4:13d6830255c:-753f</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>302697.64222749206</minx>
+    <maxx>779668.9963482786</maxx>
+    <miny>4873998.778960606</miny>
+    <maxy>5224841.164165864</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">popolazione_turistica_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>tourist population</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Popolazione Turistica</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>population touristique</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Tourismus</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

@@ -1,0 +1,13 @@
+<layer>
+  <name>siig_t_variabile</name>
+  <id>LayerInfoImpl--6cd101db:13ec0d0fcfd:-7ffb</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--6cd101db:13ec0d0fcfd:-7ffc</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

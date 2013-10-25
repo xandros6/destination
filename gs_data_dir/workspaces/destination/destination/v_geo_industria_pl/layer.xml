@@ -1,0 +1,16 @@
+<layer>
+  <name>v_geo_industria_pl</name>
+  <id>LayerInfoImpl--529052f4:13d6830255c:-32ca</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-7fff</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--529052f4:13d6830255c:-32cb</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

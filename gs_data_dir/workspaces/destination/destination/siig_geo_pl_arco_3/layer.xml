@@ -1,0 +1,16 @@
+<layer>
+  <name>siig_geo_pl_arco_3</name>
+  <id>LayerInfoImpl--32081003:13fcca0f527:-7ffc</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--304b338b:13f9e44fe32:-7fed</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--32081003:13fcca0f527:-7ffd</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

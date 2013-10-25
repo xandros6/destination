@@ -1,0 +1,16 @@
+<layer>
+  <name>rischio_3</name>
+  <id>LayerInfoImpl--1bf56c14:13eefa54d37:-7eef</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--3e3f965d:13eacac4bdf:-717b</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--1bf56c14:13eefa54d37:-7ef0</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

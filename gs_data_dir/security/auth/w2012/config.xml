@@ -1,0 +1,10 @@
+<ldap>
+  <id>-4ba04ff0:13e36df5ea8:-7fff</id>
+  <name>w2012</name>
+  <className>org.geoserver.security.ldap.LDAPAuthenticationProvider</className>
+  <serverURL>ldap://192.168.119.132/dc=w2012,dc=local</serverURL>
+  <userDnPattern>cn={0},cn=Users</userDnPattern>
+  <groupSearchBase>cn=Users</groupSearchBase>
+  <groupSearchFilter>memberOf={0}</groupSearchFilter>
+  <useTLS>false</useTLS>
+</ldap>

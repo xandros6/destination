@@ -1,0 +1,16 @@
+<layer>
+  <name>grafo_simulazione</name>
+  <id>LayerInfoImpl--352290a0:13ff6effdfe:-6c32</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--304b338b:13f9e44fe32:-7ffe</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--352290a0:13ff6effdfe:-6c33</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

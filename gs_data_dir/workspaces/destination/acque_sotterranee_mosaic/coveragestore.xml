@@ -1,0 +1,11 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl--37adeb98:1416e038f2f:-7fff</id>
+  <name>acque_sotterranee_mosaic</name>
+  <type>ImageMosaic</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:coverages/destination/acque_sotterranee</url>
+</coverageStore>

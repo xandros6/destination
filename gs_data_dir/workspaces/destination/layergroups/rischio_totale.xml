@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-60c7ceb8:13dd951fd01:-7ff9</id>
+  <name>rischio_totale</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--42b6b11c:13dd5ca2e7c:-4bd0</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-60c7ceb8:13dd951fd01:-3cad</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-60c7ceb8:13dd951fd01:-3ca8</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-60c7ceb8:13dd951fd01:-7fff</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-60c7ceb8:13dd951fd01:-7ffb</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-60c7ceb8:13dd951fd01:-7ffa</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>307376.7374592663</minx>
+    <maxx>777297.7741795989</maxx>
+    <miny>4876185.567449302</miny>
+    <maxy>5227027.997430774</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">rischio_totale</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Total Risk</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Rischio Totale Sociale - Ambientale</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>risque total</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Gesamtrisiko</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

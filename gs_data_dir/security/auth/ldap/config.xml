@@ -1,0 +1,10 @@
+<ldap>
+  <id>-3ee4d1e5:13d91c4233a:-7fff</id>
+  <name>ldap</name>
+  <className>org.geoserver.security.ldap.LDAPAuthenticationProvider</className>
+  <serverURL>ldap://localhost/dc=maxcrc,dc=com</serverURL>
+  <userDnPattern>uid={0},ou=People</userDnPattern>
+  <groupSearchBase>ou=Groups</groupSearchBase>
+  <groupSearchFilter>memberUid={1}</groupSearchFilter>
+  <useTLS>false</useTLS>
+</ldap>

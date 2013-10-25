@@ -1,0 +1,17 @@
+<wmsStore>
+  <id>WMSStoreInfoImpl-4c436e57:13c913c461f:-5df0</id>
+  <name>AmbitiAmministrativiVDA</name>
+  <type>WMS</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <metadata>
+    <entry key="useConnectionPooling">true</entry>
+  </metadata>
+  <__default>false</__default>
+  <capabilitiesURL>http://domini1sct.partout.it/arcgis/services/PTA/VDA_WMS01_AmbitiAmministrativi/MapServer/WMSServer?request=getCapabilities</capabilitiesURL>
+  <maxConnections>6</maxConnections>
+  <readTimeout>60</readTimeout>
+  <connectTimeout>30</connectTimeout>
+</wmsStore>

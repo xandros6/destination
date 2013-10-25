@@ -1,0 +1,93 @@
+<featureType>
+  <id>FeatureTypeInfoImpl-60c7ceb8:13dd951fd01:-3ca9</id>
+  <name>rischio_totale_3</name>
+  <nativeName>rischio_totale_3</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
+  </namespace>
+  <title>rischio_totale_3</title>
+  <keywords>
+    <string>features</string>
+    <string>rischio_totale_3</string>
+  </keywords>
+  <nativeCRS class="projected">PROJCS[&quot;WGS 84 / UTM zone 32N&quot;, &#xd;
+  GEOGCS[&quot;WGS 84&quot;, &#xd;
+    DATUM[&quot;World Geodetic System 1984&quot;, &#xd;
+      SPHEROID[&quot;WGS 84&quot;, 6378137.0, 298.257223563, AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]], &#xd;
+      AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]], &#xd;
+    PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], &#xd;
+    UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+    AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+    AXIS[&quot;Geodetic latitude&quot;, NORTH], &#xd;
+    AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]], &#xd;
+  PROJECTION[&quot;Transverse_Mercator&quot;, AUTHORITY[&quot;EPSG&quot;,&quot;9807&quot;]], &#xd;
+  PARAMETER[&quot;central_meridian&quot;, 9.0], &#xd;
+  PARAMETER[&quot;latitude_of_origin&quot;, 0.0], &#xd;
+  PARAMETER[&quot;scale_factor&quot;, 0.9996], &#xd;
+  PARAMETER[&quot;false_easting&quot;, 500000.0], &#xd;
+  PARAMETER[&quot;false_northing&quot;, 0.0], &#xd;
+  UNIT[&quot;m&quot;, 1.0], &#xd;
+  AXIS[&quot;Easting&quot;, EAST], &#xd;
+  AXIS[&quot;Northing&quot;, NORTH], &#xd;
+  AUTHORITY[&quot;EPSG&quot;,&quot;32632&quot;]]</nativeCRS>
+  <srs>EPSG:32632</srs>
+  <nativeBoundingBox>
+    <minx>317643.0</minx>
+    <maxx>762643.0</maxx>
+    <miny>4881313.0</miny>
+    <maxy>5221313.0</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>6.595930099061564</minx>
+    <maxx>12.460827999737447</maxx>
+    <miny>44.037946910153785</miny>
+    <maxy>47.14443928297946</maxy>
+    <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
+  DATUM[&quot;WGS84&quot;, &#xd;
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
+  PRIMEM[&quot;Greenwich&quot;, 0.0], &#xd;
+  UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+  AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <advertised>true</advertised>
+  <metadata>
+    <entry key="cachingEnabled">false</entry>
+    <entry key="JDBC_VIRTUAL_TABLE">
+      <virtualTable>
+        <name>rischio_totale_3</name>
+        <sql>SELECT&#xd;
+    siig_p.siig_geo_pl_arco_3.id_geo_arco,&#xd;
+    siig_p.siig_geo_pl_arco_3.geometria,&#xd;
+    siig_p.siig_t_elab_standard_3.calc_formula_soc AS rischio_sociale,&#xd;
+    siig_p.siig_t_elab_standard_3.calc_formula_amb AS rischio_ambientale &#xd;
+FROM&#xd;
+    siig_p.siig_geo_pl_arco_3&#xd;
+INNER JOIN&#xd;
+    siig_p.siig_t_elab_standard_3&#xd;
+ON&#xd;
+    (&#xd;
+        siig_p.siig_geo_pl_arco_3.id_geo_arco = siig_p.siig_t_elab_standard_3.id_geo_arco)&#xd;
+where siig_geo_pl_arco_3.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632)</sql>
+        <geometry>
+          <name>geometria</name>
+          <type>Polygon</type>
+          <srid>32632</srid>
+        </geometry>
+        <parameter>
+          <name>bounds</name>
+          <defaultValue>250000,4800000,1000000,6300000</defaultValue>
+          <regexpValidator>^[\w\d\s,\.\-]+$</regexpValidator>
+        </parameter>
+      </virtualTable>
+    </entry>
+  </metadata>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl--3970ff67:13c00cf828a:-7fef</id>
+  </store>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+</featureType>

@@ -1,0 +1,93 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--10a99c92:13d173f8f0a:-7fe4</id>
+  <name>bersagli_umani</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7ffc</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7ff7</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7ff3</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7fee</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7fea</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7fe5</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdfda991:7dca</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13cce29f144:-4bf9</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-1227</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-186</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-2974</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-7fff</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>438855.212727273</minx>
+    <maxx>445007.673636364</maxx>
+    <miny>4953764.25090909</miny>
+    <maxy>4961775.68272727</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">bersagli_umani</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Human Targets</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Bersagli Umani</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>cibles humaines</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>menschliche Ziele</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

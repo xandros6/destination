@@ -1,0 +1,16 @@
+<layer>
+  <name>siig_geo_grid</name>
+  <id>LayerInfoImpl--e9f7bc:13eac59f94f:-581e</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--304b338b:13f9e44fe32:-7fed</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--e9f7bc:13eac59f94f:-581f</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

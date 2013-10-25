@@ -1,0 +1,16 @@
+<layer>
+  <name>v_geo_ospedale_pt</name>
+  <id>LayerInfoImpl-494d950f:13ed56219f2:-7ffb</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-26788935:1410d6d8049:260c</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-494d950f:13ed56219f2:-7ffc</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

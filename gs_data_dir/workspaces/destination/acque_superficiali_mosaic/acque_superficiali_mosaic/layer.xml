@@ -1,0 +1,16 @@
+<layer>
+  <name>acque_superficiali_mosaic</name>
+  <id>LayerInfoImpl-4926a9c2:14182fcba1d:-7ff4</id>
+  <type>RASTER</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--529052f4:13d68619d83:-67c6</id>
+  </defaultStyle>
+  <resource class="coverage">
+    <id>CoverageInfoImpl-4926a9c2:14182fcba1d:-7ff5</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>
