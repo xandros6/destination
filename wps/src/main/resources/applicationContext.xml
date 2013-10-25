@@ -13,6 +13,10 @@
     
     <bean id="riskCalculatorSimple" class="it.geosolutions.process.gs.RiskCalculatorSimple">
       <constructor-arg index="0" ref="catalog"/>
+    </bean>
+    
+    <bean id="downloader" class="it.geosolutions.process.gs.DestinationDownload">
+      <constructor-arg index="0" ref="catalog"/>
     </bean>	
 
 	<bean id="processingRepository" class="it.geosolutions.process.gs.ProcessingRepository">
