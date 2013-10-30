@@ -83,13 +83,13 @@ Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ==================
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>1.6.6</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-expression</artifactId>
-            <version>3.1.1.RELEASE</version>
+            <version>3.0.3.RELEASE</version>
         </dependency>
 
         <dependency>
