@@ -517,6 +517,9 @@ public class ArcsIngestionProcess extends InputObject {
 						idTematico);
 			}
 		}
+		if(lunghezza <= 0 && geo != null) {
+		    lunghezza = (int)geo.getLength();
+		}		
 		if(geo != null) {
 			Transaction rowTransaction = new DefaultTransaction();
 			setTransaction(outputObjects, rowTransaction);			
