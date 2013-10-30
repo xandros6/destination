@@ -223,94 +223,108 @@ public class ZeroRemovalComputation extends InputObject {
 		return nElabZero;
 	}
 
-	private void iterativeProcess(String inputField, String outputField, Boolean streetAggregation, int aggregationLevel, int startErrors, int errors, int trace, int process, String closePhase) throws IOException{
-			Transaction transaction = new DefaultTransaction("ZeroRemoval");
-			try {
-				// setup geo input / output object
-				String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
-
-				// setup input reader
-				createInputReader(dataStore, null, geoName);
-
-				
-				OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
-
-				setInputFilter(filterFactory.equals(filterFactory.property(PARTNER_FIELD),
-						filterFactory.literal(partner)));
-				int total = getImportCount();
-				// get unique aggregation values in order to identify the roads
-			Set<BigDecimal> aggregationValues = null;
-			if(streetAggregation){
-				aggregationValues = getAggregationBigValues(ID_ORIGIN);
-			}else{
-				aggregationValues = new HashSet<BigDecimal>(Arrays.asList(new BigDecimal(-1)));
-			}
-
-				for (BigDecimal aggregationValue : aggregationValues) {
-					//
-					// First of all filter all the arcs to a specified road and partner 
-					//
-				Filter filter = filterFactory.equals(filterFactory.property(PARTNER_FIELD),filterFactory.literal(partner));
-				if(streetAggregation){
-					filter = filterFactory.and(
-							filter,
-							filterFactory.equals(filterFactory.property(ID_ORIGIN),filterFactory.literal(aggregationValue))
-							);
-				}
-				setInputFilter(filter);
-					//int arcs = getImportCount();
-				Long incidenti = (Long) getSumOnInput(inputField, new Long(0)).longValue();
-					if (incidenti != 0) {
-						Long lunghezzaTotale = (Long) getSumOnInput(LUNGHEZZA, new Long(0)).longValue();
-					DecIncManager decIncManager = new DecIncManager(inputField, kInc, lunghezzaTotale);
-
-						//
-						// Calculate elaborated incident
-						// In each iteration decrease the kInc and check if no negative values are computed
-						// 
-						//
-						decIncManager.computeNextIteration();
-						while(decIncManager.computeZeros()){
-							decIncManager.computeNextIteration();
-						}
-
-						//Update features
-						int count = 0;
-						FeatureStore<SimpleFeatureType, SimpleFeature> writer = geoObject.getWriter();
-						writer.setTransaction(transaction);
-						for(SimpleFeature inputFeature : decIncManager.getElabIncident().keySet()){
-							//updateImportProgress(total, errors - startErrors, "Update feature N. incidenti elaborati = " +  decIncManager.getElabIncident().get(inputFeature));
-						//LOGGER.debug("Update feature N. incidenti elaborati = " +  decIncManager.getElabIncident().get(inputFeature));
-						updateIncidentalita(outputField, writer,geoObject, inputFeature, decIncManager.getElabIncident().get(inputFeature));
-							if(count%50 == 0){
-								transaction.commit();
-							}
-							count++;
-						}
-						transaction.commit();
-							}
-				}
-				importFinished(total, errors - startErrors, "Accident data updated in " + geoName);
-			} catch (Exception e) {
-				LOGGER.error(e.getMessage(), e);
-				transaction.rollback();
-				errors++;
-			if(metadataHandler != null){
-				metadataHandler.logError(trace, errors, "Error importing data", getError(e), 0);
-			}
-				throw new IOException(e);
-			} finally {
-				if (process != -1 && closePhase != null) {
-					// close current process phase
-				if(metadataHandler != null){
-					metadataHandler.closeProcessPhase(process, closePhase);
-				}
-			}
-				closeInputReader();
-				
-				transaction.close();
-			}
-		}
+        private void iterativeProcess(String inputField, String outputField, Boolean streetAggregation,
+                int aggregationLevel, int startErrors, int errors, int trace, int process,
+                String closePhase) throws IOException {
+            Transaction transaction = new DefaultTransaction("ZeroRemoval");
+            try {
+                // setup geo input / output object
+                String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
+    
+                // setup input reader
+                createInputReader(dataStore, null, geoName);
+    
+                OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
+    
+                setInputFilter(filterFactory.equals(filterFactory.property(PARTNER_FIELD),
+                        filterFactory.literal(partner)));
+                int total = getImportCount();
+                // get unique aggregation values in order to identify the roads
+                Set<BigDecimal> aggregationValues = null;
+                if (streetAggregation) {
+                    aggregationValues = getAggregationBigValues(ID_ORIGIN);
+                } else {
+                    aggregationValues = new HashSet<BigDecimal>(Arrays.asList(new BigDecimal(-1)));
+                }
+    
+                for (BigDecimal aggregationValue : aggregationValues) {
+                    try {
+                        //
+                        // First of all filter all the arcs to a specified road and partner
+                        //
+                        Filter filter = filterFactory.equals(filterFactory.property(PARTNER_FIELD),
+                                filterFactory.literal(partner));
+                        if (streetAggregation) {
+                            filter = filterFactory.and(
+                                    filter,
+                                    filterFactory.equals(filterFactory.property(ID_ORIGIN),
+                                            filterFactory.literal(aggregationValue)));
+                        }
+                        setInputFilter(filter);
+                        // int arcs = getImportCount();
+                        Long incidenti = (Long) getSumOnInput(inputField, new Long(0)).longValue();
+                        if (incidenti != 0) {
+                            Long lunghezzaTotale = (Long) getSumOnInput(LUNGHEZZA, new Long(0)).longValue();
+                            DecIncManager decIncManager = new DecIncManager(inputField, kInc,
+                                    lunghezzaTotale);
+        
+                            //
+                            // Calculate elaborated incident
+                            // In each iteration decrease the kInc and check if no negative values are computed
+                            //
+                            //
+                            decIncManager.computeNextIteration();
+                            while (decIncManager.computeZeros()) {                                
+                                decIncManager.computeNextIteration();                                
+                            }
+        
+                            // Update features
+                            int count = 0;
+                            FeatureStore<SimpleFeatureType, SimpleFeature> writer = geoObject.getWriter();
+                            writer.setTransaction(transaction);
+                            for (SimpleFeature inputFeature : decIncManager.getElabIncident().keySet()) {
+                                // updateImportProgress(total, errors - startErrors, "Update feature N. incidenti elaborati = " +
+                                // decIncManager.getElabIncident().get(inputFeature));
+                                // LOGGER.debug("Update feature N. incidenti elaborati = " + decIncManager.getElabIncident().get(inputFeature));
+                                updateIncidentalita(outputField, writer, geoObject, inputFeature,
+                                        decIncManager.getElabIncident().get(inputFeature));
+                                if (count % 50 == 0) {
+                                    transaction.commit();
+                                }
+                                count++;
+                            }
+                            transaction.commit();
+                        }
+                    } catch (IllegalArgumentException e) {
+                        LOGGER.error(e.getMessage(), e);
+                        errors++;
+                        if (metadataHandler != null) {
+                            metadataHandler.logError(trace, errors, "Error importing data",
+                                    getError(e), 0);
+                        }
+                    }
+                }
+                importFinished(total, errors - startErrors, "Accident data updated in " + geoName);
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+                transaction.rollback();
+                errors++;
+                if (metadataHandler != null) {
+                    metadataHandler.logError(trace, errors, "Error importing data", getError(e), 0);
+                }
+                throw new IOException(e);
+            } finally {
+                if (process != -1 && closePhase != null) {
+                    // close current process phase
+                    if (metadataHandler != null) {
+                        metadataHandler.closeProcessPhase(process, closePhase);
+                    }
+                }
+                closeInputReader();
+    
+                transaction.close();
+            }
+        }
 
 	/**
 	 * @param writer 
@@ -393,10 +407,10 @@ public class ZeroRemovalComputation extends InputObject {
 			return noValidValueFound;
 		}
 
-		public void computeNextIteration() throws Exception{
+		public void computeNextIteration() throws IllegalArgumentException{
 			this.kInc = this.kInc - KINCR_DECR_STEP;
 			if(this.kInc <= 0){
-				throw new Exception("No valid kInc found!");
+				throw new IllegalArgumentException("No valid kInc found!");
 			}
 			Double weightedSum = 0.0;
 			int n = 0;
