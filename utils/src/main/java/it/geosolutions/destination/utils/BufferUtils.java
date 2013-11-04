@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.feature.AttributeTypeBuilder;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.feature.type.GeometryTypeImpl;
@@ -44,16 +45,20 @@ public class BufferUtils {
         List<String> distanceName;
         // input feature collection on which to calculate the N buffers        
         SimpleFeatureCollection inputFeatureCollection;
+        // name of the output featuretype
+        String outputName;
         
         boolean split = false;
                 
 
         public BufferedFeatureCollection(SimpleFeatureCollection delegate,
-                List<Double> distance, List<String> distanceName, boolean split) {
+                List<Double> distance, List<String> distanceName, boolean split,
+                String outputName) {
             this.distance = distance;
             this.distanceName = distanceName;
             this.inputFeatureCollection = delegate;            
             this.split = split;
+            this.outputName = outputName;
         }
 
         @Override
@@ -146,7 +151,7 @@ public class BufferUtils {
             // copies cfg from original feature (description, crs, name)
             tb.setDescription(inputFeatureCollection.getSchema().getDescription());
             tb.setCRS(inputFeatureCollection.getSchema().getCoordinateReferenceSystem());
-            tb.setName(inputFeatureCollection.getSchema().getName());
+            tb.setName(outputName == null ? inputFeatureCollection.getSchema().getName() : new NameImpl(outputName));
             return tb.buildFeatureType();
         }
         
@@ -367,7 +372,33 @@ public class BufferUtils {
             ) {
     	
         
-        return new BufferedFeatureCollection(features, Arrays.asList(distances), Arrays.asList(distanceNames), split);
+		return createMultipleBuffer(features,
+				distances, distanceNames, split, null);
+    } 
+    
+    /**
+     * Creates a set of buffers, aggregating the input features geometries and
+     * generating a buffer for any given distance value.
+     * 
+     * @param features
+     * @param distance
+     * @param distanceName
+     * @param distances
+     * @param distanceNames
+     * @param split
+     * @return
+     */
+    public static SimpleFeatureCollection createMultipleBuffer(
+            SimpleFeatureCollection features,            
+            Double[] distances,
+            String[] distanceNames,
+            boolean split,
+            String outputName
+            ) {
+    	
+        
+		return new BufferedFeatureCollection(features,
+				Arrays.asList(distances), Arrays.asList(distanceNames), split, outputName);
     } 
     
     /**
