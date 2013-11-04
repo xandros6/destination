@@ -45,7 +45,8 @@ public class MultipleBuffer implements GSProcess {
             @DescribeParameter(name = "distanceName", description = "Names of the output attributes for distance", min=0, max=1) String distanceName,
             @DescribeParameter(name = "distances", description = "Array of fixed values to use for the buffer distances", min=0) Double[] distances,
             @DescribeParameter(name = "distanceNames", description = "Names of the output attributes for distance", min=0) String[] distanceNames,
-            @DescribeParameter(name = "split", description = "Split each distance on a different feature", min=0, max=1) Boolean split) {
+            @DescribeParameter(name = "split", description = "Split each distance on a different feature", min=0, max=1) Boolean split,
+            @DescribeParameter(name = "outputName", description = "Optional output feature name", min=0, max=1) String outputName) {
     
     	if(split == null) {
     		split = false;
@@ -74,7 +75,10 @@ public class MultipleBuffer implements GSProcess {
                 bufferDistanceNames.add(distName);
             }
         }
-        return BufferUtils.createMultipleBuffer(features, bufferDistances.toArray(new Double[bufferDistances.size()]), bufferDistanceNames.toArray(new String[bufferDistanceNames.size()]), split.booleanValue());
+		return BufferUtils.createMultipleBuffer(features, bufferDistances
+				.toArray(new Double[bufferDistances.size()]),
+				bufferDistanceNames.toArray(new String[bufferDistanceNames
+						.size()]), split.booleanValue(), outputName);
         
     }
     
