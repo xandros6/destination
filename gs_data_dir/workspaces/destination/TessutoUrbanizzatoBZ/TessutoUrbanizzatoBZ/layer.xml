@@ -1,0 +1,16 @@
+<layer>
+  <name>TessutoUrbanizzatoBZ</name>
+  <id>LayerInfoImpl-6e8402e1:1415400ecea:-7ffe</id>
+  <type>WMS</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--570ae188:124761b8d78:-7fe2</id>
+  </defaultStyle>
+  <resource class="wmsLayer">
+    <id>WMSLayerInfoImpl-6e8402e1:1415400ecea:-7fff</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

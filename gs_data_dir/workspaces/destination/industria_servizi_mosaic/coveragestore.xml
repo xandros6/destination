@@ -1,0 +1,12 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl--38c05adb:1419c644a17:-1ad1</id>
+  <name>industria_servizi_mosaic</name>
+  <description>industria_servizi_mosaic</description>
+  <type>ImageMosaic</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:coverages/destination/industria_servizi</url>
+</coverageStore>

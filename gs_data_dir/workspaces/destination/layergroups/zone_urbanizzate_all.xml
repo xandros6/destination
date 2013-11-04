@@ -1,0 +1,69 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--529052f4:13d68495ec4:20f4</id>
+  <name>zone_urbanizzate_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--529052f4:13d68495ec4:20f2</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c644a17:-1216</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdfda991:6532</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--529052f4:13d68495ec4:20f3</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>304058.459597819</minx>
+    <maxx>779889.542551422</maxx>
+    <miny>4874115.162814349</miny>
+    <maxy>5225270.653454575</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">zone_urbanizzate_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Urbanized Zones</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Zone Urbanizzate</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>zones urbanisées</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Urbanisierte Gebiete</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

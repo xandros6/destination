@@ -1,0 +1,16 @@
+<layer>
+  <name>aree_agricole</name>
+  <id>LayerInfoImpl-4172e293:13d127ce697:-7fd7</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--67fd9ceb:13ccdbc5905:-6a55</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-4172e293:13d127ce697:-7fd8</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

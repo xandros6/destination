@@ -1,0 +1,69 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--529052f4:13d68495ec4:72bf</id>
+  <name>aree_boscate_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--529052f4:13d68495ec4:72bd</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c0eb046:-1ace</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdbc5905:-1609</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--529052f4:13d68495ec4:72be</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>304030.79077602865</minx>
+    <maxx>780846.3503834188</maxx>
+    <miny>4874078.518553133</miny>
+    <maxy>5226149.743430488</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">aree_boscate_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Forest Area</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Aree Boscate</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>zones boisées</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Waldflächen</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

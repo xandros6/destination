@@ -1,0 +1,6 @@
+<org.geoserver.security.config.J2eeAuthenticationFilterConfig>
+  <id>-53cef134:13d12582f36:-7fff</id>
+  <name>j2ee</name>
+  <className>org.geoserver.security.filter.GeoServerJ2eeAuthenticationFilter</className>
+  <roleServiceName>default</roleServiceName>
+</org.geoserver.security.config.J2eeAuthenticationFilterConfig>

@@ -1,0 +1,16 @@
+<layer>
+  <name>rischio_totale_2</name>
+  <id>LayerInfoImpl-60c7ceb8:13dd951fd01:-3cad</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-60c7ceb8:13dd951fd01:-7ffb</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-60c7ceb8:13dd951fd01:-3cae</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

@@ -1,0 +1,16 @@
+<layer>
+  <name>rischio_totale_sociale_3</name>
+  <id>LayerInfoImpl--4f14958d:13d25a1357d:-7ffe</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-60c7ceb8:13dd951fd01:1263</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--4f14958d:13d25a1357d:-7fff</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

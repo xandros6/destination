@@ -1,0 +1,78 @@
+<featureType>
+  <id>FeatureTypeInfoImpl--1c96668f:13f3239832a:-3417</id>
+  <name>formule</name>
+  <nativeName>formule</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
+  </namespace>
+  <title>formule</title>
+  <keywords>
+    <string>formule</string>
+    <string>features</string>
+  </keywords>
+  <srs>EPSG:32632</srs>
+  <nativeBoundingBox>
+    <minx>-1.0</minx>
+    <maxx>0.0</maxx>
+    <miny>-1.0</miny>
+    <maxy>0.0</maxy>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>4.511247156296258</minx>
+    <maxx>4.51125611529294</maxx>
+    <miny>-9.0193758094E-6</miny>
+    <maxy>0.0</maxy>
+    <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
+  DATUM[&quot;WGS84&quot;, &#xd;
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
+  PRIMEM[&quot;Greenwich&quot;, 0.0], &#xd;
+  UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+  AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <advertised>true</advertised>
+  <metadata>
+    <entry key="cachingEnabled">false</entry>
+    <entry key="JDBC_VIRTUAL_TABLE">
+      <virtualTable>
+        <name>formule</name>
+        <sql>SELECT&#xd;
+    siig_mtd_t_formula.id_formula,&#xd;
+    siig_mtd_r_formula_elab.id_elaborazione,&#xd;
+    siig_mtd_t_formula.flg_visibile,&#xd;
+    siig_mtd_t_formula.descrizione_it,&#xd;
+    siig_mtd_t_formula.descrizione_en,&#xd;
+    siig_mtd_t_formula.descrizione_de,&#xd;
+    siig_mtd_t_formula.descrizione_fr,&#xd;
+    siig_mtd_t_formula.udm_it,&#xd;
+    siig_mtd_t_formula.udm_en,&#xd;
+    siig_mtd_t_formula.udm_de,&#xd;
+    siig_mtd_t_formula.udm_fr,&#xd;
+    siig_mtd_t_formula.ordine_visibilita,&#xd;
+    siig_mtd_t_formula.tema_low,&#xd;
+    siig_mtd_t_formula.tema_medium,&#xd;
+    siig_mtd_t_formula.tema_max,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=1),0) as ambito_territoriale,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=2),0) as condizioni_temporali,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=3),0) as condizioni_meteo,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=4),0) as bersagli_tutti,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=5),0) as bersagli_umani,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=6),0) as bersagli_ambientali,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=7),0) as sostanze,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=8),0) as incidenti,&#xd;
+    coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=9),0) as gravita&#xd;
+FROM&#xd;
+    siig_mtd_t_formula&#xd;
+INNER JOIN siig_mtd_r_formula_elab on siig_mtd_r_formula_elab.id_formula=siig_mtd_t_formula.id_formula</sql>
+        <keyColumn>id_elaborazione</keyColumn>
+      </virtualTable>
+    </entry>
+  </metadata>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl--3970ff67:13c00cf828a:-7fef</id>
+  </store>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+</featureType>

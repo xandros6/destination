@@ -1,0 +1,16 @@
+<layer>
+  <name>industria_servizi_box</name>
+  <id>LayerInfoImpl-45506254:1404e484273:-3901</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-7fff</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-45506254:1404e484273:-3902</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

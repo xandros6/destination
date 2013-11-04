@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-24346e05:13d5e1f949a:3c51</id>
+  <name>centri_commerciali_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl-24346e05:13d5e1f949a:-3c3e</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-494d950f:13ed56219f2:-7ff7</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c0eb046:5789</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-2974</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-26788935:1410d647fae:585a</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d5e1f949a:3c50</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>-0.9998881856445223</minx>
+    <maxx>699820.7583121989</maxx>
+    <miny>-1.0000000123524828</miny>
+    <maxy>5211953.206845455</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">centri_commerciali_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Supermarket Customers and Employees</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Addetti/utenti centri commerciali</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>clients et employés des Supermarché</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Einkaufszentren und Großmärkte</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

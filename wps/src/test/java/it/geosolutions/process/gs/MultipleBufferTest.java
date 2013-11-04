@@ -56,7 +56,7 @@ public class MultipleBufferTest extends TestCase {
         }
         Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
         MultipleBuffer process = new MultipleBuffer();
-        SimpleFeatureCollection output = process.execute(features, null, null, distance, new String[] {"distance1", "distance2", "distance3", "distance4"});
+        SimpleFeatureCollection output = process.execute(features, null, null, distance, new String[] {"distance1", "distance2", "distance3", "distance4"}, null);
         assertEquals(1, output.size());
 
         SimpleFeatureIterator iterator = output.features();
@@ -96,7 +96,7 @@ public class MultipleBufferTest extends TestCase {
         }
         Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
         MultipleBuffer process = new MultipleBuffer();
-        SimpleFeatureCollection output = process.execute(features, null, null, distance, new String[] {"distance1", "distance2", "distance3", "distance4"});
+        SimpleFeatureCollection output = process.execute(features, null, null, distance, new String[] {"distance1", "distance2", "distance3", "distance4"}, null);
         assertEquals(1, output.size());
                 
         SimpleFeatureIterator iterator = output.features();
@@ -111,6 +111,46 @@ public class MultipleBufferTest extends TestCase {
         
         assertEquals(new ReferencedEnvelope(-500, 507, -500, 507, null), output.getBounds());
         assertEquals(1, output.size());
+    }
+    
+    public void testSplitLineString() throws Exception {
+        SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
+        tb.setName("featureType");
+        tb.add("geometry", Geometry.class);
+        tb.add("integer", Integer.class);
+
+        GeometryFactory gf = new GeometryFactory();
+        SimpleFeatureBuilder b = new SimpleFeatureBuilder(tb.buildFeatureType());
+
+        DefaultFeatureCollection features = new DefaultFeatureCollection(null, b.getFeatureType());
+        for (int numFeatures = 0; numFeatures < 5; numFeatures++) {
+            Coordinate array[] = new Coordinate[4];
+            int j = 0;
+            for (int i = 0 + numFeatures; i < 4 + numFeatures; i++) {
+                array[j] = new Coordinate(i, i);
+                j++;
+            }
+            b.add(gf.createLineString(array));
+            b.add(0);
+            features.add(b.buildFeature(numFeatures + ""));
+        }
+        Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
+        MultipleBuffer process = new MultipleBuffer();
+        String[] distanceNames = new String[] {"distance1", "distance2", "distance3", "distance4"};
+		SimpleFeatureCollection output = process.execute(features, null, null, distance, distanceNames, true);
+        assertEquals(4, output.size());
+                
+        SimpleFeatureIterator iterator = output.features();
+        for (int numFeatures = 0; numFeatures < 4; numFeatures++) {          	
+            SimpleFeature sf = iterator.next();
+            assertNotNull(sf);            
+            assertNotNull(sf.getDefaultGeometry());
+            assertNotNull(sf.getAttribute("geometry"));                        
+            assertEquals(distance[numFeatures], sf.getAttribute("distance"));
+            assertEquals(distanceNames[numFeatures], sf.getAttribute("description"));
+        }
+        
+        
     }
 
     public void testExecutePolygon() throws Exception {
@@ -138,7 +178,7 @@ public class MultipleBufferTest extends TestCase {
         }
         Double[] distance = new Double[] {200.0,300.0,400.0,500.0};
         MultipleBuffer process = new MultipleBuffer();
-        SimpleFeatureCollection output = process.execute(features, null, null, distance, new String[] {"distance1", "distance2", "distance3", "distance4"});
+        SimpleFeatureCollection output = process.execute(features, null, null, distance, new String[] {"distance1", "distance2", "distance3", "distance4"}, null);
         assertEquals(1, output.size());
         
         SimpleFeatureIterator iterator = output.features();
@@ -172,7 +212,7 @@ public class MultipleBufferTest extends TestCase {
         }
         
         MultipleBuffer process = new MultipleBuffer();
-        SimpleFeatureCollection output = process.execute(features, 500.0, "distance1", null, null);
+        SimpleFeatureCollection output = process.execute(features, 500.0, "distance1", null, null, null);
         assertEquals(1, output.size());
 
         SimpleFeatureIterator iterator = output.features();

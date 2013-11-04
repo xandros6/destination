@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-24346e05:13d598ba09f:-1d34</id>
+  <name>popolazione_residente_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl-24346e05:13d598ba09f:-1228</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c644a17:-122c</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-26788935:1410d939bed:4cc2</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdfda991:7dca</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-1d46</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-26788935:1410d6d8049:2ad0</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>302700.38868132315</minx>
+    <maxx>777368.6660605401</maxx>
+    <miny>4874090.208134564</miny>
+    <maxy>5224728.616434834</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">popolazione_residente_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Resident population</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Popolazione Residente</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>population résidente</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Wohnbevölkerung</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

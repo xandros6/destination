@@ -1,0 +1,33 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-26788935:1410d939bed:-1e0</id>
+  <name>beni_culturali</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--7e711dd1:13d160851b0:-7fed</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-26788935:1410d939bed:-1e1</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdfda991:70dd</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-26788935:1410d647fae:5408</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>-1.0</minx>
+    <maxx>444331.937650249</maxx>
+    <miny>-1.0</miny>
+    <maxy>4961887.00008071</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">beni_culturali</entry>
+  </metadata>
+</layerGroup>

@@ -43,8 +43,8 @@ public class FormulaUtils {
 	/** humanTargetsList */
 	public static final String humanTargetsList = "1,2,4,5,6,7";
 	
-	private static Pattern searchTargetConditional = Pattern.compile("#(.*?)#\\*%bersaglio\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
-	private static Pattern searchProcessingConditional = Pattern.compile("#(.*?)#\\*%elaborazione\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
+	private static Pattern searchTargetConditional = Pattern.compile("#([^#]*?)#\\*%bersaglio\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
+	private static Pattern searchProcessingConditional = Pattern.compile("#([^#]*?)#\\*%elaborazione\\(([0-9]+)\\)%", Pattern.CASE_INSENSITIVE);
 	
 	private static NumberFormat doubleFormat = NumberFormat.getInstance(Locale.ENGLISH);
 	static {

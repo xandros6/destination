@@ -1,0 +1,13 @@
+<layer>
+  <name>siig_mtd_t_formula</name>
+  <id>LayerInfoImpl--e9f7bc:13eac59f94f:-589d</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--e9f7bc:13eac59f94f:-589e</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

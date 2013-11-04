@@ -1,0 +1,96 @@
+<featureType>
+  <id>FeatureTypeInfoImpl--352290a0:13ff6effdfe:-6c33</id>
+  <name>grafo_simulazione</name>
+  <nativeName>grafo_simulazione</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
+  </namespace>
+  <title>grafo_simulazione</title>
+  <keywords>
+    <string>features</string>
+    <string>grafo_simulazione</string>
+  </keywords>
+  <nativeCRS class="projected">PROJCS[&quot;WGS 84 / UTM zone 32N&quot;, &#xd;
+  GEOGCS[&quot;WGS 84&quot;, &#xd;
+    DATUM[&quot;World Geodetic System 1984&quot;, &#xd;
+      SPHEROID[&quot;WGS 84&quot;, 6378137.0, 298.257223563, AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]], &#xd;
+      AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]], &#xd;
+    PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], &#xd;
+    UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+    AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+    AXIS[&quot;Geodetic latitude&quot;, NORTH], &#xd;
+    AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]], &#xd;
+  PROJECTION[&quot;Transverse_Mercator&quot;, AUTHORITY[&quot;EPSG&quot;,&quot;9807&quot;]], &#xd;
+  PARAMETER[&quot;central_meridian&quot;, 9.0], &#xd;
+  PARAMETER[&quot;latitude_of_origin&quot;, 0.0], &#xd;
+  PARAMETER[&quot;scale_factor&quot;, 0.9996], &#xd;
+  PARAMETER[&quot;false_easting&quot;, 500000.0], &#xd;
+  PARAMETER[&quot;false_northing&quot;, 0.0], &#xd;
+  UNIT[&quot;m&quot;, 1.0], &#xd;
+  AXIS[&quot;Easting&quot;, EAST], &#xd;
+  AXIS[&quot;Northing&quot;, NORTH], &#xd;
+  AUTHORITY[&quot;EPSG&quot;,&quot;32632&quot;]]</nativeCRS>
+  <srs>EPSG:32632</srs>
+  <nativeBoundingBox>
+    <minx>438784.8459</minx>
+    <maxx>445126.6242</maxx>
+    <miny>4953650.8404</miny>
+    <maxy>4961924.4325</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>8.225888560641108</minx>
+    <maxx>8.306970143264989</maxx>
+    <miny>44.73362454130094</miny>
+    <maxy>44.808614433041136</maxy>
+    <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
+  DATUM[&quot;WGS84&quot;, &#xd;
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
+  PRIMEM[&quot;Greenwich&quot;, 0.0], &#xd;
+  UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+  AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <advertised>true</advertised>
+  <metadata>
+    <entry key="cachingEnabled">false</entry>
+    <entry key="JDBC_VIRTUAL_TABLE">
+      <virtualTable>
+        <name>grafo_simulazione</name>
+        <sql>SELECT arco.id_geo_arco,arco.nr_incidenti_elab/arco.lunghezza*1000 as Pis,arco.geometria,bersagli,bersagli_desc,Cff,sostanze,sostanze_desc,Padr from&#xd;
+siig_geo_ln_arco_1 arco inner join &#xd;
+(SELECT siig_geo_ln_arco_1.id_geo_arco,z_cat(siig_t_bersaglio.id_bersaglio)::varchar(255) as bersagli,z_cat(descrizione_it)::varchar(512) as bersagli_desc, z_cat(cff)::varchar(255) as Cff&#xd;
+from siig_geo_ln_arco_1 &#xd;
+inner join siig_r_arco_1_scen_tipobers on siig_geo_ln_arco_1.id_geo_arco = siig_r_arco_1_scen_tipobers.id_geo_arco&#xd;
+inner join siig_t_bersaglio on siig_r_arco_1_scen_tipobers.id_bersaglio = siig_t_bersaglio.id_bersaglio&#xd;
+where siig_geo_ln_arco_1.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632)&#xd;
+group by siig_geo_ln_arco_1.id_geo_arco) as cfftable on arco.id_geo_arco=cfftable.id_geo_arco&#xd;
+inner join&#xd;
+(SELECT siig_geo_ln_arco_1.id_geo_arco,z_cat(siig_t_sostanza.id_sostanza)::varchar(255) as sostanze,z_cat(siig_t_sostanza.nome_sostanza_it)::varchar(255) as sostanze_desc, z_cat(padr)::varchar(255) as Padr&#xd;
+from siig_geo_ln_arco_1 &#xd;
+inner join siig_r_arco_1_sostanza on siig_geo_ln_arco_1.id_geo_arco = siig_r_arco_1_sostanza.id_geo_arco&#xd;
+inner join siig_t_sostanza on siig_r_arco_1_sostanza.id_sostanza = siig_t_sostanza.id_sostanza&#xd;
+where siig_geo_ln_arco_1.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632)&#xd;
+group by siig_geo_ln_arco_1.id_geo_arco) as padrtable  on arco.id_geo_arco=padrtable.id_geo_arco&#xd;
+where arco.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632)</sql>
+        <geometry>
+          <name>geometria</name>
+          <type>MultiLineString</type>
+          <srid>32632</srid>
+        </geometry>
+        <parameter>
+          <name>bounds</name>
+          <defaultValue>438859.3438263,4953719.9308777,445056.32630922,4961834.6496277</defaultValue>
+          <regexpValidator>^[\w\d\s,\.\-]+$</regexpValidator>
+        </parameter>
+      </virtualTable>
+    </entry>
+  </metadata>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl--3970ff67:13c00cf828a:-7fef</id>
+  </store>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+</featureType>

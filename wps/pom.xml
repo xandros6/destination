@@ -23,7 +23,7 @@
   <!-- =========================================================== -->
   <!--     Module Description                                      -->
   <!-- =========================================================== -->
-    <groupId>it.geosololutions</groupId>
+    <groupId>it.geosolutions</groupId>
     <artifactId>gt-process-destination</artifactId>
     <packaging>jar</packaging>
     <name>Destination Project Processes</name>
@@ -66,7 +66,7 @@
   <!-- =========================================================== -->
     <dependencies>
         <dependency>
-            <groupId>it.geosololutions</groupId>
+            <groupId>it.geosolutions.destination</groupId>
             <artifactId>destination-utils</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
@@ -81,11 +81,23 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-process-raster</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.geoserver</groupId>
             <artifactId>main</artifactId>
             <version>${gs.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.geoserver</groupId>
+            <artifactId>wfs</artifactId>
+            <version>${gs.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.geotools</groupId>

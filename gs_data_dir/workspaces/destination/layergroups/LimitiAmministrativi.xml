@@ -1,0 +1,77 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--e78c94c:13cb5732574:-7fe9</id>
+  <name>LimitiAmministrativi</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-7ff0</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--3508b0d7:13caa127a3e:-7ffe</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-7fee</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-7fec</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--e78c94c:13cb5732574:-7fea</id>
+    </layer>
+  </layers>
+  <styles>
+    <style/>
+    <style/>
+    <style/>
+    <style/>
+    <style/>
+  </styles>
+  <bounds>
+    <minx>6.569902890160738</minx>
+    <maxx>47.1276613649156</maxx>
+    <miny>10.370422925609953</miny>
+    <maxy>46.64189990138341</maxy>
+    <crs>EPSG:4326</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">LimitiAmministrativi</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Administrative Limits</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Limiti Amministrativi</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>limites administratives</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Verwaltungsgrenzen</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

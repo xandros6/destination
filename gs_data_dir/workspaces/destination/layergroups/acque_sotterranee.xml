@@ -1,0 +1,33 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-26788935:1410d6d8049:48f6</id>
+  <name>acque_sotterranee</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--7e711dd1:13d160851b0:-7ff6</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-26788935:1410d6d8049:48f5</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdbc5905:-47e4</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-59794cd3:1410ce31575:-68be</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>440029.597372331</minx>
+    <maxx>444042.377027668</maxx>
+    <miny>4953811.55737735</miny>
+    <maxy>4962018.5044</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">acque_sotterranee</entry>
+  </metadata>
+</layerGroup>

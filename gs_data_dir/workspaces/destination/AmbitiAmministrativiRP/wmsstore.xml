@@ -1,0 +1,17 @@
+<wmsStore>
+  <id>WMSStoreInfoImpl-4c436e57:13c913c461f:-5df6</id>
+  <name>AmbitiAmministrativiRP</name>
+  <type>WMS</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <metadata>
+    <entry key="useConnectionPooling">true</entry>
+  </metadata>
+  <__default>false</__default>
+  <capabilitiesURL>http://geoeng-pta.regione.piemonte.it/ws/pta/PIE_WMS01_AmbitiAmministrativi?service=WMS&amp;version=1.3.0&amp;request=GetCapabilities</capabilitiesURL>
+  <maxConnections>6</maxConnections>
+  <readTimeout>60</readTimeout>
+  <connectTimeout>30</connectTimeout>
+</wmsStore>

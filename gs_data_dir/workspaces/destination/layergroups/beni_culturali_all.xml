@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--529052f4:13d68619d83:-502a</id>
+  <name>beni_culturali_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--529052f4:13d68619d83:-502c</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-494d950f:13ed56219f2:-7ff5</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c644a17:-40f1</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdfda991:70dd</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-26788935:1410d647fae:5408</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--529052f4:13d68619d83:-502b</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>304033.6703101794</minx>
+    <maxx>777168.7963762847</maxx>
+    <miny>4874224.773180349</miny>
+    <maxy>5226031.678804525</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">beni_culturali_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>cultural heritage</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Beni Culturali</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>patrimoine culturel</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Kulturerbe</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-24346e05:13d598ba09f:-3e9b</id>
+  <name>acque_sotterranee_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--30e2edf6:13db00e44fe:-6a7a</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-24346e05:13d598ba09f:1915</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--37adeb98:1416e038f2f:-7ffa</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl--67fd9ceb:13ccdbc5905:-47e4</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-59794cd3:1410ce31575:-68be</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-3e9c</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>303050.0981251121</minx>
+    <maxx>777392.0052379051</maxx>
+    <miny>4874179.923634064</miny>
+    <maxy>5226046.894287371</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">acque_sotterranee_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>ground Water</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Acque Sotterranee</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>eaux souterraines</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Tiefbrunnen</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

@@ -1,0 +1,75 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--529052f4:13d68495ec4:700</id>
+  <name>strutture_scolastiche_all</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--529052f4:13d68495ec4:6fe</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-494d950f:13ed56219f2:-7ff9</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--38c05adb:1419c644a17:-121c</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-50bf8b26:13cce86fb2a:-186</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-26788935:1410d647fae:5265</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl--529052f4:13d68495ec4:6ff</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>309342.4972615022</minx>
+    <maxx>771013.9124458438</maxx>
+    <miny>4883329.050908216</miny>
+    <maxy>5219593.798321036</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">strutture_scolastiche_all</entry>
+  </metadata>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Scolastic Structures Employees and Users</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Addetti/utenti Strutture Scolastiche</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>employés et utilisateurs des écoles</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Schulen und Kindergärten</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

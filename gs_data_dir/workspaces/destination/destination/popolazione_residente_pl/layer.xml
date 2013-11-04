@@ -1,0 +1,16 @@
+<layer>
+  <name>popolazione_residente_pl</name>
+  <id>LayerInfoImpl--10a99c92:13d173f8f0a:-7ffc</id>
+  <type>VECTOR</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--67fd9ceb:13ccdfda991:7dca</id>
+  </defaultStyle>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--10a99c92:13d173f8f0a:-7ffd</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

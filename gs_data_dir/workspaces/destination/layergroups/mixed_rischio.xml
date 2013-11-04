@@ -1,0 +1,72 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl--3705ef22:13ef4b731ce:-7dbc</id>
+  <name>mixed_rischio</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl--1bf56c14:13eefa54d37:-7ef9</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--1bf56c14:13eefa54d37:-7ef4</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl--1bf56c14:13eefa54d37:-7eef</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-72bb612b:13ef4d86d02:-7e07</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-40220030:13ef4fa591e:-7cc6</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-40220030:13ef4fa591e:-7808</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>317643.0</minx>
+    <maxx>517643.0</maxx>
+    <miny>4881313.0</miny>
+    <maxy>5141313.0</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <authorityURLs>
+    <AuthorityURL>
+      <name>en</name>
+      <href>http://destination.geo-solutions.it/en</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>it</name>
+      <href>http://destination.geo-solutions.it/it</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>fr</name>
+      <href>http://destination.geo-solutions.it/fr</href>
+    </AuthorityURL>
+    <AuthorityURL>
+      <name>de</name>
+      <href>http://destination.geo-solutions.it/de</href>
+    </AuthorityURL>
+  </authorityURLs>
+  <identifiers>
+    <Identifier>
+      <authority>en</authority>
+      <identifier>Total Risk</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>it</authority>
+      <identifier>Rischio Totale</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>fr</authority>
+      <identifier>risque total</identifier>
+    </Identifier>
+    <Identifier>
+      <authority>de</authority>
+      <identifier>Gesamtrisiko</identifier>
+    </Identifier>
+  </identifiers>
+</layerGroup>

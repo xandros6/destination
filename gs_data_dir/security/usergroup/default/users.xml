@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<userRegistry version="1.0" xmlns="http://www.geoserver.org/security/users">
+    <users>
+        <user enabled="true" name="admin" password="crypt1:Yso71v+O3wcHUYCZhkBaQyx468u3xHk0"/>
+        <user enabled="true" name="base" password="crypt1:Vb0Ep43ySe+BEK7vJd7ndg=="/>
+        <user enabled="true" name="destination" password="crypt1:5lyDxY0R5Ei+ghsVB5g5VL+L2RoDDrU4"/>
+        <user enabled="true" name="major" password="crypt1:pb6Dgq9Z33wJc9GxHGs8yw=="/>
+        <user enabled="true" name="super" password="crypt1:Q7drJOwTzb6ZMyfwWgstnw=="/>
+        <user enabled="true" name="test" password="crypt1:nnF06pQITxv9KtsMCn08Og=="/>
+    </users>
+    <groups/>
+</userRegistry>
