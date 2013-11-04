@@ -46,19 +46,33 @@ public class Formula {
 			
 	Pattern searchFormulas = Pattern.compile("%formula\\(([0-9]+)(,[^)]+)?\\)%(\\*%([a-zA-Z]+)\\(([0-9]+)\\)%)?", Pattern.CASE_INSENSITIVE);			
 
+	String description = "";
+	
 	/**
 	 * @param grid
 	 */
-	public Formula(String sql, boolean nogrid, boolean grid, boolean arcs, boolean targets) {
+	public Formula(String sql, String description, boolean nogrid, boolean grid, boolean arcs, boolean targets) {
 		super();
 		
 		this.sql = sql;
+		this.description = description;
 		this.grid = grid;
 		this.nogrid = nogrid;
 		this.arcs = arcs;
 		this.targets = targets;
 	}
 	
+	
+	
+	/**
+	 * @return the description
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+
+
 	public boolean hasGrid() {
 		return grid;
 	}
@@ -83,6 +97,10 @@ public class Formula {
 		return sql == null || sql.trim().equals("");
 	}
 	
+	public static Formula load(Connection conn, int processing, int formula, int target) throws SQLException {
+		return Formula.load(conn, processing, formula, target, "it");
+	}
+	
 	/**
 	 * Loads formula data from metadata tables.
 	 * 
@@ -91,12 +109,13 @@ public class Formula {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public static Formula load(Connection conn, int processing, int formula, int target) throws SQLException {
+	public static Formula load(Connection conn, int processing, int formula, int target, String language) throws SQLException {
 		String sql =  "select formula, flg_visibile, ";
 		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=1),0) as flg_i, ";
 		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=4),0) as flg_m_1, ";
 		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=5),0) as flg_m_2, ";
-		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=6),0) as flg_m_3 ";
+		   sql += " coalesce((select flg_obbligatorio+1 from siig_mtd_r_formula_criterio where id_formula=siig_mtd_t_formula.id_formula and id_criterio=6),0) as flg_m_3, ";
+		   sql += " descrizione_"+language+" as description ";
 	       sql += "from siig_mtd_t_formula ";	       
 	       sql += "where id_formula=?";
 		PreparedStatement stmt = null;
@@ -106,7 +125,7 @@ public class Formula {
 			stmt.setInt(1, formula);		
 			rs = stmt.executeQuery();			
 			if(rs.next()) {
-				return new Formula(rs.getString(1), rs.getInt(2) == 1 || rs.getInt(2) == 3, rs.getInt(2) == 2 || rs.getInt(2) == 3,
+				return new Formula(rs.getString(1), rs.getString(7), rs.getInt(2) == 1 || rs.getInt(2) == 3, rs.getInt(2) == 2 || rs.getInt(2) == 3,
 						rs.getInt(3) > 0, rs.getInt(4) > 0 || rs.getInt(5) > 0 || rs.getInt(6) > 0).parse(conn, target, processing);				
 			}
 			return null;
