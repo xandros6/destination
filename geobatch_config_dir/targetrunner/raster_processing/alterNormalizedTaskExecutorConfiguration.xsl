@@ -5,7 +5,7 @@
 		
 	<xsl:template match="GdalRasterize">
 		<xsl:value-of select="concat(
-		'_baseOutputPath_',substring(//shapefilename,1,2),'/',//shapefilename,'_normalized.shp',
+		//baseOutputPath,substring(//shapefilename,1,2),'/',//shapefilename,'_normalized.shp',
 		' ','-sql &quot;ALTER TABLE ')"/><xsl:value-of select='concat("",//shapefilename,"_normalized")' /><xsl:value-of select="concat('',' ADD COLUMN NORM float&quot;')" />
 	</xsl:template>
 

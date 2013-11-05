@@ -8,7 +8,7 @@
 	</xsl:template>
 	
 	<xsl:template match="baseOutputPath">
-		<xsl:value-of select="concat(' ','_baseOutputPath_',substring(//shapefilename,1,2),'/',//shapefilename,'.tif',' 2 4 8')" />
+		<xsl:value-of select="concat( .,substring(//shapefilename,1,2),'/',//shapefilename,'.tif',' 2 4 8')" />
 		<xsl:apply-templates select="@*|node()" />
 	</xsl:template>
 

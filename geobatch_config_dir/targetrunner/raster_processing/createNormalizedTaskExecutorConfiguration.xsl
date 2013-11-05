@@ -5,7 +5,7 @@
 		
 	<xsl:template match="GdalRasterize">
 		<xsl:value-of select="concat(
-		'_baseOutputPath_',substring(//shapefilename,1,2),'/',//shapefilename,'_normalized.shp',
+		//baseOutputPath,substring(//shapefilename,1,2),'/',//shapefilename,'_normalized.shp',
 		' ',//shapefilepath,//shapefilename,'.shp')" />
 	</xsl:template>
 

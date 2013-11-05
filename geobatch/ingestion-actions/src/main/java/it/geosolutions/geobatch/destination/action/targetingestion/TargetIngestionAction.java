@@ -122,6 +122,7 @@ public class TargetIngestionAction extends BaseAction<EventObject> {
         }
 
         JDBCDataStore dataStore = (JDBCDataStore) ds;
+        dataStore.setExposePrimaryKeyColumns(true);
         MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
 
         TargetIngestionProcess computation = new TargetIngestionProcess(

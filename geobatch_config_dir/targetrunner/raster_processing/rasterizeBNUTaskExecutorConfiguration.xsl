@@ -25,7 +25,7 @@
 	</xsl:template>
 	
 	<xsl:template match="baseOutputPath">
-		<xsl:value-of select="concat(' ','_baseOutputPath_',substring(//shapefilename,1,2),'/',//shapefilename,'.tif')" />
+		<xsl:value-of select="concat(' ', .,substring(//shapefilename,1,2),'/',//shapefilename,'.tif')" />
 		<xsl:apply-templates select="@*|node()" />
 	</xsl:template>
 
