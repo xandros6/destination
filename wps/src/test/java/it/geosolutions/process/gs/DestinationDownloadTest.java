@@ -38,6 +38,7 @@ import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.SchemaException;
 import org.geotools.jdbc.JDBCDataStore;
+import org.json.simple.parser.ParseException;
 import org.junit.After;
 import org.junit.Before;
 import org.opengis.feature.simple.SimpleFeature;
@@ -339,15 +340,15 @@ public class DestinationDownloadTest extends TestCase {
 		}
 	}
 	
-	public void testSimpleDownload() throws IOException, SQLException, SchemaException {
+	public void testSimpleDownload() throws IOException, SQLException, SchemaException, ParseException {
 		if(downloader != null && dataStoreName != null && dataStore != null) {
 		
 			
 			String fileName = downloader.execute(getSampleData(1, 1),
-					dataStoreName, null, null, null, STANDARD_PROCESSING, /* cff */
-					2, ALL_TARGETS, ALL_MATERIALS, ALL_SCENARIOS,
-					ALL_ENTITIES, ALL_SEVERENESS, FP_SCEN_CENTRALE, null,
-					null, null, null, null, "8,125,250,500,780", "Ambientale,Alta Letalita,Bassa Letalita,Lesioni irreversibili,Lesioni reversibili", null);
+					dataStoreName, null, null, null, 3, /* cff */
+					26, 98, ALL_MATERIALS, ALL_SCENARIOS,					
+					ALL_ENTITIES, ALL_SEVERENESS, FP_SCEN_CENTRALE,"-1,0,POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))_1,1000,POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))", "[{\"id\":0,\"type\":\"popolazione_residente_box\",\"geometry\":\"POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))\",\"value\":1000,\"newfeature\":true,\"removed\":false},{\"id\":249023,\"type\":\"popolazione_residente_box\",\"geometry\":\"POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))\",\"value\":1000,\"newfeature\":true,\"removed\":true},{\"id\":249023,\"type\":\"popolazione_residente_box\",\"geometry\":\"POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))\",\"value\":1000,\"newfeature\":false,\"removed\":false}]", null,
+					null, null, null, "8,125,250,500,780", "Ambientale,Alta Letalita,Bassa Letalita,Lesioni irreversibili,Lesioni reversibili", null, "it");
 				
 			assertNotNull(fileName);
 			
@@ -377,8 +378,8 @@ public class DestinationDownloadTest extends TestCase {
 		
 		SimpleFeature[] features = new SimpleFeature[numOfFeatures];
 		for(int count = 0; count < numOfFeatures; count++) {
-			int id = count+1;
-			features[count] = DataUtilities.createFeature(inputType, id + "=" + id + "|1|0.8|2|100|0|1|1|LINESTRING(1 2,3 4,5 6)|1|S|S");
+			int id = count+1;			
+			features[count] = DataUtilities.createFeature(inputType, id + "=" + id + "|1|0.8|2|100|0|1|1|LINESTRING(379750 4934450, 379800 4934450,  379800 4934400)|1|S|S");
 		}
 		return DataUtilities.collection(features);		
 	}

@@ -74,7 +74,8 @@ public class RiskCalculator extends RiskCalculatorBase {
 		super(catalog);		
 	}
 
-	public class TargetInfo {
+	public static class TargetInfo {
+		private int id;
 		private int type;
 		private Geometry geometry;
 		private double value;
@@ -94,6 +95,34 @@ public class RiskCalculator extends RiskCalculatorBase {
 				removed = true;
 			}
 		}
+		
+		public TargetInfo(int id, int type, Geometry geometry, double value) {
+			super();
+			this.id = id;
+			this.type = Math.abs(type);
+			this.geometry = geometry;
+			this.value = value;
+			if(type < 0) {
+				removed = true;
+			}
+		}
+		
+		/**
+		 * @return the id
+		 */
+		public int getId() {
+			return id;
+		}
+
+		/**
+		 * @param id the id to set
+		 */
+		public void setId(int id) {
+			this.id = id;
+		}
+
+
+
 		/**
 		 * @return the type
 		 */
@@ -126,6 +155,10 @@ public class RiskCalculator extends RiskCalculatorBase {
 		
 		public boolean isRemoved() {
 			return removed;
+		}
+		
+		public boolean isNew() {
+			return id == 0;
 		}
 	}
 	
@@ -380,7 +413,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 	 * @throws SQLException 
 	 * @throws IOException 
 	 */
-	private void loadSimulationTargets(
+	public static void loadSimulationTargets(
 			JDBCDataStore dataStore,
 			List<TargetInfo> valuesMap,
 			String valuesList) throws ParseException, IOException, SQLException {
