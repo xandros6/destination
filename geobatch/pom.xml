@@ -126,6 +126,11 @@
                 <artifactId>gb-action-ds2ds</artifactId>
                 <version>${gb.version}</version>
             </dependency>
+            <dependency>      
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-action-taskexecutor</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
             <!-- tools -->
             <dependency>
                 <groupId>it.geosolutions.geobatch</groupId>
