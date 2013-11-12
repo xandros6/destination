@@ -348,7 +348,7 @@ public class DestinationDownloadTest extends TestCase {
 					dataStoreName, null, null, null, 3, /* cff */
 					26, 98, ALL_MATERIALS, ALL_SCENARIOS,					
 					ALL_ENTITIES, ALL_SEVERENESS, FP_SCEN_CENTRALE,"-1,0,POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))_1,1000,POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))", "[{\"id\":0,\"type\":\"popolazione_residente_box\",\"geometry\":\"POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))\",\"value\":1000,\"newfeature\":true,\"removed\":false},{\"id\":249023,\"type\":\"popolazione_residente_box\",\"geometry\":\"POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))\",\"value\":1000,\"newfeature\":true,\"removed\":true},{\"id\":249023,\"type\":\"popolazione_residente_box\",\"geometry\":\"POLYGON((379700 4934400,379800 4934400, 379800 4934500, 379700 4934500,379700 4934400))\",\"value\":1000,\"newfeature\":false,\"removed\":false}]", null,
-					null, null, null, "8,125,250,500,780", "Ambientale,Alta Letalita,Bassa Letalita,Lesioni irreversibili,Lesioni reversibili", null, "it");
+					null, null, null, "8,125,250,500,780", "Ambientale,Alta Letalita,Bassa Letalita,Lesioni irreversibili,Lesioni reversibili", null, "it", false);
 				
 			assertNotNull(fileName);
 			
