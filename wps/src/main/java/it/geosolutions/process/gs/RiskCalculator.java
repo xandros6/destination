@@ -34,12 +34,16 @@ import java.util.logging.Logger;
 
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.DataStoreInfo;
+import org.geoserver.catalog.FeatureTypeInfo;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.store.EmptyFeatureCollection;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -51,6 +55,7 @@ import org.geotools.process.factory.DescribeResult;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.FilterFactory2;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiLineString;
@@ -67,6 +72,7 @@ import com.vividsolutions.jts.io.WKTReader;
 public class RiskCalculator extends RiskCalculatorBase {
 	private static final Logger LOGGER = Logging.getLogger(RiskCalculator.class);	
 	private static final WKTReader wktReader = new WKTReader();
+	private static final FilterFactory2 ff2 = CommonFactoryFinder.getFilterFactory2();
 	/**
 	 * @param catalog
 	 */
@@ -208,7 +214,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 		if(features == null) {
 			throw new ProcessException("Missing input feature");
 		}
-		
+		checkProcessingAllowed(dataStore, processing);
 		if(processing == 3) {
 			
 			List<String> pscs = new ArrayList<String>();
@@ -268,6 +274,23 @@ public class RiskCalculator extends RiskCalculatorBase {
 						
 		}
 		
+	}
+
+	/**
+	 * @param dataStore 
+	 * @throws IOException 
+	 * 
+	 */
+	private void checkProcessingAllowed(JDBCDataStore dataStore, int processing) throws IOException {
+		// access through catalog to let the security jump in
+		FeatureTypeInfo ft = catalog.getResourceByName("destination", "siig_mtd_d_elaborazione", FeatureTypeInfo.class);
+		FeatureSource source = ft.getFeatureSource(null, null); 
+		FeatureCollection fc = source.getFeatures(ff2.equals(ff2.property("id_elaborazione"), ff2.literal(processing)));
+		// check if the given processing is allowed (if not is filtered out from results
+		// so size should be 0)
+		if(fc.size() != 1) {
+			throw new ProcessException("Operation not allowed");
+		}
 	}
 
 	/**
