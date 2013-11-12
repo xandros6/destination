@@ -208,6 +208,27 @@
             <writeMode>PURGE_INSERT</writeMode>
             <closePhase>B</closePhase>
         </RiskConfiguration>
+        
+        <StreetUserConfiguration>
+            <id>streetuser_1</id>
+            <name>Street users computation level 1</name>
+            <description>Street users computation level 1</description>
+            <aggregationLevel>1</aggregationLevel>
+        </StreetUserConfiguration>
+        
+        <StreetUserConfiguration>
+            <id>streetuser_2</id>
+            <name>Street users computation level 2</name>
+            <description>Street users computation level 2</description>
+            <aggregationLevel>2</aggregationLevel>
+        </StreetUserConfiguration>
+
+        <StreetUserConfiguration>
+            <id>streetuser_3</id>
+            <name>Street users computation level 3</name>
+            <description>Street users computation level 3</description>
+            <aggregationLevel>3</aggregationLevel>
+        </StreetUserConfiguration>
 
     </EventConsumerConfiguration>
 

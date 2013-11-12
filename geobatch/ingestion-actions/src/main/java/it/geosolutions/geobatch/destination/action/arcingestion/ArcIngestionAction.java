@@ -122,6 +122,7 @@ public class ArcIngestionAction extends BaseAction<EventObject> {
         }
 
         JDBCDataStore dataStore = (JDBCDataStore) ds;
+        dataStore.setExposePrimaryKeyColumns(true);
         MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
 
         ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(
