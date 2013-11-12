@@ -383,15 +383,15 @@ public class StreetUserTest {
 		/*
 		 * CALCOLI X TEST ( 2 archi perpendicolari)
 		 * 
-		 * feature_1_2 (interessata) -> densit‡Leggeri=56  velocit‡MediaLeggeri=50, densit‡Pesanti=16 , velocit‡MediaPesanti=50, nCorsie=1
+		 * feature_1_2 (interessata) -> densit√†Leggeri=56  velocit√†MediaLeggeri=50, densit√†Pesanti=16 , velocit√†MediaPesanti=50, nCorsie=1
 		 * distanza = 50 -> Ls_1_2 = 100; Ls_1_3 = 100
 		 * scneario = 1 -> tempo di coda = 500
 		 * 
 		 * feature_1_2: 
-		 * nTerritoriali_1_2_leggeri = densit‡L * Ls_1_2 = 56 * 100 = 5600
-		 * nTerritoriali_1_2_pesanti = densit‡P * Ls_1_2 = 16 * 100 = 1600
-		 * nCoda_1_2_leggeri = densit‡L * Vl_1_2 * Tc = 56 * 50 * (500/3600) = 388.88
-		 * nCoda_1_2_pesanti = densit‡P * Vp_1_2 * Tc = 16 * 50 * (500/3600) = 111.11
+		 * nTerritoriali_1_2_leggeri = densit√†L * Ls_1_2 = 56 * 100 = 5600
+		 * nTerritoriali_1_2_pesanti = densit√†P * Ls_1_2 = 16 * 100 = 1600
+		 * nCoda_1_2_leggeri = densit√†L * Vl_1_2 * Tc = 56 * 50 * (500/3600) = 388.88
+		 * nCoda_1_2_pesanti = densit√†P * Vp_1_2 * Tc = 16 * 50 * (500/3600) = 111.11
 		 * nCoinvolti_1_2_leggeri = nTerritoriali_1_2_leggeri +  nCoda_1_2_leggeri = 5600 + 388.88 = 5988.88
 		 * nCoinvolti_1_2_pesanti = nTerritoriali_1_2_pesanti + + nCoda_1_2_pesanti = 1600 + 111.11 = 1711.11
 		 * storage = 150 * nCorsie * length = 150 * 1 * 100 = 15000
@@ -399,11 +399,11 @@ public class StreetUserTest {
 		 * storage/2 > nCoinvolti_1_2_pesanti -> nCoinvolti_1_2_pesanti = 1711.11
 		 * N_UTENTI_SEDE = nCoinvolti_1_2_leggeri * coeff_occupazione_l + nCoinvolti_1_2_pesanti * coeff_occupazione_p = 5988.88 * 1.5 + 1711.11 * 1.1 = 8983.32 + 1882.221 = 10865.541
 		 * 
-		 * feature_1_3 -> densit‡Leggeri=9  velocit‡MediaLeggeri=50, densit‡Pesanti=8 , velocit‡MediaPesanti=50, nCorsie=1
-		 * nTerritoriali_1_3_leggeri = densit‡L * Ls_1_3 = 9 * 100 = 900
-		 * nTerritoriali_1_3_pesanti = densit‡P * Ls_1_3 = 8 * 100 = 800
-		 * nTransito_1_3_leggeri = densit‡L * Ls_1_3 * Tc = 9 * 50 * (500/3600) = 62.50
-		 * nTransito_1_3_pesanti = densit‡P * Ls_1_3 * Tc = 8 * 50 * (500/3600) = 55.55
+		 * feature_1_3 -> densit√†Leggeri=9  velocit√†MediaLeggeri=50, densit√†Pesanti=8 , velocit√†MediaPesanti=50, nCorsie=1
+		 * nTerritoriali_1_3_leggeri = densit√†L * Ls_1_3 = 9 * 100 = 900
+		 * nTerritoriali_1_3_pesanti = densit√†P * Ls_1_3 = 8 * 100 = 800
+		 * nTransito_1_3_leggeri = densit√†L * Ls_1_3 * Tc = 9 * 50 * (500/3600) = 62.50
+		 * nTransito_1_3_pesanti = densit√†P * Ls_1_3 * Tc = 8 * 50 * (500/3600) = 55.55
 		 * nCoinvolti_1_3_leggeri = nTerritoriali_1_3_leggeri +  nTransito_1_3_leggeri = 962.50
 		 * nCoinvolti_1_3_pesanti = nTerritoriali_1_3_pesanti + nTransito_1_3_pesanti = 855.55
 		 * N_UTENTI_BERSAGLIO = nCoinvolti_1_3_leggeri * coeff_occupazione_l + nCoinvolti_1_3_pesanti * coeff_occupazione_p = 962.50 * 1.5 + 855.55 * 1.1 = 1443.75 + 941.105 = 2384.855
