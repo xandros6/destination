@@ -331,7 +331,8 @@ public class DestinationDownload extends RiskCalculatorBase {
 			@DescribeParameter(name = "distances", description = "list of distances for damage areas", min = 0) String distances,
 			@DescribeParameter(name = "distanceNames", description = "optional list of distance names for damage areas", min = 0) String distanceNames,
 			@DescribeParameter(name = "damageArea", description = "optional field containing damage area geometry or an id for the ProcessingRepository storing the same data", min = 0) String damageArea,
-			@DescribeParameter(name = "language", description = "optional field containing language to be used in localized data", min = 0) String language
+			@DescribeParameter(name = "language", description = "optional field containing language to be used in localized data", min = 0) String language,
+			@DescribeParameter(name = "onlyarcs", description = "optional flag to include only arcs in download", min = 0) Boolean onlyArcs
 
 		)  {
 		try {
@@ -350,6 +351,10 @@ public class DestinationDownload extends RiskCalculatorBase {
 				target = 98;
 			} else if(target == -3) {
 				target = 99;
+			}
+			
+			if(onlyArcs == null) {
+				onlyArcs = true;
 			}
 			
 			List<String> finalZipFileNames = new ArrayList<String>();
@@ -414,18 +419,18 @@ public class DestinationDownload extends RiskCalculatorBase {
 					
 				}
 				
-				
-				// damage area buffers
-				finalZipFileNames.add(createDamageAreasShapefile(features,
-						storeName, distances,
-						distanceNames,
-						processing,
-						damageArea));
-				
-				// selected targets shapefiles
-				addTargets(features, storeName, connectionParams, target, distances,
-						finalZipFileNames, dataStore, processing, changedTargetsInfo);
-				
+				if(!onlyArcs) {
+					// damage area buffers
+					finalZipFileNames.add(createDamageAreasShapefile(features,
+							storeName, distances,
+							distanceNames,
+							processing,
+							damageArea));
+					
+					// selected targets shapefiles
+					addTargets(features, storeName, connectionParams, target, distances,
+							finalZipFileNames, dataStore, processing, changedTargetsInfo);
+				}
 				
 				finalZipFileNames.add(createReportFile(processing, formula, target, materials, scenarios,
 						entities, fpfield, language, conn));
