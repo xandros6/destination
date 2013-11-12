@@ -3,6 +3,7 @@ import it.geosolutions.geobatch.action.scripting.ScriptingAction
 import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration
 import it.geosolutions.geobatch.flow.event.action.ActionException
 import it.geosolutions.filesystemmonitor.monitor.FileSystemEvent
+import it.geosolutions.geobatch.destination.vulnerability.VulnerabilityComputation
 import groovy.xml.MarkupBuilder
 
 public Map execute(Map argsMap) throws Exception {
@@ -11,7 +12,7 @@ public Map execute(Map argsMap) throws Exception {
 	final File tempDir = argsMap.get(ScriptingAction.TEMPDIR_KEY)
 	final File confDir = argsMap.get(ScriptingAction.CONFIGDIR_KEY)
 	final Map props = configuration.getProperties()
-	String _baseOutputPath = confDir.getParentFile().getAbsolutePath() + fs + 'out' + fs
+	String _baseOutputPath = System.getProperty(VulnerabilityComputation.RASTER_PATH_PROP, "")
 	if(props != null && props.get('baseOutputPath') != null && !props.get('baseOutputPath').isEmpty()){
 		_baseOutputPath = props.get('baseOutputPath')
 	}

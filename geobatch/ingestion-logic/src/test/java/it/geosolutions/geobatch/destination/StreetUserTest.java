@@ -124,7 +124,7 @@ public class StreetUserTest {
 				"id_scenario:int," +
 						"codice:string," +
 						"tipologia:string," +
-				"tempo_di_coda:int");
+				"tempo_di_coda:double");
 
 		SimpleFeature feature_3 = DataUtilities.createFeature(siig_t_scenario, "id_scenario1=1|A|POOL FIRE DA LIQUIDO INFIAMMABILE|500" );
 		SimpleFeature feature_4 = DataUtilities.createFeature(siig_t_scenario, "id_scenario2=2|B|FLASH FIRE DA VAPORI LIQUIDO INFIAMMABILE|500" );
@@ -264,10 +264,10 @@ public class StreetUserTest {
 		 * OUTPUT=siig_r_scen_vuln_X
 		 */		
 		SimpleFeatureType siig_r_scen_vuln_1 = DataUtilities.createType("siig_r_scen_vuln_1", 
-				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int");
+				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int," +"fk_partner:int");
 
 		SimpleFeatureType siig_r_scen_vuln_3 = DataUtilities.createType("siig_r_scen_vuln_3", 
-				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int");
+				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int," +"fk_partner:int");
 
 		MemoryDataStore mds = new MemoryDataStore();		
 		mds.addFeature(feature_15_1);
