@@ -312,9 +312,9 @@ public abstract class InputObject {
 	 */
 	protected int logFile(int processo, int bersaglio, int partner, String codicePartner, String date, boolean update) throws IOException {
 		if(metadataHandler != null){
-		return metadataHandler.logFile(processo, -1,
-				partner, codicePartner, inputTypeName, date, false);
-	}
+			return metadataHandler.logFile(processo, bersaglio,
+					partner, codicePartner, inputTypeName, date, update);
+		}
 		return 0;
 	}
 	
