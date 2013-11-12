@@ -117,27 +117,31 @@ public class ArcIngestionAction extends BaseAction<EventObject> {
         if (ds == null) {
             throw new ActionException(this, "Can't find datastore ");
         }
-        if (!(ds instanceof JDBCDataStore)) {
-            throw new ActionException(this, "Bad Datastore type " + ds.getClass().getName());
-        }
-
-        JDBCDataStore dataStore = (JDBCDataStore) ds;
-        MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
-
-        ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(
-                featureCfg.getTypeName(),
-                listenerForwarder, metadataHandler, dataStore);
         try {
-            arcIngestion.importArcs(null,
-                    cfg.getAggregationLevel(),
-                    cfg.isOnGrid(),
-                    cfg.isDropInput(),
-                    cfg.getClosePhase());
-        } catch (IOException ex) {
-            // TODO: what shall we do here??
-            // log and rethrow for the moment, but a rollback should be implementened somewhere
-            LOGGER.error("Error in importing arcs", ex);
-            throw new ActionException(this, "Error in importing arcs", ex);
+	        if (!(ds instanceof JDBCDataStore)) {
+	            throw new ActionException(this, "Bad Datastore type " + ds.getClass().getName());
+	        }
+	
+	        JDBCDataStore dataStore = (JDBCDataStore) ds;
+	        MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
+	
+	        ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(
+	                featureCfg.getTypeName(),
+	                listenerForwarder, metadataHandler, dataStore);
+	        try {
+	            arcIngestion.importArcs(null,
+	                    cfg.getAggregationLevel(),
+	                    cfg.isOnGrid(),
+	                    cfg.isDropInput(),
+	                    cfg.getClosePhase());
+	        } catch (IOException ex) {
+	            // TODO: what shall we do here??
+	            // log and rethrow for the moment, but a rollback should be implementened somewhere
+	            LOGGER.error("Error in importing arcs", ex);
+	            throw new ActionException(this, "Error in importing arcs", ex);
+	        }
+        } finally {
+        	ds.dispose();
         }
     }
 

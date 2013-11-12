@@ -117,28 +117,32 @@ public class TargetIngestionAction extends BaseAction<EventObject> {
         if (ds == null) {
             throw new ActionException(this, "Can't find datastore ");
         }
-        if (!(ds instanceof JDBCDataStore)) {
-            throw new ActionException(this, "Bad Datastore type " + ds.getClass().getName());
-        }
-
-        JDBCDataStore dataStore = (JDBCDataStore) ds;
-        dataStore.setExposePrimaryKeyColumns(true);
-        MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
-
-        TargetIngestionProcess computation = new TargetIngestionProcess(
-                featureCfg.getTypeName(),
-                listenerForwarder,
-                metadataHandler,
-                dataStore);
-
         try {
-            computation.importTarget(null, cfg.isDropInput());
-
-        } catch (IOException ex) {
-            // TODO: what shall we do here??
-            // log and rethrow for the moment, but a rollback should be implementened somewhere
-            LOGGER.error("Error in importing targets", ex);
-            throw new ActionException(this, "Error in importing targets", ex);
+	        if (!(ds instanceof JDBCDataStore)) {
+	            throw new ActionException(this, "Bad Datastore type " + ds.getClass().getName());
+	        }
+        
+	        JDBCDataStore dataStore = (JDBCDataStore) ds;
+	        dataStore.setExposePrimaryKeyColumns(true);
+	        MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
+	
+	        TargetIngestionProcess computation = new TargetIngestionProcess(
+	                featureCfg.getTypeName(),
+	                listenerForwarder,
+	                metadataHandler,
+	                dataStore);
+	
+	        try {
+	            computation.importTarget(null, cfg.isDropInput());
+	
+	        } catch (IOException ex) {
+	            // TODO: what shall we do here??
+	            // log and rethrow for the moment, but a rollback should be implementened somewhere
+	            LOGGER.error("Error in importing targets", ex);
+	            throw new ActionException(this, "Error in importing targets", ex);
+	        }
+        } finally {
+        	ds.dispose();
         }
     }
 }
