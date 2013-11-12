@@ -71,9 +71,10 @@ ON&#xd;
     (&#xd;
         siig_p.siig_geo_ln_arco_2.id_geo_arco = siig_p.siig_t_elab_standard_2.id_geo_arco)&#xd;
 where siig_geo_ln_arco_2.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632)</sql>
+        <keyColumn>id_geo_arco</keyColumn>
         <geometry>
           <name>geometria</name>
-          <type>LineString</type>
+          <type>MultiLineString</type>
           <srid>32632</srid>
         </geometry>
         <parameter>
