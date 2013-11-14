@@ -38,6 +38,8 @@ public class StreetUserComputation extends InputObject {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(StreetUserComputation.class);
 	private Double SECONDS_IN_HOUR = 3600d;
+	private Double KM_IN_METER = 1/1000d;
+	private Double HOUR_IN_DAY = 24d;
 	private String codicePartner;
 	private int partner;
 	private boolean removeFeatures = true;
@@ -139,10 +141,11 @@ public class StreetUserComputation extends InputObject {
 		if(aggregationLevel == 3){
 			executeCell(aggregationLevel);
 		}
+		dataStore.dispose();
 	}
 
 	public void executeCell(Integer aggregationLevel){
-		LOGGER.debug("Start execution for CELL with partner="+partner+" and aggregationLevel="+aggregationLevel);
+		LOGGER.info("Start execution for CELL with partner="+partner+" and aggregationLevel="+aggregationLevel);
 
 		Transaction transaction = new DefaultTransaction("handle");
 		try{
@@ -232,6 +235,7 @@ public class StreetUserComputation extends InputObject {
 				for(Integer idScenario : cellResults.keySet()){
 					StreetUserResult celResult = cellResults.get(idScenario);
 					persistStreetUsersData(partner,idGeoCell, idDistanza, idScenario, celResult.getUtentiSede(), celResult.getUtentiBersaglio(), featureStore);
+					transaction.commit(); 
 				}
 
 			}
@@ -248,7 +252,6 @@ public class StreetUserComputation extends InputObject {
 		finally {
 			try {
 				transaction.close();
-				dataStore.dispose();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage(),e);
 			}
@@ -257,7 +260,7 @@ public class StreetUserComputation extends InputObject {
 
 	public void executeArc(Integer aggregationLevel){
 
-		LOGGER.debug("Start execution with partner="+partner+" and aggregationLevel="+aggregationLevel);
+		LOGGER.info("Start execution with partner="+partner+" and aggregationLevel="+aggregationLevel);
 		Transaction transaction = new DefaultTransaction("handle");		
 		try{
 			siig_r_scen_vuln_X_type = "siig_r_scen_vuln_"+aggregationLevel;
@@ -288,6 +291,7 @@ public class StreetUserComputation extends InputObject {
 					for(Integer key : results.keySet()){
 						StreetUserResult r = results.get(key);
 						persistStreetUsersData(partner,r.getIdArco(),r.getIdDistanza(),r.getIdScenario(),r.getUtentiSede(),r.getUtentiBersaglio(),featureStore);
+						transaction.commit(); 
 					}
 				}
 			}
@@ -304,7 +308,6 @@ public class StreetUserComputation extends InputObject {
 		finally {
 			try {
 				transaction.close();
-				dataStore.dispose();
 			} catch (IOException e) {
 				LOGGER.error(e.getMessage(),e);
 			}
@@ -458,11 +461,11 @@ public class StreetUserComputation extends InputObject {
 	}
 
 	private Double computeVeicleT0(StreetVeicle veicle, StreetInfo streetInfo) {
-		return  (veicle.getDensity() * streetInfo.getEffectiveGeometry().getLength());
+		return  (veicle.getDensity() * (streetInfo.getEffectiveGeometry().getLength() * KM_IN_METER));
 	}
 
 	private Double computeVeicleStorage(Double length, Integer nCorsie) {
-		return  MAX_VEICLE_QUEUE_SIZE * nCorsie * length;
+		return  MAX_VEICLE_QUEUE_SIZE * nCorsie * (length * KM_IN_METER);
 	}
 
 	private void retrieveStreetInBuffer(StreetDistance street, StreetUser streetUser, int aggregationLevel){
@@ -514,8 +517,11 @@ public class StreetUserComputation extends InputObject {
 				SimpleFeature sf = inputIterator.next();
 				StreetVeicle veicle = new StreetVeicle();
 				veicle.setType(getAttributeAsInt(sf.getAttribute("id_tipo_veicolo")));
-				veicle.setDensity(getAttributeAsInt(sf.getAttribute("densita_veicolare")));
-				veicle.setMeanVelocity(getAttributeAsInt(sf.getAttribute("velocita_media")));
+				int tgm = getAttributeAsInt(sf.getAttribute("densita_veicolare"));
+				int meanVelocity = getAttributeAsInt(sf.getAttribute("velocita_media"));
+				double densita = tgm / (meanVelocity * HOUR_IN_DAY);						
+				veicle.setDensity(densita);
+				veicle.setMeanVelocity(meanVelocity);
 				retrieveVeicleInfo(veicle);
 				ss.addVeicleType(veicle);
 			}

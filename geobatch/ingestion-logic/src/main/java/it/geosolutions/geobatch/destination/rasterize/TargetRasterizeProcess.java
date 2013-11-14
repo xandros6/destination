@@ -72,7 +72,7 @@ public class TargetRasterizeProcess extends InputObject{
 			// partner numerical id (from siig_t_partner)
 			partner = Integer.parseInt(partners.get(codicePartner).toString());		
 			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());		
-			priority = Integer.parseInt(targetTypes.get(m.group(5)).toString());		
+			priority = Integer.parseInt(m.group(6).toString());		
 			return true;
 		}
 		return false;
