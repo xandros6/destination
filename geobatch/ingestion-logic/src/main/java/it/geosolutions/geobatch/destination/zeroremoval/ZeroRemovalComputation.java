@@ -320,8 +320,7 @@ public class ZeroRemovalComputation extends InputObject {
                         metadataHandler.closeProcessPhase(process, closePhase);
                     }
                 }
-                closeInputReader();
-    
+                closeInputReader();    
                 transaction.close();
             }
         }
