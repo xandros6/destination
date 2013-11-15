@@ -37,17 +37,20 @@ public class TargetRasterizeProcess extends InputObject{
 	//private static Pattern TYPE_NAME_PARTS_ARCS = Pattern.compile("^([A-Z]{2})_([A-Z]{1})-([A-Za-z]+)_([0-9]{8})$");
 	private static Pattern TYPE_NAME_PARTS_TARGETS  = Pattern.compile("^([A-Z]{2})[_-]([A-Z]{2,3})[_-]([A-Z]+)([_-][C|I])?[_-]([0-9]{8})[_-]([0-9]{2})$");
 	private static Properties targetTypes = new Properties();
+	private static Properties targetNameTypes = new Properties();
 
 	private String inputTypeName;
 	private String codicePartner;
 	private int partner;
 	private int targetType;
+	private int priority;
 	private final static String fs = "/";
 
 	static {	
 		// load mappings from resources
 		try {			
-			targetTypes.load(TargetIngestionProcess.class.getResourceAsStream(fs+"targets.properties"));	
+			targetTypes.load(TargetRasterizeProcess.class.getResourceAsStream(fs+"targets.properties"));	
+			targetNameTypes.load(TargetRasterizeProcess.class.getResourceAsStream(fs+"targets_name.properties"));	
 		} catch (IOException e) {
 			LOGGER.error("Unable to load configuration: "+e.getMessage(), e);
 		}
@@ -68,7 +71,8 @@ public class TargetRasterizeProcess extends InputObject{
 			codicePartner = m.group(1);
 			// partner numerical id (from siig_t_partner)
 			partner = Integer.parseInt(partners.get(codicePartner).toString());		
-			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());			
+			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());		
+			priority = Integer.parseInt(m.group(6).toString());		
 			return true;
 		}
 		return false;
@@ -151,8 +155,13 @@ public class TargetRasterizeProcess extends InputObject{
 
 		TaskExecutor action = initAction(configDir,tempDir);
 
-		clearOutput(baseTifOutputDir);
-
+		//Check priority
+		File outputFile = new File(baseTifOutputDir.getAbsolutePath() + fs + codicePartner + fs + targetNameTypes.getProperty(targetType+"") + ".tif");
+		if(outputFile.exists() && priority == 1){
+			return;
+		}		
+		clearOutput(baseTifOutputDir);		
+		
 		//No human target
 		if(targetType>=10){
 			LOGGER.debug("NO HUMAN TARGET");
@@ -182,10 +191,20 @@ public class TargetRasterizeProcess extends InputObject{
 
 			//Execute overview on output TIF
 			events = overview(action,events);
-
+			
 			//Clear normalized SHP
 			clearNormalized(baseTifOutputDir);
 
+		}
+		
+		//Rename output tif
+		{
+			File inputFile = new File(baseTifOutputDir.getAbsolutePath() + fs + codicePartner + fs + inputTypeName + ".tif");
+			
+			if(outputFile.exists()){
+				outputFile.delete();
+			}
+			inputFile.renameTo(outputFile);
 		}
 
 	}
@@ -229,8 +248,8 @@ public class TargetRasterizeProcess extends InputObject{
 
 	private void clearOutput(File outputDir){
 		File partnerOutput = new File(outputDir.getAbsolutePath()+ fs +codicePartner);
-		if(partnerOutput.exists()){
-			FileFilter fileFilter = new WildcardFileFilter(this.inputTypeName+"*.*");
+		if(partnerOutput.exists()){			
+			FileFilter fileFilter = new WildcardFileFilter(targetNameTypes.getProperty(targetType+"") + ".tif");
 			File[] files = partnerOutput.listFiles(fileFilter);
 			for (File file : files) {
 				file.delete();

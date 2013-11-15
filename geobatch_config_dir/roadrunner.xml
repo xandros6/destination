@@ -46,15 +46,23 @@
                    </entry>
                    <entry>
                      <string>database</string>
-                     <string>dest_staging</string>
+                     <string>destination_staging</string>
+                   </entry>
+                   <entry>
+                     <string>database</string>
+                     <string>destination_staging</string>
+                   </entry>
+                   <entry>
+                     <string>schema</string>
+                     <string>siig_p</string>
                    </entry>
                    <entry>
                      <string>user</string>
-                     <string>geosol</string>
+                     <string>siig_p</string>
                    </entry>
                    <entry>
                      <string>passwd</string>
-                     <string>geosol</string>
+                     <string>siig_p</string>
                    </entry>
                 </dataStore>
             </outputFeature>

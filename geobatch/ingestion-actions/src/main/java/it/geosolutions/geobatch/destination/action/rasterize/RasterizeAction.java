@@ -7,6 +7,7 @@ import it.geosolutions.geobatch.annotations.Action;
 import it.geosolutions.geobatch.annotations.CheckConfiguration;
 import it.geosolutions.geobatch.configuration.event.action.ActionConfiguration;
 import it.geosolutions.geobatch.destination.rasterize.TargetRasterizeProcess;
+import it.geosolutions.geobatch.destination.vulnerability.VulnerabilityComputation;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 import it.geosolutions.geobatch.flow.event.action.BaseAction;
 
@@ -77,7 +78,8 @@ public class RasterizeAction extends BaseAction<EventObject> {
 
 	private void doProcess(RasterizeConfiguration configuration, FeatureConfiguration featureConfiguration) throws ActionException {
 		TargetRasterizeProcess rasterize = new TargetRasterizeProcess(featureConfiguration.getTypeName(), listenerForwarder, null, null);
-		File outputDir = new File(getConfigDir().getParentFile().getAbsolutePath() + "/out/");
+		
+		File outputDir =  new File(System.getProperty(VulnerabilityComputation.RASTER_PATH_PROP, "")); 
 		if(configuration.getBaseOutputPath() != null && !configuration.getBaseOutputPath().isEmpty()){
 			outputDir = new File(configuration.getBaseOutputPath());
 		}		

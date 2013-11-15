@@ -124,7 +124,7 @@ public class StreetUserTest {
 				"id_scenario:int," +
 						"codice:string," +
 						"tipologia:string," +
-				"tempo_di_coda:int");
+				"tempo_di_coda:double");
 
 		SimpleFeature feature_3 = DataUtilities.createFeature(siig_t_scenario, "id_scenario1=1|A|POOL FIRE DA LIQUIDO INFIAMMABILE|500" );
 		SimpleFeature feature_4 = DataUtilities.createFeature(siig_t_scenario, "id_scenario2=2|B|FLASH FIRE DA VAPORI LIQUIDO INFIAMMABILE|500" );
@@ -187,12 +187,12 @@ public class StreetUserTest {
 						"flg_velocita:string," +
 				"flg_densita_veicolare:string");
 		
-		SimpleFeature feature_14_1 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,1=1|1|56|50|1|S|C" );
-		SimpleFeature feature_14_2 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,1=2|1|16|50|1|S|C" );		
-		SimpleFeature feature_14_3 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,2=1|2|9|50|1|S|C" );
-		SimpleFeature feature_14_4 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,2=2|2|8|50|1|S|C" );		
-		SimpleFeature feature_14_5 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,3=1|3|10|50|1|S|C" );
-		SimpleFeature feature_14_6 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,3=2|3|52|50|1|S|C" );
+		SimpleFeature feature_14_1 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,1=1|1|56*24|50|1|S|C" );
+		SimpleFeature feature_14_2 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,1=2|1|16*24|50|1|S|C" );		
+		SimpleFeature feature_14_3 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,2=1|2|9*24|50|1|S|C" );
+		SimpleFeature feature_14_4 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,2=2|2|8*24|50|1|S|C" );		
+		SimpleFeature feature_14_5 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,3=1|3|10*24|50|1|S|C" );
+		SimpleFeature feature_14_6 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,3=2|3|52*24|50|1|S|C" );
 		
 		SimpleFeature feature_14_7 = DataUtilities.createFeature(siig_r_tipovei_geoarco3, "id1,1=1|1|56|50|1|S|C" );
 		SimpleFeature feature_14_8 = DataUtilities.createFeature(siig_r_tipovei_geoarco3, "id2,1=2|1|16|50|1|S|C" );
@@ -264,10 +264,10 @@ public class StreetUserTest {
 		 * OUTPUT=siig_r_scen_vuln_X
 		 */		
 		SimpleFeatureType siig_r_scen_vuln_1 = DataUtilities.createType("siig_r_scen_vuln_1", 
-				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int");
+				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int," +"fk_partner:int");
 
 		SimpleFeatureType siig_r_scen_vuln_3 = DataUtilities.createType("siig_r_scen_vuln_3", 
-				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int");
+				"id_distanza:int," + "id_geo_arco:int," + "id_scenario:int," + "utenti_carr_bersaglio:int," + "utenti_carr_sede_inc:int," +"fk_partner:int");
 
 		MemoryDataStore mds = new MemoryDataStore();		
 		mds.addFeature(feature_15_1);
@@ -393,7 +393,7 @@ public class StreetUserTest {
 		 * nCoda_1_2_leggeri = densitàL * Vl_1_2 * Tc = 56 * 50 * (500/3600) = 388.88
 		 * nCoda_1_2_pesanti = densitàP * Vp_1_2 * Tc = 16 * 50 * (500/3600) = 111.11
 		 * nCoinvolti_1_2_leggeri = nTerritoriali_1_2_leggeri +  nCoda_1_2_leggeri = 5600 + 388.88 = 5988.88
-		 * nCoinvolti_1_2_pesanti = nTerritoriali_1_2_pesanti + + nCoda_1_2_pesanti = 1600 + 111.11 = 1711.11
+		 * nCoinvolti_1_2_pesanti = nTerritoriali_1_2_pesanti + nCoda_1_2_pesanti = 1600 + 111.11 = 1711.11
 		 * storage = 150 * nCorsie * length = 150 * 1 * 100 = 15000
 		 * storage/2 > nCoinvolti_1_2_leggeri -> nCoinvolti_1_2_leggeri = 5988.88
 		 * storage/2 > nCoinvolti_1_2_pesanti -> nCoinvolti_1_2_pesanti = 1711.11

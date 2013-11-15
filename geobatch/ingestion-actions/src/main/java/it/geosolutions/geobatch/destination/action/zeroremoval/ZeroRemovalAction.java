@@ -122,6 +122,7 @@ public class ZeroRemovalAction extends BaseAction<EventObject> {
         }
 
         JDBCDataStore dataStore = (JDBCDataStore) ds;
+        dataStore.setExposePrimaryKeyColumns(true);
         MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);
 
         ZeroRemovalComputation computation = new ZeroRemovalComputation(
@@ -140,6 +141,8 @@ public class ZeroRemovalAction extends BaseAction<EventObject> {
             // log and rethrow for the moment, but a rollback should be implementened somewhere
             LOGGER.error("Error in removing zeroes", ex);
             throw new ActionException(this, "Error in removing zeroes", ex);
+        }finally{
+            dataStore.dispose();
         }
     }
 }
