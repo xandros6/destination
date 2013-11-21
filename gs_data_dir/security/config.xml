@@ -11,6 +11,7 @@
       <filter>contextAsc</filter>
       <filter>rememberme</filter>
       <filter>basic</filter>
+      <filter>shibboleth</filter>
       <filter>anonymous</filter>
       <filter>guiException</filter>
       <filter>interceptor</filter>
@@ -39,6 +40,7 @@
     <filters name="default" path="/**">
       <filter>contextNoAsc</filter>
       <filter>basic</filter>
+      <filter>shibboleth</filter>
       <filter>anonymous</filter>
       <filter>exception</filter>
       <filter>interceptor</filter>

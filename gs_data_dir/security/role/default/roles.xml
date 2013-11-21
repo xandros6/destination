@@ -4,12 +4,21 @@
         <role id="ADMIN"/>
         <role id="GROUP_ADMIN"/>
         <role id="ROLE_ADMIN"/>
+        <role id="ROLE_BASE"/>
+        <role id="ROLE_MAJOR"/>
+        <role id="ROLE_SUPER"/>
         <role id="TEST"/>
         <role id="tomcat"/>
     </roleList>
     <userList>
         <userRoles username="admin">
             <roleRef roleID="ADMIN"/>
+            <roleRef roleID="ROLE_ADMIN"/>
+        </userRoles>
+        <userRoles username="base">
+            <roleRef roleID="ROLE_BASE"/>
+        </userRoles>
+        <userRoles username="super">
             <roleRef roleID="ROLE_ADMIN"/>
         </userRoles>
         <userRoles username="test"/>

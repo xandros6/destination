@@ -12,5 +12,27 @@ target/
 .settings/
 deploy/
 raster/
+DESTINATION_GEOBATCH_CONFIG_DIR/
+rasterize/
+vms/
+data/
+database/backup*
+download/
+gs_data_dir/www/
+gs_data_dir/workspaces-old/
+gs_data_dir/coverages/
+gs_data_dir/demo/
+gs_data_dir/data/
+gs_data_dir/styles/
+gs_data_dir/layergroups/
+gs_data_dir/logs/
+gs_data_dir/gwc/
+gs_data_dir/validation/
+gs_data_dir/plugIns/
+gs_data_dir/palettes/
+gs_data_dir/user_projections/
+workshop/
+iride/
+rasters_out/
 
 .springBeans
