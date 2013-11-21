@@ -42,7 +42,6 @@ public class StreetUserTest {
 
 	@Before
 	public void before() throws Exception { 
-		File inputXML = new File("src/test/resources/streetUserInput.xml");
 		//typeName = streetUserConfiguration.getTypeName();
 		typeName = "RP_C_ZURB_20130613";
 
@@ -187,15 +186,15 @@ public class StreetUserTest {
 						"flg_velocita:string," +
 				"flg_densita_veicolare:string");
 		
-		SimpleFeature feature_14_1 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,1=1|1|56*24|50|1|S|C" );
-		SimpleFeature feature_14_2 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,1=2|1|16*24|50|1|S|C" );		
-		SimpleFeature feature_14_3 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,2=1|2|9*24|50|1|S|C" );
-		SimpleFeature feature_14_4 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,2=2|2|8*24|50|1|S|C" );		
-		SimpleFeature feature_14_5 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,3=1|3|10*24|50|1|S|C" );
-		SimpleFeature feature_14_6 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,3=2|3|52*24|50|1|S|C" );
+		SimpleFeature feature_14_1 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,1=1|1|5600*24|50|1|S|C" );
+		SimpleFeature feature_14_2 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,1=2|1|1600*24|50|1|S|C" );		
+		SimpleFeature feature_14_3 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,2=1|2|900*24|50|1|S|C" );
+		SimpleFeature feature_14_4 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,2=2|2|800*24|50|1|S|C" );		
+		SimpleFeature feature_14_5 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id1,3=1|3|1000*24|50|1|S|C" );
+		SimpleFeature feature_14_6 = DataUtilities.createFeature(siig_r_tipovei_geoarco1, "id2,3=2|3|5200*24|50|1|S|C" );
 		
-		SimpleFeature feature_14_7 = DataUtilities.createFeature(siig_r_tipovei_geoarco3, "id1,1=1|1|56|50|1|S|C" );
-		SimpleFeature feature_14_8 = DataUtilities.createFeature(siig_r_tipovei_geoarco3, "id2,1=2|1|16|50|1|S|C" );
+		SimpleFeature feature_14_7 = DataUtilities.createFeature(siig_r_tipovei_geoarco3, "id1,1=1|1|5600|50|1|S|C" );
+		SimpleFeature feature_14_8 = DataUtilities.createFeature(siig_r_tipovei_geoarco3, "id2,1=2|1|1600|50|1|S|C" );
 
 		SimpleFeatureType siig_d_tipo_veicolo = DataUtilities.createType("siig_d_tipo_veicolo", 
 				"id_tipo_veicolo:int," +
@@ -408,8 +407,8 @@ public class StreetUserTest {
 		 * nCoinvolti_1_3_pesanti = nTerritoriali_1_3_pesanti + nTransito_1_3_pesanti = 855.55
 		 * N_UTENTI_BERSAGLIO = nCoinvolti_1_3_leggeri * coeff_occupazione_l + nCoinvolti_1_3_pesanti * coeff_occupazione_p = 962.50 * 1.5 + 855.55 * 1.1 = 1443.75 + 941.105 = 2384.855
 		 */
-		double N_UTENTI_SEDE_1_ATTESO = 10865;
-		double N_UTENTI_BERSAGLIO_1_ATTESO = 2384;
+		double N_UTENTI_SEDE_1_ATTESO = 19;
+		double N_UTENTI_BERSAGLIO_1_ATTESO = 13;
 		MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(dataStore);		
 		StreetUserComputation streetUserComputation = new StreetUserComputation(this.typeName,
 				new ProgressListenerForwarder(null),

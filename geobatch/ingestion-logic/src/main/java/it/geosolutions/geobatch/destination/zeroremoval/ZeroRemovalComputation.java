@@ -166,7 +166,6 @@ public class ZeroRemovalComputation extends InputObject {
 		reset();
 
 		if (isValid()) {
-			
 
 			crs = checkCrs(crs);
 
@@ -177,27 +176,31 @@ public class ZeroRemovalComputation extends InputObject {
 			int startErrors = 0;
 			// existing process
 			MetadataIngestionHandler.Process importData = getProcessData();
-			if(importData != null){
-			process = importData.getId();
-			trace = importData.getMaxTrace();
-			errors = importData.getMaxError();
+			if (importData != null) {
+				process = importData.getId();
+				trace = importData.getMaxTrace();
+				errors = importData.getMaxError();
 				startErrors = errors;
 			}
 
-			if(metadataHandler != null && process == -1) {
+			if (metadataHandler != null && process == -1) {
 				LOGGER.error("Cannot find process for input file");
 				throw new IOException("Cannot find process for input file");
 			}
-			
-			//First iteration on NR_INCIDENTI -> NR_INCIDENTI_ELAB
-			LOGGER.debug("Start first iteration");
-			this.iterativeProcess("nr_incidenti", "nr_incidenti_elab", true, aggregationLevel, startErrors, errors, trace, process, closePhase);
-			//Check for zero nr_incidenti_elab
 
-			//Second iteration on NR_INCIDENTI_ELAB -> NR_INCIDENTI_ELAB
-			if(this.existsZeroInElab(aggregationLevel,"nr_incidenti_elab")){
+			// First iteration on NR_INCIDENTI -> NR_INCIDENTI_ELAB
+			LOGGER.debug("Start first iteration");
+			this.iterativeProcess("nr_incidenti", "nr_incidenti_elab", true,
+					aggregationLevel, startErrors, errors, trace, process,
+					closePhase);
+			// Check for zero nr_incidenti_elab
+
+			// Second iteration on NR_INCIDENTI_ELAB -> NR_INCIDENTI_ELAB
+			if (this.existsZeroInElab(aggregationLevel, "nr_incidenti_elab")) {
 				LOGGER.debug("Start second iteration");
-				this.iterativeProcess("nr_incidenti_elab", "nr_incidenti_elab", false, aggregationLevel, startErrors, errors, trace, process, closePhase);
+				this.iterativeProcess("nr_incidenti_elab", "nr_incidenti_elab",
+						false, aggregationLevel, startErrors, errors, trace,
+						process, closePhase);
 			}
 
 		}
@@ -297,6 +300,7 @@ public class ZeroRemovalComputation extends InputObject {
                         }
                     } catch (IllegalArgumentException e) {
                         LOGGER.error(e.getMessage(), e);
+                        transaction.rollback();
                         errors++;
                         if (metadataHandler != null) {
                             metadataHandler.logError(trace, errors, "Error importing data",

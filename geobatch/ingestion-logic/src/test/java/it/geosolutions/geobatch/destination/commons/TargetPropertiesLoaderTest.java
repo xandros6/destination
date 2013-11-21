@@ -25,22 +25,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import junit.framework.TestCase;
+
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author DamianoG
  *
  */
-public class TargetPropertiesLoaderTest extends DestinationOnlineTestCase{
+public class TargetPropertiesLoaderTest extends TestCase{
 
     public TargetPropertiesLoaderTest(){};
     
     @Test
     public void testTargetLoading(){
         
-        System.setProperty("EXTERNAL_PROP_DIR_PATH", getExternalPropDirPath());
+        //System.setProperty("EXTERNAL_PROP_DIR_PATH", getExternalPropDirPath());
         
         TargetPropertiesLoader tpl = new TargetPropertiesLoader();
         
@@ -61,7 +62,7 @@ public class TargetPropertiesLoaderTest extends DestinationOnlineTestCase{
 
     /* (non-Javadoc)
      * @see it.geosolutions.geobatch.destination.commons.PostgisOnlineTestCase#getFixtureId()
-     */
+     
     @Override
     protected String getFixtureId() {
         return "destination";
@@ -74,5 +75,5 @@ public class TargetPropertiesLoaderTest extends DestinationOnlineTestCase{
             ret.setProperty(entry.getKey().toString(), entry.getValue().toString());
         }
         return ret;
-    }
+    }*/
 }

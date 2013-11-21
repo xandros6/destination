@@ -16,6 +16,9 @@ public Map execute(Map argsMap) throws Exception {
 	if(props != null && props.get('baseOutputPath') != null && !props.get('baseOutputPath').isEmpty()){
 		_baseOutputPath = props.get('baseOutputPath')
 	}
+    if(!_baseOutputPath.endsWith("\\")) {
+        _baseOutputPath = _baseOutputPath + "\\";
+    }
 	final List events = argsMap.get(ScriptingAction.EVENTS_KEY)
 	final EventObject event = events.poll();
 	final FeatureConfiguration featureConfiguration = unwrapFeatureConfig(event)
@@ -31,7 +34,7 @@ public Map execute(Map argsMap) throws Exception {
 			attribute = 'RESIDENTI'
 			break
 		case 'PTUR':
-			attribute = 'PRES_MAX'
+			attribute = 'N_PTUR_MAX'
 			break		
 	}
 	

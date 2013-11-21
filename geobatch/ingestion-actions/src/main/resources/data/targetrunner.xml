@@ -46,15 +46,23 @@
                    </entry>
                    <entry>
                      <string>database</string>
-                     <string>dest_staging</string>
+                     <string>destination_staging</string>
+                   </entry>
+                   <entry>
+                     <string>database</string>
+                     <string>destination_staging</string>
+                   </entry>
+                   <entry>
+                     <string>schema</string>
+                     <string>siig_p</string>
                    </entry>
                    <entry>
                      <string>user</string>
-                     <string>geosol</string>
+                     <string>siig_p</string>
                    </entry>
                    <entry>
                      <string>passwd</string>
-                     <string>geosol</string>
+                     <string>siig_p</string>
                    </entry>
                 </dataStore>
             </outputFeature>
@@ -68,8 +76,38 @@
             <id>target_processing</id>
             <name>Target processing</name>
             <description>Target postprocessing</description>
-            <dropInput>true</dropInput>
+            <dropInput>false</dropInput>
         </TargetIngestionConfiguration>
+		
+		<ScriptingConfiguration>
+			<id>scripting</id>
+			<description>Groovy to generate XML input for task executor action in rasterize process</description>
+			<name>GroovyRasterizeAction</name>
+			
+			<listenerId>ScriptActionLogger0</listenerId>
+			<listenerId>ScriptActionStatus0</listenerId>
+
+            <language>groovy</language>
+
+            <scriptFile>gdalTaskInputXmlCreator.groovy</scriptFile>
+
+			<!--
+		    <properties>
+				 <entry>
+				    <string>baseOutputPath</string>
+				    <string>C:/temp/</string>
+				  </entry>
+			</properties>
+			-->
+			
+		</ScriptingConfiguration>
+
+		<RasterizeConfiguration>
+            <id>raster_processing</id>
+            <name>Raster processing</name>
+            <description>Raster postprocessing</description>
+			<!--<baseOutputPath>C:/temp/</baseOutputPath>-->
+        </RasterizeConfiguration>
 
     </EventConsumerConfiguration>
 

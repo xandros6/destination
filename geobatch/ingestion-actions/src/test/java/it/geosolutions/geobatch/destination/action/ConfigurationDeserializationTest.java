@@ -1,22 +1,27 @@
 package it.geosolutions.geobatch.destination.action;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import it.geosolutions.geobatch.configuration.event.action.ActionConfiguration;
 import it.geosolutions.geobatch.configuration.flow.file.FileBasedFlowConfiguration;
+import it.geosolutions.geobatch.destination.action.arcingestion.ArcIngestionConfiguration;
+import it.geosolutions.geobatch.destination.action.rasterize.RasterizeConfiguration;
+import it.geosolutions.geobatch.destination.action.risk.RiskConfiguration;
+import it.geosolutions.geobatch.destination.action.streetuser.StreetUserConfiguration;
+import it.geosolutions.geobatch.destination.action.targetingestion.TargetIngestionConfiguration;
+import it.geosolutions.geobatch.destination.action.vulnerability.VulnerabilityConfiguration;
+import it.geosolutions.geobatch.destination.action.zeroremoval.ZeroRemovalConfiguration;
 import it.geosolutions.geobatch.registry.AliasRegistry;
 import it.geosolutions.geobatch.xstream.Alias;
 
 import java.io.File;
+import java.io.StringWriter;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.thoughtworks.xstream.XStream;
-import it.geosolutions.geobatch.destination.action.arcingestion.ArcIngestionConfiguration;
-import it.geosolutions.geobatch.destination.action.risk.RiskConfiguration;
-import it.geosolutions.geobatch.destination.action.targetingestion.TargetIngestionConfiguration;
-import it.geosolutions.geobatch.destination.action.vulnerability.VulnerabilityConfiguration;
-import it.geosolutions.geobatch.destination.action.zeroremoval.ZeroRemovalConfiguration;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 //@RunWith(SpringJUnit4ClassRunner.class)
@@ -57,8 +62,7 @@ public class ConfigurationDeserializationTest extends BaseTest{
 
 
 	@Test
-
-	public void testDeserialization() throws Exception{
+	public void testRoadsDeserialization() throws Exception{
 		XStream xstream = new XStream();
 		Alias alias=new Alias();
 		alias.setAliasRegistry(aliasRegistry);
@@ -71,6 +75,7 @@ public class ConfigurationDeserializationTest extends BaseTest{
         int vulncnt = 0;
         int zerocnt = 0;
         int riskcnt = 0;
+        int streetusercnt = 0;
 
 		for(ActionConfiguration actionConfiguration : configuration.getEventConsumerConfiguration().getActions()){
 			if(actionConfiguration != null) {
@@ -82,6 +87,8 @@ public class ConfigurationDeserializationTest extends BaseTest{
                     zerocnt++;
                 } else if (actionConfiguration instanceof RiskConfiguration ){
                     riskcnt++;
+                } else if (actionConfiguration instanceof StreetUserConfiguration ){
+                	streetusercnt++;
                 }
             }
 		}
@@ -90,6 +97,34 @@ public class ConfigurationDeserializationTest extends BaseTest{
         assertEquals(3, zerocnt);
         assertEquals(3, vulncnt);
         assertEquals(3, riskcnt);
+        assertEquals(3, streetusercnt);
+	}
+	
+	@Test
+	public void testTargetsDeserialization() throws Exception{
+		XStream xstream = new XStream();
+		Alias alias=new Alias();
+		alias.setAliasRegistry(aliasRegistry);
+		alias.setAliases(xstream);
+		File configFile = loadFile("data/targetrunner.xml");
+
+        FileBasedFlowConfiguration configuration = (FileBasedFlowConfiguration)xstream.fromXML(configFile);
+
+        int targetcnt = 0;
+        int rastercnt = 0;
+        
+		for(ActionConfiguration actionConfiguration : configuration.getEventConsumerConfiguration().getActions()){
+			if(actionConfiguration != null) {
+                if (actionConfiguration instanceof TargetIngestionConfiguration ){
+                	targetcnt++;
+                } else if (actionConfiguration instanceof RasterizeConfiguration ){
+                	rastercnt++;
+                }
+            }
+		}
+
+        assertEquals(1, targetcnt);
+        assertEquals(1, rastercnt);
 	}
 
 
@@ -107,8 +142,10 @@ public class ConfigurationDeserializationTest extends BaseTest{
         cfg.setOnGrid(false);
         cfg.setClosePhase("A");
 
-        xstream.toXML(cfg, System.out);
-        System.out.println();
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
     }
 
     @Test
@@ -124,8 +161,10 @@ public class ConfigurationDeserializationTest extends BaseTest{
         cfg.setWriteMode("PURGE_INSERT");
         cfg.setClosePhase("B");
 
-        xstream.toXML(cfg, System.out);
-        System.out.println();
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
     }
 
     @Test
@@ -140,8 +179,10 @@ public class ConfigurationDeserializationTest extends BaseTest{
         cfg.setAggregationLevel(1);
         cfg.setClosePhase("B");
 
-        xstream.toXML(cfg, System.out);
-        System.out.println();
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
     }
 
     @Test
@@ -167,8 +208,10 @@ public class ConfigurationDeserializationTest extends BaseTest{
         cfg.setWriteMode("PURGE_INSERT");
         cfg.setClosePhase("B");
 
-        xstream.toXML(cfg, System.out);
-        System.out.println();
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
     }
 
     @Test
@@ -182,8 +225,43 @@ public class ConfigurationDeserializationTest extends BaseTest{
         TargetIngestionConfiguration cfg = new TargetIngestionConfiguration("id", "name", "descr");
         cfg.setDropInput(true);
 
-        xstream.toXML(cfg, System.out);
-        System.out.println();
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
+    }
+    
+    @Test
+	public void testTargetRasterizeIngestionSerialization() throws Exception {
+
+		XStream xstream = new XStream();
+		Alias alias=new Alias();
+		alias.setAliasRegistry(aliasRegistry);
+		alias.setAliases(xstream);
+
+		RasterizeConfiguration cfg = new RasterizeConfiguration("id", "name", "descr");
+        cfg.setBaseOutputPath("basePath");
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
+    }
+    
+    @Test
+	public void testStreetUserSerialization() throws Exception {
+
+		XStream xstream = new XStream();
+		Alias alias=new Alias();
+		alias.setAliasRegistry(aliasRegistry);
+		alias.setAliases(xstream);
+
+		StreetUserConfiguration cfg = new StreetUserConfiguration("id", "name", "descr");
+        cfg.setAggregationLevel(1);
+
+        StringWriter writer = new StringWriter();
+        xstream.toXML(cfg, writer);
+        assertNotNull(writer.toString());
+        assertTrue(writer.toString().length() > 0);
     }
 
 }

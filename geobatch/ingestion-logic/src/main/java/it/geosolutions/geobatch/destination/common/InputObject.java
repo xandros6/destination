@@ -118,6 +118,17 @@ public abstract class InputObject {
 		this.valid = this.parseTypeName(inputTypeName);
 	}
 	
+	
+	
+	/**
+	 * @param sequenceManager the sequenceManager to set
+	 */
+	public void setSequenceManager(SequenceManager sequenceManager) {
+		this.sequenceManager = sequenceManager;
+	}
+
+
+
 	/**
 	 * Parses type name to extract information about the to be ingested object.
 	 * 

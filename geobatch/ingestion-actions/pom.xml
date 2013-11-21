@@ -41,6 +41,11 @@
             <groupId>it.geosolutions.geobatch</groupId>
             <artifactId>gb-action-ds2ds</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>it.geosolutions.geobatch</groupId>
+            <artifactId>gb-action-scripting</artifactId>                
+        </dependency>
 
         <dependency>
             <groupId>it.geosolutions.geobatch</groupId>
