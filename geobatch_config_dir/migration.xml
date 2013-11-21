@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowConfiguration>
+
+    <id>migration</id>
+
+    <name>Migration</name>
+    <description>Migration data from staging to production</description>
+
+    <autorun>true</autorun>
+
+    <EventGeneratorConfiguration>
+        <serviceID>fsEventGeneratorService</serviceID>
+        <wildCard>*.run</wildCard>
+        <watchDirectory>migration/in</watchDirectory>
+        <osType>OS_UNDEFINED</osType>
+        <eventType>FILE_ADDED</eventType>
+    </EventGeneratorConfiguration>
+
+    <EventConsumerConfiguration>
+
+        <listenerId>ConsumerLogger0</listenerId>
+        <listenerId>Cumulator</listenerId>
+
+        <MigrationConfiguration>
+			<id>migration</id>
+			<description>migration</description>
+			<name>migration</name>               
+			<failIgnored>true</failIgnored>
+			<purgeData>true</purgeData>
+			<sourceFeature>
+				<!-- Coordinate system EPSG code: force input feature crs, if not defined -->
+				<crs>EPSG:4326</crs>
+				<!-- source GeoTools DataStore connection parameters: an entry for each 
+					connection parameter -->
+				<dataStore>
+					<entry>
+						<string>dbtype</string>
+						<string>postgis</string>
+					</entry>
+					<entry>
+						<string>host</string>
+						<string>localhost</string>
+					</entry>
+					<entry>
+						<string>port</string>
+						<string>5432</string>
+					</entry>
+					<entry>
+						<string>database</string>
+						<string>destination_staging</string>
+					</entry>
+					<entry>
+						<string>schema</string>
+						<string>siig_p</string>
+					</entry>
+					<entry>
+						<string>user</string>
+						<string>siig_p</string>
+					</entry>
+					<entry>
+						<string>passwd</string>
+						<string>siig_p</string>
+					</entry>
+					<entry>
+						<string>Expose primary keys</string>
+						<string>true</string>
+					</entry>
+				</dataStore>
+			</sourceFeature>
+			<!-- Configures the output feature: mandatory -->
+			<outputFeature>
+				<dataStore>
+					<entry>
+						<string>dbtype</string>
+						<string>postgis</string>
+					</entry>
+					<entry>
+						<string>host</string>
+						<string>localhost</string>
+					</entry>
+					<entry>
+						<string>port</string>
+						<string>5432</string>
+					</entry>
+					<entry>
+						<string>database</string>
+						<string>destination_production</string>
+					</entry>
+					<entry>
+						<string>schema</string>
+						<string>siig_p</string>
+					</entry>
+					<entry>
+						<string>user</string>
+						<string>siig_p</string>
+					</entry>
+					<entry>
+						<string>passwd</string>
+						<string>siig_p</string>
+					</entry>
+					<entry>
+						<string>Expose primary keys</string>
+						<string>true</string>
+					</entry>
+				</dataStore>
+			</outputFeature>
+		</MigrationConfiguration>
+		
+	</EventConsumerConfiguration>
+
+
+    <ListenerConfigurations>
+
+        <LoggingProgressListener>
+            <serviceID>loggingListenerService</serviceID>
+            <id>ConsumerLogger0</id>
+
+            <loggerName>it.geosolutions.ConsLogger</loggerName>
+        </LoggingProgressListener>
+
+        <CumulatingProgressListener>
+            <serviceID>cumulatingListenerService</serviceID>
+            <id>Cumulator</id>
+        </CumulatingProgressListener>
+
+    </ListenerConfigurations>
+
+</FlowConfiguration>
