@@ -28,6 +28,7 @@ import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.vulnerability.RiskComputation;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.geotools.jdbc.JDBCDataStore;
@@ -42,7 +43,7 @@ public class RiskAction extends DestinationBaseAction<RiskConfiguration> {
     @Override
 	protected void doProcess(RiskConfiguration cfg,
 			FeatureConfiguration featureCfg, JDBCDataStore dataStore,
-			MetadataIngestionHandler metadataHandler) throws ActionException {
+			MetadataIngestionHandler metadataHandler, File file) throws ActionException {
         
         try {
 	        

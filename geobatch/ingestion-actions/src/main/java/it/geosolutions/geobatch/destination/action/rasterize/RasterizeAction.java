@@ -24,7 +24,7 @@ public class RasterizeAction extends DestinationBaseAction<RasterizeConfiguratio
 	@Override
 	protected void doProcess(RasterizeConfiguration cfg,
 			FeatureConfiguration featureCfg, JDBCDataStore dataStore,
-			MetadataIngestionHandler metadataHandler) throws ActionException {
+			MetadataIngestionHandler metadataHandler, File file) throws ActionException {
         
 		TargetRasterizeProcess rasterize = new TargetRasterizeProcess(featureCfg.getTypeName(), listenerForwarder, null, null);
 		

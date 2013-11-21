@@ -115,7 +115,7 @@ public class ProductionUpdater extends InputObject{
 			// partner alphanumerical abbreviation (from siig_t_partner)
 			codicePartner = m.group(1);
 			// partner numerical id (from siig_t_partner)
-			partner = Integer.parseInt(partners.get(codicePartner).toString());		
+			partner = Integer.parseInt(partners.get(codicePartner).toString());
 			// target detailed type id (from siig_t_bersaglio)
 			targetType = Integer.parseInt(targetTypes.get(m.group(3)).toString());
 			return true;

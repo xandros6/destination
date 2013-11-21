@@ -36,7 +36,10 @@
             <groupId>it.geosolutions.destination.geobatch</groupId>
             <artifactId>gb-destination-ingestion</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>it.geosolutions.destination.geobatch</groupId>
+            <artifactId>gb-destination-migration</artifactId>
+        </dependency>
         <dependency>
             <groupId>it.geosolutions.geobatch</groupId>
             <artifactId>gb-action-ds2ds</artifactId>

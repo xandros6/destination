@@ -29,7 +29,7 @@
 			<purgeData>true</purgeData>
 			<sourceFeature>
 				<!-- Coordinate system EPSG code: force input feature crs, if not defined -->
-				<crs>EPSG:4326</crs>
+				<crs>EPSG:32632</crs>
 				<!-- source GeoTools DataStore connection parameters: an entry for each 
 					connection parameter -->
 				<dataStore>

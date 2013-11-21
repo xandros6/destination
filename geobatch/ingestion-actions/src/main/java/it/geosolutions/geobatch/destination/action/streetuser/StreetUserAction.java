@@ -7,6 +7,7 @@ import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.streetuser.StreetUserComputation;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.geotools.jdbc.JDBCDataStore;
@@ -22,7 +23,7 @@ public class StreetUserAction extends DestinationBaseAction<StreetUserConfigurat
 	@Override
 	protected void doProcess(StreetUserConfiguration cfg,
 			FeatureConfiguration featureCfg, JDBCDataStore dataStore,
-			MetadataIngestionHandler metadataHandler) throws ActionException {
+			MetadataIngestionHandler metadataHandler, File file) throws ActionException {
 		
 		try {
 			

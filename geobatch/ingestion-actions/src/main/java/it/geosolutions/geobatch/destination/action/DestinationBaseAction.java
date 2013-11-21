@@ -18,6 +18,7 @@ import java.util.EventObject;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import org.apache.commons.io.FilenameUtils;
 import org.geotools.data.DataStore;
 import org.geotools.jdbc.JDBCDataStore;
 
@@ -83,6 +84,11 @@ public abstract class DestinationBaseAction<T extends ActionConfiguration> exten
 			listenerForwarder.started();
 			while (!events.isEmpty()) {
 				EventObject event = events.poll();
+				File file = null;
+				if (event instanceof FileSystemEvent) {
+					FileSystemEvent fse = (FileSystemEvent) event;
+					file = fse.getSource();					
+				}
 				FeatureConfiguration featureConfiguration = unwrapFeatureConfig(event);
 				DataStore ds = FeatureConfigurationUtil
 						.createDataStore(featureConfiguration);
@@ -99,7 +105,7 @@ public abstract class DestinationBaseAction<T extends ActionConfiguration> exten
 					MetadataIngestionHandler metadataHandler = new MetadataIngestionHandler(
 							dataStore);
 					doProcess((T) getConfiguration(), featureConfiguration,
-							dataStore, metadataHandler);
+							dataStore, metadataHandler, file);
 
 					// pass the feature config to the next action
 					ret.add(new FileSystemEvent(((FileSystemEvent) event)
@@ -136,5 +142,5 @@ public abstract class DestinationBaseAction<T extends ActionConfiguration> exten
 	 */
 	protected abstract void doProcess(T configuration,
 			FeatureConfiguration featureConfiguration, JDBCDataStore ds,
-			MetadataIngestionHandler metadataHandler) throws ActionException;
+			MetadataIngestionHandler metadataHandler, File file) throws ActionException;
 }

@@ -28,6 +28,7 @@ import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.geotools.jdbc.JDBCDataStore;
@@ -43,7 +44,7 @@ public class ArcIngestionAction extends DestinationBaseAction<ArcIngestionConfig
 	@Override
 	protected void doProcess(ArcIngestionConfiguration cfg,
 			FeatureConfiguration featureCfg, JDBCDataStore dataStore,
-			MetadataIngestionHandler metadataHandler) throws ActionException {
+			MetadataIngestionHandler metadataHandler, File file) throws ActionException {
 
 		try {
 

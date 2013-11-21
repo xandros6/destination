@@ -19,16 +19,14 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package it.geosolutions.geobatch.destination.datamigration.action;
+package it.geosolutions.geobatch.destination.action.datamigration;
 
 import it.geosolutions.filesystemmonitor.monitor.FileSystemEvent;
 import it.geosolutions.filesystemmonitor.monitor.FileSystemEventType;
 import it.geosolutions.geobatch.annotations.Action;
 import it.geosolutions.geobatch.annotations.CheckConfiguration;
-import it.geosolutions.geobatch.destination.MigrationRunner;
+import it.geosolutions.geobatch.destination.action.DestinationBaseAction;
 import it.geosolutions.geobatch.destination.datamigration.ProductionUpdater;
-import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures;
-import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures.UpdaterFeature;
 import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 import it.geosolutions.geobatch.flow.event.action.BaseAction;
@@ -46,8 +44,7 @@ import org.slf4j.LoggerFactory;
 @Action(configurationClass = MigrationConfiguration.class)
 public class MigrationAction extends BaseAction<EventObject> {
 
-	private final static Logger LOGGER = LoggerFactory.getLogger(MigrationAction.class);
-	private final MigrationConfiguration configuration;
+	private MigrationConfiguration configuration;
 
 	public MigrationAction(final MigrationConfiguration configuration) throws IOException {
 		super(configuration);
@@ -73,27 +70,27 @@ public class MigrationAction extends BaseAction<EventObject> {
 	public Queue<EventObject> execute(Queue<EventObject> events) throws ActionException {
 
 		listenerForwarder.setTask("Check config");
-
 		checkInit();
-
-		listenerForwarder.started();
-
 		final LinkedList<EventObject> ret = new LinkedList<EventObject>();
-
-		while (!events.isEmpty()) {
-			EventObject event = events.poll();
-			if (event instanceof FileSystemEvent) {
-				FileSystemEvent fse = (FileSystemEvent) event;
-				File file = fse.getSource();
-				doProcess(configuration,FilenameUtils.getBaseName(file.getName()));
+		try {
+			listenerForwarder.started();
+			while (!events.isEmpty()) {
+				EventObject event = events.poll();
+				if (event instanceof FileSystemEvent) {
+					FileSystemEvent fse = (FileSystemEvent) event;
+					File file = fse.getSource();
+					doProcess(configuration,FilenameUtils.getBaseName(file.getName()));
+				}
+				
+				// pass the feature config to the next action
+				ret.add(new FileSystemEvent(((FileSystemEvent)event).getSource(), FileSystemEventType.FILE_ADDED));
 			}
-			
-
-			// pass the feature config to the next action
-			ret.add(new FileSystemEvent(((FileSystemEvent)event).getSource(), FileSystemEventType.FILE_ADDED));
+			listenerForwarder.completed();
+			return ret;
+		} catch (Exception t) {
+			listenerForwarder.failed(t);
+			throw new ActionException(this, t.getMessage(), t);
 		}
-
-		return ret;
 	}
 
 	private void doProcess(MigrationConfiguration cfg, String typeName) throws ActionException {
