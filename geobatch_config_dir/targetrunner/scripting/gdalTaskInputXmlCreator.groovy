@@ -16,14 +16,15 @@ public Map execute(Map argsMap) throws Exception {
 	if(props != null && props.get('baseOutputPath') != null && !props.get('baseOutputPath').isEmpty()){
 		_baseOutputPath = props.get('baseOutputPath')
 	}
-    if(!_baseOutputPath.endsWith("\\")) {
-        _baseOutputPath = _baseOutputPath + "\\";
+	// Repair linux dist with file_separator
+    if(!_baseOutputPath.endsWith(fs)) {
+        _baseOutputPath = _baseOutputPath + fs;
     }
 	final List events = argsMap.get(ScriptingAction.EVENTS_KEY)
 	final EventObject event = events.poll();
 	final FeatureConfiguration featureConfiguration = unwrapFeatureConfig(event)
 	final String typeName = featureConfiguration.getTypeName()
-	final String shpDir = tempDir.getParentFile().getAbsolutePath() + fs + typeName + fs
+	final String shpDir = getShpDir(tempDir, fs, typeName)
 	
 	def myRegularExpression = '^([A-Z]{2})[_-]([A-Z]{2,3})[_-]([A-Z]+)([_-][C|I])?[_-]([0-9]{8})[_-]([0-9]{2})$'
 	def matcher = ( typeName =~ myRegularExpression )
@@ -55,6 +56,26 @@ public Map execute(Map argsMap) throws Exception {
 	 
 	return mapOut;
 }
+
+ /**
+  * Check if the excutions come from a remote operation and obtain related directory
+  *
+  * @return directory that contains the shp file
+  **/
+ private String getShpDir(File tempDir, String fs, String typeName){
+ 	String basePath = tempDir.getParentFile().getAbsolutePath();
+ 	String restInputStr = basePath + fs + 'rest_input';
+ 	try{
+ 		File restInputDir = new File(restInputStr);
+ 		if(restInputDir.exists()){
+ 			// basePath it's rest_input path
+ 			basePath = restInputStr;
+ 		}
+	} catch (Exception e){
+		// some error trying to get rest input path. We'll use base path
+	}
+	return basePath + fs + typeName + fs;
+ }
 
  private FeatureConfiguration unwrapFeatureConfig(EventObject event) throws ActionException {
 	if (event instanceof FileSystemEvent) {
