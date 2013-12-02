@@ -104,7 +104,7 @@ public class TargetIngestionProcess extends InputObject {
 	 */
 	public TargetIngestionProcess(String inputTypeName,
 			ProgressListenerForwarder listenerForwarder,
-			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+			MetadataIngestionHandler metadataHandler, DataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);		
 	}
 
@@ -181,10 +181,11 @@ public class TargetIngestionProcess extends InputObject {
 						partner, codicePartner, date, false);
 
 				// setup input reader								
-				createInputReader(dataStore, null, null);							
+				createInputReader(dataStore, Transaction.AUTO_COMMIT, null);	
+				
 									
 				// is it an update (alternative geo shapefile for an already imported one)
-				boolean update =isAnUpdate(dataStore, null);
+				boolean update =isAnUpdate(dataStore, Transaction.AUTO_COMMIT);
 				
 				// is it an update with new records (currently acque superficiali supports this
 				// modality)
