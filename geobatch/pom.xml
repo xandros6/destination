@@ -464,6 +464,11 @@
             <name>OpenGeo Maven Repository</name>
             <url>http://repo.opengeo.org</url>
         </repository>
+        <repository>
+            <id>jasig</id>
+            <name>JASIG Developers Maven Repository</name>
+            <url>https://developer.jasig.org/repo/content/repositories/3rd-party</url>
+        </repository>
     </repositories>
 
     
