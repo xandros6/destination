@@ -17,6 +17,8 @@
 package it.geosolutions.geobatch.destination;
 
 //import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
 import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
@@ -32,16 +34,17 @@ import org.apache.tools.ant.util.FileUtils;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.logging.Logging;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
@@ -197,7 +200,19 @@ public class RoadArcTest {
 	 * @throws IOException 
 	 */
 	private void checkFeature(String typeName, int expectedSize) throws IOException {
-		assertEquals(expectedSize, dataStore.getFeatureSource(typeName).getCount(new Query(typeName)));
+		SimpleFeatureSource featureSource = dataStore.getFeatureSource(typeName);
+		SimpleFeatureType schema = dataStore.getSchema(typeName);
+		assertNotNull(schema);
+		assertEquals(expectedSize, featureSource.getCount(new Query(typeName)));
+		SimpleFeatureIterator iterator = featureSource.getFeatures().features();
+		try {
+			while(iterator.hasNext()) {
+				SimpleFeature feature = iterator.next();
+				assertNotNull(feature);
+			}
+		} finally {
+			iterator.close();
+		}
 	}
 
 	/**

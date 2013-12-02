@@ -180,7 +180,7 @@ public class RiskSimulator extends RiskCalculatorBase {
 								conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
 								materials, scenarios, entities, severeness, fpfield, target, null, 
 								temp, precision,
-								null, psc, null, null, null);								
+								null, psc, null, null, null, false);								
 						result.addAll(temp.values());
 						temp = new HashMap<Number, SimpleFeature>();								
 					}

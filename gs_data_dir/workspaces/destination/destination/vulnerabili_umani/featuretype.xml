@@ -1,13 +1,13 @@
 <featureType>
-  <id>FeatureTypeInfoImpl-7108c48e:13d2049d06d:-7eeb</id>
-  <name>rischio_totale_sociale_2</name>
-  <nativeName>rischio_totale_sociale_2</nativeName>
+  <id>FeatureTypeInfoImpl-5dc16118:1429a374510:18e6</id>
+  <name>vulnerabili_umani</name>
+  <nativeName>vulnerabili_umani</nativeName>
   <namespace>
     <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
   </namespace>
-  <title>rischio_totale_sociale_2</title>
+  <title>vulnerabili_umani</title>
   <keywords>
-    <string>rischio_totale_sociale_2</string>
+    <string>vulnerabili_umani</string>
     <string>features</string>
   </keywords>
   <nativeCRS class="projected">PROJCS[&quot;WGS 84 / UTM zone 32N&quot;, &#xd;
@@ -32,17 +32,17 @@
   AUTHORITY[&quot;EPSG&quot;,&quot;32632&quot;]]</nativeCRS>
   <srs>EPSG:32632</srs>
   <nativeBoundingBox>
-    <minx>317643.7185</minx>
-    <maxx>761707.75</maxx>
-    <miny>4881314.0</miny>
-    <maxy>5216902.50012207</maxy>
+    <minx>-1.0</minx>
+    <maxx>1.0</maxx>
+    <miny>-1.0</miny>
+    <maxy>1.0</maxy>
     <crs class="projected">EPSG:32632</crs>
   </nativeBoundingBox>
   <latLonBoundingBox>
-    <minx>6.597724863865391</minx>
-    <maxx>12.445969435320345</maxx>
-    <miny>44.038289999473655</miny>
-    <maxy>47.10473618861783</maxy>
+    <minx>4.511247156296258</minx>
+    <maxx>4.511265074289679</maxx>
+    <miny>-9.0193759208E-6</miny>
+    <maxy>9.0193759208E-6</maxy>
     <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
   DATUM[&quot;WGS84&quot;, &#xd;
     SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
@@ -53,35 +53,18 @@
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
   <enabled>true</enabled>
-  <advertised>true</advertised>
   <metadata>
     <entry key="cachingEnabled">false</entry>
     <entry key="JDBC_VIRTUAL_TABLE">
       <virtualTable>
-        <name>rischio_totale_sociale_2</name>
-        <sql>SELECT&#xd;
-    siig_p.siig_geo_ln_arco_2.id_geo_arco,&#xd;
-    siig_p.siig_geo_ln_arco_2.geometria,&#xd;
-    siig_p.siig_t_elab_standard_2.calc_formula_soc AS rischio&#xd;
-FROM&#xd;
-    siig_p.siig_geo_ln_arco_2&#xd;
-INNER JOIN&#xd;
-    siig_p.siig_t_elab_standard_2&#xd;
-ON&#xd;
-    (&#xd;
-        siig_p.siig_geo_ln_arco_2.id_geo_arco = siig_p.siig_t_elab_standard_2.id_geo_arco)&#xd;
-where siig_geo_ln_arco_2.geometria &amp;&amp; st_makeenvelope(%bounds%, 32632)</sql>
-        <keyColumn>id_geo_arco</keyColumn>
+        <name>vulnerabili_umani</name>
+        <sql>select 1 as id, ST_GeomFromText(&apos;POINT(0 0)&apos;,32632) as geometria</sql>
+        <keyColumn>id</keyColumn>
         <geometry>
           <name>geometria</name>
-          <type>MultiLineString</type>
+          <type>Geometry</type>
           <srid>32632</srid>
         </geometry>
-        <parameter>
-          <name>bounds</name>
-          <defaultValue>250000,4800000,1000000,6300000</defaultValue>
-          <regexpValidator>^[\w\d\s,\.\-]+$</regexpValidator>
-        </parameter>
       </virtualTable>
     </entry>
   </metadata>

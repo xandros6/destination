@@ -191,7 +191,8 @@ public class RiskCalculator extends RiskCalculatorBase {
 			@DescribeParameter(name = "pis", description = "optional List (_ delimited) of csv id_geo_arco,pis values to use on the simulation", min = 0) String pis,
 			@DescribeParameter(name = "distances", description = "optional list of distances for the simulation processing", min = 0) String distances,
 			
-			@DescribeParameter(name = "damageArea", description = "optional field containing damage area geometry or an id for the ProcessingRepository storing the same data", min = 0) String damageArea
+			@DescribeParameter(name = "damageArea", description = "optional field containing damage area geometry or an id for the ProcessingRepository storing the same data", min = 0) String damageArea,
+			@DescribeParameter(name = "extendedSchema", description = "optional field that chooses an extended schema for the result (useful for download)", min = 0) Boolean extendedSchema
 
 		) throws IOException, SQLException {
 		// building DataStore connection using Catalog/storeName or connection input parameters
@@ -213,6 +214,9 @@ public class RiskCalculator extends RiskCalculatorBase {
 		
 		if(features == null) {
 			throw new ProcessException("Missing input feature");
+		}
+		if(extendedSchema == null) {
+			extendedSchema = false;
 		}
 		checkProcessingAllowed(dataStore, processing);
 		if(processing == 3) {
@@ -248,7 +252,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 			return calculateRisk(features, dataStore, storeName, precision, connectionParams,
 					processing, formula, target, materials, scenarios,
 					entities, severeness, fpfield, 1, true, null, null, simulationTargets, cffs, pscs,
-					padrs, piss, distancesList);
+					padrs, piss, distancesList, extendedSchema);
 		} else if(processing == 4){
 			try {
 				Geometry damageAreaGeometry = loadDamageArea(dataStore, damageArea);
@@ -256,7 +260,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 				return calculateRisk(features, dataStore, storeName, precision, connectionParams,
 						processing, formula, target, materials, scenarios,
 						entities, severeness, fpfield, 1, false, damageAreaGeometry, damageValues, null, null, null,
-						null, null, null);
+						null, null, null, extendedSchema);
 			} catch (ParseException e) {
 				throw new ProcessException("Error reading targets WKT", e);
 			}
@@ -270,7 +274,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 			return calculateRisk(features, dataStore, storeName, precision, connectionParams,
 					processing, formula, target, materials, scenarios,
 					entities, severeness, fpfield, batch, false, null, null, null, null, null,
-					null, null, null);
+					null, null, null, extendedSchema);
 						
 		}
 		
@@ -515,7 +519,8 @@ public class RiskCalculator extends RiskCalculatorBase {
 			List<String> psc,
 			Map<Integer, Map<Integer, Double>> padrs,
 			Map<Integer, Double> piss,
-			List<Integer> distances
+			List<Integer> distances,
+			boolean extendedSchema
 		) throws IOException, SQLException {
 		
 		if(precision == null) {
@@ -535,8 +540,17 @@ public class RiskCalculator extends RiskCalculatorBase {
 			SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();									
 			tb.add("id_geo_arco", features.getSchema().getDescriptor("id_geo_arco").getType().getBinding());
 			tb.add("geometria", MultiLineString.class,features.getSchema().getGeometryDescriptor().getCoordinateReferenceSystem());
-	        tb.add("rischio1", Double.class);			
-	        tb.add("rischio2", Double.class);
+			
+			if(extendedSchema) {
+				tb.add("rischio_sociale", Double.class);			
+		        tb.add("rischio_ambientale", Double.class);
+				tb.add("nr_corsie", Integer.class);			
+		        tb.add("lunghezza", Integer.class);
+		        tb.add("nr_incidenti", Integer.class);
+			} else {
+				tb.add("rischio1", Double.class);			
+		        tb.add("rischio2", Double.class);
+			}
 	        // fake layer name (risk) used for WPS output. Layer risk must be defined in GeoServer
 	        // catalog
 	        tb.setName(new NameImpl(features.getSchema().getName().getNamespaceURI(), "risk"));	        
@@ -588,7 +602,11 @@ public class RiskCalculator extends RiskCalculatorBase {
 						} 
 						fb.add(risk[0]);
 						fb.add(risk[1]);
-												
+						if(extendedSchema) {
+							fb.add((Number)feature.getAttribute("nr_corsie"));			
+					        fb.add((Number)feature.getAttribute("lunghezza"));
+					        fb.add((Number)feature.getAttribute("nr_incidenti"));
+						}
 						temp.put(id.intValue(), fb.buildFeature(id + ""));						
 							
 						if(simulation) {
@@ -631,7 +649,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 									conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
 									materials, scenarios, entities, severeness, fpfield, target, simulationTargets, 
 									temp, precision,
-									cff, psc, padr, pis, null);
+									cff, psc, padr, pis, null, extendedSchema);
 							
 							result.addAll(temp.values());
 							temp = new HashMap<Number, SimpleFeature>();	
@@ -642,7 +660,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 										conn, level, processing, formulaDescriptor, id.intValue(), fk_partner,
 										materials, scenarios, entities, severeness, fpfield, target, null, 
 										temp, precision,
-										null, null, null, null, damageValues);
+										null, null, null, null, damageValues, extendedSchema);
 								result.addAll(temp.values());								
 							}
 							temp = new HashMap<Number, SimpleFeature>();
@@ -654,7 +672,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 								LOGGER.info("Calculated " + count + " values");
 								FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
 										.substring(1), fk_partner, materials, scenarios,
-										entities, severeness, fpfield, target, temp, precision);								
+										entities, severeness, fpfield, target, temp, precision, extendedSchema);								
 								result.addAll(temp.values());
 								ids = new StringBuilder();
 								temp = new HashMap<Number, SimpleFeature>();								
@@ -668,7 +686,7 @@ public class RiskCalculator extends RiskCalculatorBase {
 					if(ids.length() > 0) {
 						FormulaUtils.calculateFormulaValues(conn, level, processing, formulaDescriptor, ids.toString()
 								.substring(1), fk_partner, materials, scenarios, entities,
-								severeness, fpfield, target, temp, precision);
+								severeness, fpfield, target, temp, precision, extendedSchema);
 					}					
 					result.addAll(temp.values());
 					
