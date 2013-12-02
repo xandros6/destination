@@ -18,9 +18,6 @@
 
     <EventConsumerConfiguration>
 
-        <listenerId>ConsumerLogger0</listenerId>
-        <listenerId>Cumulator</listenerId>
-
         <MigrationConfiguration>
 			<id>migration</id>
 			<description>migration</description>
@@ -104,25 +101,26 @@
 					</entry>
 				</dataStore>
 			</outputFeature>
+			<!-- Listeners -->
+	        <listenerId>ConsumerLogger0</listenerId>
+	        <listenerId>Cumulator</listenerId>
 		</MigrationConfiguration>
 		
 	</EventConsumerConfiguration>
 
 
     <ListenerConfigurations>
-
         <LoggingProgressListener>
             <serviceID>loggingListenerService</serviceID>
             <id>ConsumerLogger0</id>
-
             <loggerName>it.geosolutions.ConsLogger</loggerName>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
         </LoggingProgressListener>
-
         <CumulatingProgressListener>
             <serviceID>cumulatingListenerService</serviceID>
             <id>Cumulator</id>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
         </CumulatingProgressListener>
-
     </ListenerConfigurations>
 
 </FlowConfiguration>
