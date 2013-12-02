@@ -126,11 +126,11 @@
       <null/>
     </entry>
     <entry>
-      <string>InputTransparentColor</string>
+      <string>OutputTransparentColor</string>
       <string></string>
     </entry>
     <entry>
-      <string>OutputTransparentColor</string>
+      <string>InputTransparentColor</string>
       <string></string>
     </entry>
     <entry>
@@ -138,12 +138,12 @@
       <string>512,512</string>
     </entry>
     <entry>
-      <string>USE_JAI_IMAGEREAD</string>
-      <string>true</string>
-    </entry>
-    <entry>
       <string>BackgroundValues</string>
       <null/>
+    </entry>
+    <entry>
+      <string>USE_JAI_IMAGEREAD</string>
+      <string>true</string>
     </entry>
   </parameters>
 </coverage>

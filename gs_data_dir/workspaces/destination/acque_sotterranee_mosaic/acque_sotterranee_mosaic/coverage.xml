@@ -112,7 +112,7 @@
   <parameters>
     <entry>
       <string>AllowMultithreading</string>
-      <string>false</string>
+      <string>true</string>
     </entry>
     <entry>
       <string>Filter</string>
@@ -127,24 +127,24 @@
       <null/>
     </entry>
     <entry>
-      <string>InputTransparentColor</string>
-      <string></string>
-    </entry>
-    <entry>
       <string>OutputTransparentColor</string>
       <string></string>
     </entry>
     <entry>
-      <string>SUGGESTED_TILE_SIZE</string>
-      <string>512,512</string>
+      <string>InputTransparentColor</string>
+      <string></string>
     </entry>
     <entry>
-      <string>USE_JAI_IMAGEREAD</string>
-      <string>true</string>
+      <string>SUGGESTED_TILE_SIZE</string>
+      <null/>
     </entry>
     <entry>
       <string>BackgroundValues</string>
       <null/>
+    </entry>
+    <entry>
+      <string>USE_JAI_IMAGEREAD</string>
+      <string>false</string>
     </entry>
   </parameters>
 </coverage>
