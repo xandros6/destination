@@ -86,7 +86,7 @@ public class StreetUserComputation extends InputObject {
 			FeatureIterator<SimpleFeature> inputIterator = null;
 			try {
 				inputIterator = inputReader.getFeatures(inputQuery).features();
-	
+
 				FeatureStore<SimpleFeatureType, SimpleFeature> outputFeatureStore = FeatureLoaderUtils.createFeatureSource(dataStore, transaction,this.siig_r_scen_vuln_X_type);
 				Query clearQuery = new Query(this.siig_r_scen_vuln_X_type);
 				while(inputIterator.hasNext()) {
@@ -96,13 +96,13 @@ public class StreetUserComputation extends InputObject {
 					clearQuery.setFilter(filterFactory.equals(filterFactory.property("id_geo_arco"),filterFactory.literal(idGeoArco)));
 					outputFeatureStore.removeFeatures(clearQuery.getFilter());
 				}
-		    	    
+
 				transaction.commit();
 			} finally  {
-		    	if(inputIterator != null) {
-		    		inputIterator.close();
-		    	}
-		    }	
+				if(inputIterator != null) {
+					inputIterator.close();
+				}
+			}	
 		}catch (Exception ex){
 			LOGGER.error(ex.getMessage(),ex);
 			try {
@@ -128,15 +128,17 @@ public class StreetUserComputation extends InputObject {
 		FeatureIterator<SimpleFeature> inputIterator = null;
 		try {
 			inputIterator = inputReader.getFeatures(inputQuery).features();
-		
+
 			while(inputIterator.hasNext()) {
 				SimpleFeature sf = inputIterator.next();
-				LOGGER.debug("Scenario <" + sf.getAttribute("tipologia") + "> found ");
-				StreetScenario scenario = new StreetScenario();
-				scenario.setIdScenario(getAttributeAsInt(sf.getAttribute("id_scenario")));
-				scenario.setDescrizioneScenario((String) sf.getAttribute("tipologia"));			
-				scenario.setTempoDiCoda(getAttributeAsDouble(sf.getAttribute("tempo_di_coda")) / SECONDS_IN_HOUR);
-				scenari.add(scenario);	
+				if(sf.getAttribute("tempo_di_coda") != null){
+					LOGGER.debug("Scenario <" + sf.getAttribute("tipologia") + "> found ");
+					StreetScenario scenario = new StreetScenario();
+					scenario.setIdScenario(getAttributeAsInt(sf.getAttribute("id_scenario")));
+					scenario.setDescrizioneScenario((String) sf.getAttribute("tipologia"));
+					scenario.setTempoDiCoda(getAttributeAsDouble(sf.getAttribute("tempo_di_coda")) / SECONDS_IN_HOUR);
+					scenari.add(scenario);	
+				}
 			}
 			return scenari;
 		} finally {
@@ -144,8 +146,8 @@ public class StreetUserComputation extends InputObject {
 				inputIterator.close();
 			}
 		}
-		
-		
+
+
 	}
 
 	public void execute(Integer aggregationLevel) throws IOException {
@@ -198,26 +200,26 @@ public class StreetUserComputation extends InputObject {
 					SimpleFeature sfCell = null;
 					FeatureStore<SimpleFeatureType, SimpleFeature> inputReaderCell = FeatureLoaderUtils.createFeatureSource(dataStore, transaction,"siig_geo_pl_arco_" + aggregationLevel);
 					Query inputQueryCell = new Query("siig_geo_pl_arco_" + aggregationLevel);
-	
+
 					inputQueryCell.setFilter(filterFactory.and(
 							filterFactory.equals(filterFactory.property("fk_partner"),filterFactory.literal(partner)),
 							filterFactory.equals(filterFactory.property("id_geo_arco"), filterFactory.literal(idGeoCell))
 							));
-	
+
 					FeatureIterator<SimpleFeature>  inputIteratorCell = null; 
 					try {
 						inputIteratorCell = inputReaderCell.getFeatures(inputQueryCell).features();
 						if(inputIteratorCell.hasNext()) {
 							sfCell = inputIteratorCell.next();					
 						}
-						
+
 					} finally {
 						if(inputIteratorCell != null) {
 							inputIteratorCell.close();
 						}
 					}
-					
-					
+
+
 					if(sfCell == null){
 						continue;
 					}
@@ -260,15 +262,15 @@ public class StreetUserComputation extends InputObject {
 							inputIteratorArc.close();
 						}
 					}
-	
+
 					for(Integer idScenario : cellResults.keySet()){
 						StreetUserResult celResult = cellResults.get(idScenario);
 						persistStreetUsersData(partner,idGeoCell, idDistanza, idScenario, celResult.getUtentiSede(), celResult.getUtentiBersaglio(), featureStore);
 						transaction.commit(); 
 					}
-	
+
 				}
-				
+
 				transaction.commit();
 			} finally {
 				if(inputIterator != null) {
@@ -313,11 +315,11 @@ public class StreetUserComputation extends InputObject {
 			FeatureIterator<SimpleFeature> inputIterator = null;
 			try {
 				inputIterator = inputReader.getFeatures(inputQuery).features();
-			
+
 
 				SimpleFeatureStore featureStore = (SimpleFeatureStore) this.dataStore.getFeatureSource(this.siig_r_scen_vuln_X_type);
 				featureStore.setTransaction( transaction );
-	
+
 				while(inputIterator.hasNext()) {
 					SimpleFeature sf = inputIterator.next();
 					Integer idGeoArco = getAttributeAsInt(sf.getAttribute("id_geo_arco"));
@@ -332,7 +334,7 @@ public class StreetUserComputation extends InputObject {
 						}
 					}
 				}
-				
+
 				transaction.commit(); 
 			} finally {
 				if(inputIterator != null) {
@@ -599,7 +601,7 @@ public class StreetUserComputation extends InputObject {
 	public void setRemoveFeatures(boolean removeFeatures) {
 		this.removeFeatures = removeFeatures;
 	}
-	
+
 	private int getAttributeAsInt(Object value){
 		if(value instanceof BigDecimal){
 			return ((BigDecimal)value).intValue();
@@ -607,7 +609,7 @@ public class StreetUserComputation extends InputObject {
 			return ((Integer)value).intValue();
 		}
 	}
-	
+
 	private double getAttributeAsDouble(Object value){
 		if(value instanceof BigDecimal){
 			return ((BigDecimal)value).doubleValue();
