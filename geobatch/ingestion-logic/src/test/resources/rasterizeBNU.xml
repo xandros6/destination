@@ -1,6 +1,0 @@
-<GdalRasterize>
-  <shapefilename>BZ_BNU-ASOTT_C_20130521_02</shapefilename>
-  <shapefilepath>G:\Temp\RASTERIZE_INPUT\BZ_BNU-ASOTT_C_20130521_02\</shapefilepath>
-  <baseOutputPath>G:\Temp\RASTERIZE_OUTPUT\</baseOutputPath>
-  <targetValue>1</targetValue>
-</GdalRasterize>
