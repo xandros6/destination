@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 public class TargetRasterizeTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StreetUserTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TargetRasterizeTest.class);
 	private TaskExecutorConfiguration taskExecutorConfiguration;
 
 	static{
