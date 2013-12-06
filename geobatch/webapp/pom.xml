@@ -83,6 +83,37 @@
       <groupId>it.geosolutions.geobatch</groupId>
       <artifactId>gb-dao-xstream</artifactId>
     </dependency>
+    <dependency>
+      <groupId>it.geosolutions.geobatch</groupId>
+      <artifactId>gb-web-core</artifactId>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>it.geosolutions.geobatch</groupId>
+      <artifactId>gb-web-core</artifactId>
+      <classifier>classes</classifier>
+    </dependency>
+    <dependency>
+        <groupId>it.geosolutions.geobatch</groupId>
+        <artifactId>gb-action-commons</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>it.geosolutions.geobatch</groupId>
+        <artifactId>gb-action-freemarker</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>it.geosolutions.geobatch</groupId>
+        <artifactId>gb-action-shapefile</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>it.geosolutions.geobatch</groupId>
+        <artifactId>gb-rest-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>it.geosolutions.geobatch</groupId>
+        <artifactId>gb-rest-impl</artifactId>
+    </dependency>
     <!-- ============================== -->
     <!-- log4j -->
     <!-- ============================== -->
