@@ -38,6 +38,8 @@ public abstract class DestinationMemoryTest {
 		}
 	}
 
+	protected abstract void checkData();
+	
 	protected void initTestWithData(String[] strings) throws IOException, SchemaException {
 		initTestDataStore();
 		loadTestData(strings);

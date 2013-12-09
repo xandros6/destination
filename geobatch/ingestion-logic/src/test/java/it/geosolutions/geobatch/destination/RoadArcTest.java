@@ -111,6 +111,12 @@ public class RoadArcTest extends DestinationMemoryTest{
 		return process;
 	}
 
+	@Override
+	protected void checkData() {
+		// TODO Auto-generated method stub
+		
+	}
+
 	/*
 	@Test  @Ignore
 	public void testImportArcs() throws IOException {

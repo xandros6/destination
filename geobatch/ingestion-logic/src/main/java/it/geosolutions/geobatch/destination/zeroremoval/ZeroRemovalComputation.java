@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.Transaction;
@@ -108,7 +109,7 @@ public class ZeroRemovalComputation extends InputObject {
 	 */
 	public ZeroRemovalComputation(double kIncr, String inputTypeName,
 			ProgressListenerForwarder listenerForwarder,
-			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+			MetadataIngestionHandler metadataHandler, DataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
 		this.kInc = kIncr;
 	}
@@ -121,7 +122,7 @@ public class ZeroRemovalComputation extends InputObject {
 	 */
 	public ZeroRemovalComputation(String inputTypeName,
 			ProgressListenerForwarder listenerForwarder,
-			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+			MetadataIngestionHandler metadataHandler, DataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
 		this.kInc = KINCR_DEFAULT_VALUE;
 	}
@@ -212,7 +213,7 @@ public class ZeroRemovalComputation extends InputObject {
 		try{
 			//Check if exists almost one arc for partner with NR_INCIDENTI_ELAB = 0
 			String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
-			createInputReader(dataStore, null, geoName);
+			createInputReader(dataStore,  Transaction.AUTO_COMMIT, geoName);
 			setInputFilter(
 					filterFactory.and(
 							filterFactory.equals(filterFactory.property(PARTNER_FIELD),filterFactory.literal(partner)),
@@ -235,9 +236,9 @@ public class ZeroRemovalComputation extends InputObject {
                 String geoName = getTypeName(GEO_TYPE_NAME, aggregationLevel);
     
                 // setup input reader
-                createInputReader(dataStore, null, geoName);
+                createInputReader(dataStore, transaction, geoName);
     
-                OutputObject geoObject = new OutputObject(dataStore, null, geoName, GEOID);
+                OutputObject geoObject = new OutputObject(dataStore, transaction, geoName, GEOID);
     
                 setInputFilter(filterFactory.equals(filterFactory.property(PARTNER_FIELD),
                         filterFactory.literal(partner)));

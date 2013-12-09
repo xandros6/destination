@@ -126,4 +126,10 @@ public class TargetRasterizeTest extends DestinationMemoryTest{
 
 	}
 
+	@Override
+	protected void checkData() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
