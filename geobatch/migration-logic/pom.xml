@@ -88,7 +88,6 @@ Version: $Id: pom.xml 329 2011-06-14 13:00:49Z ccancellieri $ ==================
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
         </dependency>
 
         <dependency>
