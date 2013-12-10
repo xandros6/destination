@@ -63,7 +63,7 @@ public class FeatureLoaderUtils {
     
     private static MultiKeyMap featureAttributesMap = new MultiKeyMap();
 
-    public static List<SimpleFeature> loadFeatures(JDBCDataStore datastore, String featureTypeName) {
+    public static List<SimpleFeature> loadFeatures(DataStore datastore, String featureTypeName) {
 
         List<SimpleFeature> features = new ArrayList<SimpleFeature>();
         FeatureIterator iter = null;

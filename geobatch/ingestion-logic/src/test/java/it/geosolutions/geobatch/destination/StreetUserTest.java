@@ -78,4 +78,10 @@ public class StreetUserTest extends DestinationMemoryTest{
 		return process;
 	}
 
+	@Override
+	protected void checkData() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

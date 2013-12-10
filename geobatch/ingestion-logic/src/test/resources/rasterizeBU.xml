@@ -1,6 +1,0 @@
-<GdalRasterize>
-  <shapefilename>BZ_BU-ASCOL_C_20130531_01</shapefilename>
-  <shapefilepath>G:\Temp\RASTERIZE_INPUT\BZ_BU-ASCOL_C_20130531_01\</shapefilepath>
-  <baseOutputPath>G:\Temp\RASTERIZE_OUTPUT\</baseOutputPath>
-  <attributeToNormalize>N_ADDETTI</attributeToNormalize>
-</GdalRasterize>

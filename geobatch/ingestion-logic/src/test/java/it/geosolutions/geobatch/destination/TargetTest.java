@@ -159,4 +159,10 @@ public class TargetTest extends DestinationMemoryTest{
 		return process;
 	}
 
+	@Override
+	protected void checkData() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
