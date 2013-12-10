@@ -1,10 +1,10 @@
-siig_geo_ln_arco_1=id_geo_arco1=1|0|0|1|10|1|1|1|LINESTRING (0 0, 100 0)|1|S|C		
-siig_geo_ln_arco_1=id_geo_arco2=2|0|0|1|10|1|1|1|LINESTRING (50 -100, 50 100)|1|S|C
-siig_geo_ln_arco_2=id_geo_arco1=1|0|0|1|10|1|1|1|LINESTRING (0 0, 100 0)|1|S|C	
-siig_geo_ln_arco_2=id_geo_arco2=2|0|0|1|10|1|1|1|LINESTRING (50 -100, 50 100)|1|S|C
-siig_geo_ln_arco_3=id_geo_arco1=1|0|0|1|10|1|1|1|LINESTRING (0 0, 100 0)|1|S|C	
-siig_geo_ln_arco_3=id_geo_arco2=2|0|0|1|10|1|1|1|LINESTRING (50 -100, 50 100)|1|S|C
-siig_geo_pl_arco_3=id_geo_arco1=1|0|0|1|10|1|1|1|LINESTRING (25 -50, 125 -50, 125 50, 25 50)|1|S|C	
+siig_geo_ln_arco_1=id_geo_arco1=1|0|0|1|10|1|1|LINESTRING (0 0, 100 0)|1|S|C		
+siig_geo_ln_arco_1=id_geo_arco2=2|0|0|1|10|1|1|LINESTRING (50 -100, 50 100)|1|S|C
+siig_geo_ln_arco_2=id_geo_arco1=1|0|0|1|10|1|1|LINESTRING (0 0, 100 0)|1|S|C	
+siig_geo_ln_arco_2=id_geo_arco2=2|0|0|1|10|1|1|LINESTRING (50 -100, 50 100)|1|S|C
+siig_geo_ln_arco_3=id_geo_arco1=1|0|0|1|10|1|1|LINESTRING (0 0, 100 0)|1|S|C	
+siig_geo_ln_arco_3=id_geo_arco2=2|0|0|1|10|1|1|LINESTRING (50 -100, 50 100)|1|S|C
+siig_geo_pl_arco_3=id_geo_arco1=1|0|0|1|10|1|1|LINESTRING (25 -50, 125 -50, 125 50, 25 50)|1|S|C	
 siig_r_tipovei_geoarco1=id11,1=1|1|5600|50|1|S|C
 siig_r_tipovei_geoarco1=id21,1=2|1|1600|50|1|S|C		
 siig_r_tipovei_geoarco1=id21,2=1|2|900|50|1|S|C

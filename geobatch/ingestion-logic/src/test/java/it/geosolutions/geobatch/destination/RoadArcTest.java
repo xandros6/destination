@@ -113,4 +113,9 @@ public class RoadArcTest extends DestinationMemoryTest{
 		return process;
 	}
 
+	@Override
+	protected void checkData() {
+		
+	}
+
 }
