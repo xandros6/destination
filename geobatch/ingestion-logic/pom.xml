@@ -108,16 +108,18 @@
 			<version>8-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
-		<!--
-        org.geotools.jdbc
-        gt-jdbc-postgis
-        10-SNAPSHOT
-        test 
-        <dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-postgis-versioned</artifactId>
-			<version>8-SNAPSHOT</version>
-		</dependency> -->
+	    <dependency>
+	        <groupId>org.geotools</groupId>
+	        <artifactId>gt-coveragetools</artifactId>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.geotools</groupId>
+	        <artifactId>gt-image</artifactId>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.geotools</groupId>
+	        <artifactId>gt-imagemosaic</artifactId>
+	    </dependency>
 
 		<!-- =========================================================== -->
 
