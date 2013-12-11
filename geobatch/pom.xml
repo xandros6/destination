@@ -55,6 +55,10 @@
         <slf4j.version>1.5.11</slf4j.version>
         <!-- <slf4j.version>1.6.6</slf4j.version> -->
         <log4j.version>1.2.17</log4j.version>    
+        <joda-time.version>2.3</joda-time.version>
+        <jt.version>1.2.0</jt.version>
+        <jai.version>1.1.3</jai.version>
+        <jai_imageio.version>1.1</jai_imageio.version>
 <!--
         <allow.test.skip>true</allow.test.skip>
         <allow.test.failure.ignore>false</allow.test.failure.ignore>
@@ -270,7 +274,7 @@
                 <version>${gt.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
+	        <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-shapefile</artifactId>
                 <version>${gt.version}</version>
@@ -278,7 +282,8 @@
             <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-transform</artifactId>
-                <version>${gt.version}</version>
+                <!-- <version>${gt.version}</version> -->
+                <version>10-SNAPSHOT</version>
             </dependency>
 
             <!-- ============================== -->
@@ -309,6 +314,13 @@
               <version>${slf4j.version}</version>
             </dependency>
 
+            <!-- Joda time -->
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda-time.version}</version>
+            </dependency>
+            
             <!-- ============================== -->
             <!-- Test: JETTY -->
             <!-- ============================== -->
@@ -332,6 +344,29 @@
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
+            </dependency>
+            
+            <!-- JAI Tools -->
+            <dependency>
+                <!--<groupId>com.googlecode.jaitools</groupId> -->
+                <groupId>org.jaitools</groupId>
+                <artifactId>jt-zonalstats</artifactId>
+                <version>${jt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.media</groupId>
+                <artifactId>jai_core</artifactId>
+                <version>${jai.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.media</groupId>
+                <artifactId>jai_codec</artifactId>
+                <version>${jai.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.media</groupId>
+                <artifactId>jai_imageio</artifactId>
+                <version>${jai_imageio.version}</version>
             </dependency>
 
         </dependencies>

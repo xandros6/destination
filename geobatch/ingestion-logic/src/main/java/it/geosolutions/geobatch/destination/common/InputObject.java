@@ -88,14 +88,14 @@ public abstract class InputObject {
 	
 	//
 	private String inputTypeName = "";
-	private ProgressListener listenerForwarder=null;
+	protected ProgressListener listenerForwarder=null;
 	
 	private boolean valid = false;
 	
 	FeatureStore<SimpleFeatureType, SimpleFeature> inputReader = null;
 	Query inputQuery = null;	
 	FeatureIterator<SimpleFeature> inputIterator = null;
-	int inputCount = 0;
+	protected int inputCount = 0;
 	int readCount = 0;
 	
 	protected MetadataIngestionHandler metadataHandler;

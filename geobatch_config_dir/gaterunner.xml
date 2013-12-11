@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowConfiguration>
+
+    <id>gaterunner</id>
+
+    <name>Gate ingestion</name>
+    <description>Gate data ingestion for Destination project that reads plain xml file</description>
+
+    <autorun>true</autorun>
+
+    <EventGeneratorConfiguration>
+        <serviceID>fsEventGeneratorService</serviceID>
+        <wildCard>*.xml</wildCard>
+        <watchDirectory>gaterunner/in</watchDirectory>
+        <osType>OS_UNDEFINED</osType>
+        <eventType>FILE_ADDED</eventType>
+    </EventGeneratorConfiguration>
+
+    <EventConsumerConfiguration>
+
+        <listenerId>ConsumerLogger0</listenerId>
+        <listenerId>Cumulator</listenerId>
+
+        <GateIngestionConfiguration>
+            <id>import_data</id>
+            <name>XML gate ingestion</name>
+            <description>Ingesting xml file into the DB</description>
+            <listenerConfigurations/>
+            <failIgnored>false</failIgnored>
+            <purgeData>true</purgeData>
+            <outputFeature>
+                <dataStore>
+                   <entry>
+                     <string>dbtype</string>
+                     <string>postgis</string>
+                   </entry>
+                   <entry>
+                     <string>host</string>
+                     <string>localhost</string>
+                   </entry>
+                   <entry>
+                     <string>port</string>
+                     <string>5432</string>
+                   </entry>
+                   <entry>
+                     <string>database</string>
+                     <string>destination_staging</string>
+                   </entry>
+                   <entry>
+                     <string>database</string>
+                     <string>destination_staging</string>
+                   </entry>
+                   <entry>
+                     <string>schema</string>
+                     <string>siig_p</string>
+                   </entry>
+                   <entry>
+                     <string>user</string>
+                     <string>siig_p</string>
+                   </entry>
+                   <entry>
+                     <string>passwd</string>
+                     <string>siig_p</string>
+                   </entry>
+                </dataStore>
+            </outputFeature>
+            <projectOnMappings>false</projectOnMappings>
+            <ignorePks>false</ignorePks>
+            <attributeMappings/>
+            <!-- Listeners -->
+            <listenerId>ConsumerLogger0</listenerId>
+            <listenerId>Cumulator</listenerId>
+        </GateIngestionConfiguration>
+
+    </EventConsumerConfiguration>
+
+    <ListenerConfigurations>
+        <LoggingProgressListener>
+            <serviceID>loggingListenerService</serviceID>
+            <id>ConsumerLogger0</id>
+            <loggerName>it.geosolutions.ConsLogger</loggerName>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
+        </LoggingProgressListener>
+        <CumulatingProgressListener>
+            <serviceID>cumulatingListenerService</serviceID>
+            <id>Cumulator</id>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
+        </CumulatingProgressListener>
+    </ListenerConfigurations>
+
+</FlowConfiguration>
