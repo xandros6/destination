@@ -412,7 +412,7 @@ public class DestinationDownload extends RiskCalculatorBase {
 							scenarios, entities, severeness, fpfield, changedTargets, cff,
 							psc, padr, pis, distances, damageArea, language));
 					
-					String riskShapeFileName = UUID.randomUUID().toString() + ".zip";							
+					String riskShapeFileName = createUniqueFileName() + ".zip";							
 					
 					// original arcs with no risk
 					finalZipFileNames.add(writeToShapeFile(riskShapeFileName, features));
@@ -466,7 +466,7 @@ public class DestinationDownload extends RiskCalculatorBase {
 			String materials, String scenarios, String entities,
 			String fpfield, String language,
 			Connection conn) throws IOException, SQLException {
-		String reportFileName = UUID.randomUUID().toString() + ".txt";
+		String reportFileName = createUniqueFileName() + ".txt";
 		BufferedWriter writer = null;
 		try{
 			 writer = new BufferedWriter(new FileWriter(downloadFolder + File.separator + reportFileName));
@@ -720,7 +720,7 @@ public class DestinationDownload extends RiskCalculatorBase {
 	 */
 	private String createTargetShapefile(
 			SimpleFeatureCollection targetCollection) throws FileNotFoundException, IOException {
-		String targetShapeFileName = UUID.randomUUID().toString() + ".zip";			
+		String targetShapeFileName = createUniqueFileName() + ".zip";			
 		
 		return writeToShapeFile(targetShapeFileName, targetCollection);
 	}
@@ -773,7 +773,7 @@ public class DestinationDownload extends RiskCalculatorBase {
 			}
 			new File(tempFilePath).delete();
 		}
-		String fileName = UUID.randomUUID().toString() + ".zip";
+		String fileName = createUniqueFileName() + ".zip";
 		ZipOutputStream outZip = new ZipOutputStream(new FileOutputStream(
 				downloadFolder + File.separator + fileName));
 		org.geoserver.data.util.IOUtils.zipDirectory(tempDir, outZip, null);
@@ -872,10 +872,21 @@ public class DestinationDownload extends RiskCalculatorBase {
 			String damageArea) throws IOException,
 			SQLException, FileNotFoundException {
 		
-		String riskShapeFileName = UUID.randomUUID().toString() + ".zip";
-		SimpleFeatureCollection fc = riskCalculator.execute(features, storeName, batch, precision, connectionParams, processing, formula, target, materials, scenarios, entities, severeness, fpfield, changedTargets, cff, psc, padr, pis, distances, damageArea);			
+		String riskShapeFileName = createUniqueFileName() + ".zip";
+		SimpleFeatureCollection fc = riskCalculator.execute(features,
+				storeName, batch, precision, connectionParams, processing,
+				formula, target, materials, scenarios, entities, severeness,
+				fpfield, changedTargets, cff, psc, padr, pis, distances,
+				damageArea, true);			
 		
 		return writeToShapeFile(riskShapeFileName, fc);
+	}
+
+	/**
+	 * @return
+	 */
+	private String createUniqueFileName() {
+		return UUID.randomUUID().toString();
 	}
 	
 	/**
@@ -914,7 +925,7 @@ public class DestinationDownload extends RiskCalculatorBase {
 			String damageArea, String language) throws IOException,
 			SQLException, FileNotFoundException, ParseException {
 		
-		String riskCSVFileName = UUID.randomUUID().toString() + ".csv";
+		String riskCSVFileName = createUniqueFileName() + ".csv";
 		String fcString = simpleRiskCalculator.execute(storeName, batch, precision, connectionParams, processing, formula, target, materials, scenarios, entities, severeness, fpfield);			
 		JSONParser parser = new JSONParser();
 		JSONObject root = (JSONObject)parser.parse(fcString);
@@ -997,7 +1008,7 @@ public class DestinationDownload extends RiskCalculatorBase {
 			String damageArea) throws IOException,
 			SQLException, FileNotFoundException, SchemaException {
 		
-		String damageAreaShapeFileName = UUID.randomUUID().toString() + ".zip";
+		String damageAreaShapeFileName = createUniqueFileName() + ".zip";
 		SimpleFeatureCollection fc = null;
 		if(processing == 4) {
 			SimpleFeatureType type = DataUtilities.createType("damagearea", 

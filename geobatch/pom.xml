@@ -45,11 +45,16 @@
 
     <properties>
 	<gb.version>1.4-SNAPSHOT</gb.version>
-        <gt.version>8-SNAPSHOT</gt.version>
+        <gt.version>10-SNAPSHOT</gt.version>
         <destination.version>1.0-SNAPSHOT</destination.version>
         <jetty.version>6.1.8</jetty.version>
         <javaassist.version>3.13.0-GA</javaassist.version>
         <junit.version>4.10</junit.version>
+        <!-- Caution: this dependencies maybe the same that inside GeoBatch.
+            Incompatible versions between slf4j and log4j causes crash deployment of war files -->
+        <slf4j.version>1.5.11</slf4j.version>
+        <!-- <slf4j.version>1.6.6</slf4j.version> -->
+        <log4j.version>1.2.17</log4j.version>    
 <!--
         <allow.test.skip>true</allow.test.skip>
         <allow.test.failure.ignore>false</allow.test.failure.ignore>
@@ -178,6 +183,43 @@
                 <artifactId>gb-alias-registry</artifactId>
                 <version>${gb.version}</version>
             </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-action-commons</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-action-freemarker</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-action-shapefile</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-rest-api</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-rest-impl</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>it.geosolutions.geobatch</groupId>
+              <artifactId>gb-web-core</artifactId>
+              <type>war</type>
+              <version>${gb.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>it.geosolutions.geobatch</groupId>
+              <artifactId>gb-web-core</artifactId>
+              <classifier>classes</classifier>
+              <version>${gb.version}</version>
+            </dependency>
             
             <!-- =========================================================== -->
             <!-- GEOTOOOLS -->
@@ -228,11 +270,15 @@
                 <version>${gt.version}</version>
                 <scope>test</scope>
             </dependency>
-	    <dependency>
+            <dependency>
                 <groupId>org.geotools</groupId>
                 <artifactId>gt-shapefile</artifactId>
                 <version>${gt.version}</version>
-                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.geotools</groupId>
+                <artifactId>gt-transform</artifactId>
+                <version>${gt.version}</version>
             </dependency>
 
             <!-- ============================== -->
@@ -242,20 +288,27 @@
             <dependency>
               <groupId>org.slf4j</groupId>
               <artifactId>slf4j-api</artifactId>
-              <version>1.6.6</version>
+              <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
               <groupId>org.slf4j</groupId>
               <artifactId>slf4j-log4j12</artifactId>
-              <version>1.6.6</version>
+              <version>${slf4j.version}</version>
             </dependency>
 
             <dependency>
               <groupId>log4j</groupId>
               <artifactId>log4j</artifactId>
-              <version>1.2.17</version>
+              <version>${log4j.version}</version>
             </dependency>
+
+            <dependency>
+              <groupId>org.slf4j</groupId>
+              <artifactId>jcl-over-slf4j</artifactId>
+              <version>${slf4j.version}</version>
+            </dependency>
+
             <!-- ============================== -->
             <!-- Test: JETTY -->
             <!-- ============================== -->
@@ -464,6 +517,11 @@
             <name>OpenGeo Maven Repository</name>
             <url>http://repo.opengeo.org</url>
         </repository>
+        <repository>
+            <id>jasig</id>
+            <name>JASIG Developers Maven Repository</name>
+            <url>https://developer.jasig.org/repo/content/repositories/3rd-party</url>
+        </repository>
     </repositories>
 
     
@@ -492,10 +550,8 @@
     <modules>
         <module>ingestion-logic</module>
         <module>migration-logic</module>
-
         <module>ingestion-actions</module>
-
-        <!--module>webapp</module-->
+        <module>webapp</module>
     </modules>
 
 <!--

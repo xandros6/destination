@@ -27,6 +27,7 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+
 /**
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
@@ -90,6 +91,7 @@ public class RoadArcTest extends DestinationMemoryTest{
 		checkFeature("siig_r_arco_3_dissesto", 3);
 		checkFeature("siig_r_arco_3_scen_tipobers", 13);
 		checkFeature("siig_r_arco_3_sostanza", 10); 
+
 	}
 
 
@@ -113,96 +115,7 @@ public class RoadArcTest extends DestinationMemoryTest{
 
 	@Override
 	protected void checkData() {
-		// TODO Auto-generated method stub
 		
 	}
 
-	/*
-	@Test  @Ignore
-	public void testImportArcs() throws IOException {
-		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
-		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
-
-			@Override
-			public void setId(String arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public String getId() {
-				return "id";
-			}
-		}));
-
-		arc.importArcs(cfg.getDataStore(), null, 1, false, false, null);
-
-	}
-
-	@Test  @Ignore
-	public void testRemoveZeros() throws IOException {
-		String input = "D:\\Develop\\arcsoutput.xml";
-		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
-
-			@Override
-			public void setId(String arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public String getId() {
-				return "id";
-			}
-		}));
-
-//		arc.removeZeros(cfg.getDataStore(), null, 1, false, false);
-
-	}
-
-	@Test  @Ignore
-	public void testAggregateArcs() throws IOException {
-		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
-		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
-
-			@Override
-			public void setId(String arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public String getId() {
-				return "id";
-			}
-		}));
-
-		arc.importArcs(cfg.getDataStore(), null, 2, false, false, null);
-
-	}
-
-	@Test  @Ignore
-	public void testAggregateGrid() throws IOException {
-		String input = "D:\\Develop\\GEOBATCH_CONFIG\\temp\\importBersagliVettoriali\\20130402-080846-028\\0_Ds2dsGeneratorService\\output.xml";
-		FeatureConfiguration cfg = FeatureConfiguration.fromXML(new FileInputStream(input));
-		ArcsIngestionProcess arc = new ArcsIngestionProcess(cfg.getTypeName(), new ProgressListenerForwarder(new Identifiable() {
-
-			@Override
-			public void setId(String arg0) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public String getId() {
-				return "id";
-			}
-		}));
-
-		arc.importArcs(cfg.getDataStore(), null, 3, true, false, null);
-
-	}*/
 }

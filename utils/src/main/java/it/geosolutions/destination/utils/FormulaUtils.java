@@ -149,25 +149,25 @@ public class FormulaUtils {
 	public static void calculateFormulaValues(Connection conn, int level, int processing,
 			Formula formulaDescriptor, String ids, String fk_partner, String materials,
 			String scenarios, String entities, String severeness, String fpfield, int target,
-			Map<Number, SimpleFeature> features, int precision)
+			Map<Number, SimpleFeature> features, int precision, boolean extendedSchema)
 			throws SQLException {
 	
 		String sql = formulaDescriptor.getSql();
 		
 		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", target + "", null, features, precision, null, null, null, null, null);
+					entities, severeness, fpfield, sql, extendedSchema ? ("rischio_" + (checkTarget(target, humanTargetsList) ? "sociale" : "ambientale")) : "rischio1", target + "", null, features, precision, null, null, null, null, null);
 		} else if(isAllHumanTargets(target)) {
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", null, features, precision, null, null, null, null, null);
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_sociale" : "rischio1", "1,2,4,5,6,7", null, features, precision, null, null, null, null, null);
 		} else if(isAllNotHumanTargets(target)) {
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "10,11,12,13,14,15,16", null, features, precision, null, null, null, null, null);			
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_ambientale" : "rischio1", "10,11,12,13,14,15,16", null, features, precision, null, null, null, null, null);			
 		} else if(isAllTargets(target)) {			
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", null, features, precision, null, null, null, null, null);
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_sociale" : "rischio1", "1,2,4,5,6,7", null, features, precision, null, null, null, null, null);
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, ids, fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio2", "10,11,12,13,14,15,16", null, features, precision, null, null, null, null, null);
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_ambientale" : "rischio2", "10,11,12,13,14,15,16", null, features, precision, null, null, null, null, null);
 		}				
 	}
 	
@@ -463,29 +463,30 @@ public class FormulaUtils {
 			Formula formulaDescriptor, int id_geo_arco, String fk_partner, String materials,
 			String scenarios, String entities, String severeness, String fpfield, int target,
 			Map<Integer, Map<Integer, Double>> changedTargets, Map<Number, SimpleFeature> features, int precision, 
-			Map<Integer, Double>  cff, List<String> psc, Map<Integer, Double> padr, Double pis, Map<Integer, Double> damageValues)
+			Map<Integer, Double>  cff, List<String> psc, Map<Integer, Double> padr, Double pis, Map<Integer, Double> damageValues
+			, boolean extendedSchema)
 			throws SQLException {
 	
 		String sql = formulaDescriptor.getSql();
 		
 		if(isSimpleTarget(target) || !formulaDescriptor.useTargets()) {
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", target + "", changedTargets, features, precision,
+					entities, severeness, fpfield, sql, extendedSchema ? ("rischio_" + (checkTarget(target, humanTargetsList) ? "sociale" : "ambientale")) : "rischio1", target + "", changedTargets, features, precision,
 					cff, psc, padr, pis, damageValues);
 		} else if(isAllHumanTargets(target)) {
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", changedTargets, features, precision,
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_sociale" : "rischio1", "1,2,4,5,6,7", changedTargets, features, precision,
 					cff, psc, padr, pis, damageValues);
 		} else if(isAllNotHumanTargets(target)) {
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "10,11,12,13,14,15,16", changedTargets, features, precision,
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_ambientale" : "rischio1", "10,11,12,13,14,15,16", changedTargets, features, precision,
 					cff, psc, padr, pis, damageValues);			
 		} else if(isAllTargets(target)) {			
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio1", "1,2,4,5,6,7", changedTargets, features, precision,
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_sociale" : "rischio1", "1,2,4,5,6,7", changedTargets, features, precision,
 					cff, psc, padr, pis, damageValues);
 			calculateFormulaValues(conn, level, processing, formulaDescriptor, id_geo_arco+"", fk_partner, materials, scenarios,
-					entities, severeness, fpfield, sql, "rischio2", "10,11,12,13,14,15,16", changedTargets, features, precision,
+					entities, severeness, fpfield, sql, extendedSchema ? "rischio_ambientale" : "rischio2", "10,11,12,13,14,15,16", changedTargets, features, precision,
 					cff, psc, padr, pis, damageValues);
 		}				
 	}

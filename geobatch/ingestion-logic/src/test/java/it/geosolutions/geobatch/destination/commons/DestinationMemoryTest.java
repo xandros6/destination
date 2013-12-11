@@ -1,6 +1,7 @@
 package it.geosolutions.geobatch.destination.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import it.geosolutions.geobatch.destination.TestMetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 
@@ -15,6 +16,8 @@ import org.apache.tools.ant.util.FileUtils;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.feature.SchemaException;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
@@ -88,8 +91,20 @@ public abstract class DestinationMemoryTest {
 	 * @param i
 	 * @throws IOException 
 	 */
-	protected void checkFeature(String typeName, int expectedSize) throws IOException {
-		assertEquals(expectedSize, dataStore.getFeatureSource(typeName).getCount(new Query(typeName)));
+	protected void checkFeature(String typeName, int expectedSize) throws IOException {		
+		SimpleFeatureSource featureSource = dataStore.getFeatureSource(typeName);
+		SimpleFeatureType schema = dataStore.getSchema(typeName);
+		assertNotNull(schema);
+		assertEquals(expectedSize, featureSource.getCount(new Query(typeName)));
+		SimpleFeatureIterator iterator = featureSource.getFeatures().features();
+		try {
+			while(iterator.hasNext()) {
+				SimpleFeature feature = iterator.next();
+				assertNotNull(feature);
+			}
+		} finally {
+			iterator.close();
+		}
 	}
 
 	protected void checkFile(String filePath) throws IOException {

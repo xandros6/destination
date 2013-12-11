@@ -18,6 +18,9 @@
     <bean id="downloader" class="it.geosolutions.process.gs.DestinationDownload">
       <constructor-arg index="0" ref="catalog"/>
     </bean>	
+    
+    <bean id="removeDownload" class="it.geosolutions.process.gs.DestinationRemoveDownload">      
+    </bean>	
 
 	<bean id="processingRepository" class="it.geosolutions.process.gs.ProcessingRepository">
       <constructor-arg index="0" ref="catalog"/>
