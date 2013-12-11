@@ -1,0 +1,12 @@
+siig_geo_ln_arco_1=id_geo_arco1=1|0|0.4625|1|200|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco2=2|4|3.405357142857143|1|300|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco3=3|0|0.4625|1|100|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco4=4|5|4.4053571428571425|1|100|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco5=5|0|0.4625|1|500|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco6=6|8|7.4053571428571425|1|100|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco7=7|6|5.4053571428571425|1|200|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco8=8|0|0.4625|1|100|0|1|-1|1|C|C
+siig_geo_ln_arco_1=id_geo_arco9=9|3|3.0|1|100|0|1|-1|2|C|C
+siig_geo_ln_arco_1=id_geo_arco10=10|6|6.0|1|100|0|1|-1|2|C|C
+siig_geo_ln_arco_1=id_geo_arco11=11|7|7.0|1|200|0|1|-1|2|C|C
+siig_geo_ln_arco_1=id_geo_arco12=12|8|8.0|1|700|0|1|-1|2|C|C
