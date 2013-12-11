@@ -24,7 +24,9 @@ import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Map;
@@ -188,6 +190,21 @@ public abstract class InputObject {
 		readCount = 0;
 	}
 	
+	public Connection getConnection(DataStore dataStore, Transaction transaction){
+		Connection connection= null;
+		try{
+			if( dataStore != null){
+				Method getConnection = dataStore.getClass().getMethod("getConnection",Transaction.class);
+				if (getConnection != null) {       
+					connection = (Connection)getConnection.invoke(dataStore,transaction);
+				}
+			}
+		} catch (Exception e) {
+			LOGGER.error(e.getMessage(), e);
+		}
+		return connection;
+	}
+
 	protected void resetInputCounter(){
 	    inputCount = 0;
 	}

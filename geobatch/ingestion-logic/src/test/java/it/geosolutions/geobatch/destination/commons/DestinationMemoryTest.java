@@ -39,15 +39,25 @@ public abstract class DestinationMemoryTest {
 	}
 
 	protected abstract void checkData();
-	
-	protected void initTestWithData(String[] strings) throws IOException, SchemaException {
-		initTestDataStore();
+
+	protected void initTestWithData(String[] strings,  MemoryDataStore inDataStore) throws IOException, SchemaException {
+		initTestDataStore(inDataStore);
 		loadTestData(strings);
 		initMetadata();		
 	}
 
-	private void initTestDataStore() throws IOException, SchemaException {
-		dataStore = new MemoryDataStore();
+	protected void initTestWithData(String[] strings) throws IOException, SchemaException {
+		initTestDataStore(null);
+		loadTestData(strings);
+		initMetadata();		
+	}
+
+	private void initTestDataStore(MemoryDataStore inDataStore) throws IOException, SchemaException {
+		if(inDataStore != null){
+			dataStore = inDataStore;
+		}else{
+			dataStore = new MemoryDataStore();
+		}
 		model = loadTestModel();
 		for(SimpleFeatureType schema : model.values()) {
 			dataStore.createSchema(schema);
@@ -81,7 +91,7 @@ public abstract class DestinationMemoryTest {
 	protected void checkFeature(String typeName, int expectedSize) throws IOException {
 		assertEquals(expectedSize, dataStore.getFeatureSource(typeName).getCount(new Query(typeName)));
 	}
-	
+
 	protected void checkFile(String filePath) throws IOException {
 		assertEquals(new File(filePath).exists(), true);
 	}

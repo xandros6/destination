@@ -138,12 +138,20 @@
             <artifactId>slf4j-log4j12</artifactId>
             <scope>test</scope>
         </dependency>
+		
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
             <version>1.6.6</version>
             <scope>test</scope>
         </dependency>
+		
+		<dependency>
+			<groupId>com.mockrunner</groupId>
+			<artifactId>mockrunner-jdbc</artifactId>
+			<version>0.4.6</version>
+			<scope>test</scope>
+		 </dependency>
 	</dependencies>
 
 	<build>
