@@ -140,6 +140,23 @@
         <groupId>javax.media</groupId>
         <artifactId>jai_imageio</artifactId>
     </dependency>
+    <!-- imageio-ext -->
+    <dependency>
+        <groupId>${imageio-ext.group}</groupId>
+        <artifactId>imageio-ext-tiff</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>${imageio-ext.group}</groupId>
+        <artifactId>imageio-ext-geocore</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>${imageio-ext.group}</groupId>
+        <artifactId>imageio-ext-imagereadmt</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>${imageio-ext.group}</groupId>
+        <artifactId>imageio-ext-streams</artifactId>
+    </dependency>
     <!-- ============================== -->
     <!-- Test: JETTY -->
     <!-- ============================== -->
