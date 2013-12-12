@@ -47,7 +47,7 @@ public class RiskTestMemoryMockDataStore extends MemoryDataStore{
 
 			for(int id_geo_arco = 1 ; id_geo_arco<=20 ; id_geo_arco++){
 				MockResultSet rsRisk = new MockResultSet("risk" + id_geo_arco);
-				String sqlRisk = "select.*siig_geo_ln_arco_1.*id_geo_arco.*in\\s\\("+id_geo_arco+"\\)\\sgroup\\sby\\sid_geo_arco$";
+				String sqlRisk = "select.*\\("+id_geo_arco+"\\)\\sgroup\\sby\\sid_geo_arco$";
 				rsRisk.addRow(Arrays.asList(new Object[]{id_geo_arco,Math.random()}));
 				statementHandler.prepareResultSet(sqlRisk, rsRisk);
 			}
