@@ -78,7 +78,7 @@
             <id>target_processing</id>
             <name>Target processing</name>
             <description>Target postprocessing</description>
-            <dropInput>false</dropInput>
+            <dropInput>true</dropInput>
             <!-- Listeners -->
             <listenerId>ConsumerLogger0</listenerId>
             <listenerId>Cumulator</listenerId>

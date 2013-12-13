@@ -114,8 +114,8 @@ public class RoadRunner{
 					metadataHandler,
 					dataStore);
 	        
-	        streetUserComputation.execute(1);
-	        /*streetUserComputation.execute(2);
+	        /*streetUserComputation.execute(1);
+	       streetUserComputation.execute(2);
 	        streetUserComputation.execute(3);*/
         } catch(Exception e) {
         	LOGGER.error(e.getMessage());

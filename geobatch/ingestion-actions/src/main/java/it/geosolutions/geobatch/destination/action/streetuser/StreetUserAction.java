@@ -33,7 +33,7 @@ public class StreetUserAction extends DestinationBaseAction<StreetUserConfigurat
 					metadataHandler,
 					dataStore);
 	
-			computation.execute(cfg.getAggregationLevel());
+			computation.execute(cfg.getAggregationLevel(), cfg.isDropInput(), cfg.getClosePhase());
 		} catch (IOException ex) {
             // TODO: what shall we do here??
             // log and rethrow for the moment, but a rollback should be implementened somewhere

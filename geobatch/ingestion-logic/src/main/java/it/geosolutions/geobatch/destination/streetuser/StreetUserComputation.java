@@ -150,12 +150,23 @@ public class StreetUserComputation extends InputObject {
 
 	}
 
-	public void execute(Integer aggregationLevel) throws IOException {
-		if(aggregationLevel == 1 || aggregationLevel == 2){
-			executeArc(aggregationLevel);
-		}
-		if(aggregationLevel == 3){
-			executeCell(aggregationLevel);
+	public void execute(Integer aggregationLevel, boolean dropInput, String closePhase) throws IOException {
+		try {
+			if(aggregationLevel == 1 || aggregationLevel == 2){
+				executeArc(aggregationLevel);
+			}
+			if(aggregationLevel == 3){
+				executeCell(aggregationLevel);
+			}
+		} finally {
+			if(dropInput) {
+				dropInputFeature(dataStore);
+			}
+			/*
+			 *TODO: implement process and closing if(process != -1 && processPhase != null) {
+				// close current process phase
+				metadataHandler.closeProcessPhase(process, processPhase);
+			}*/
 		}
 	}
 
@@ -273,6 +284,7 @@ public class StreetUserComputation extends InputObject {
 
 				transaction.commit();
 			} finally {
+				
 				if(inputIterator != null) {
 					inputIterator.close();
 				}
