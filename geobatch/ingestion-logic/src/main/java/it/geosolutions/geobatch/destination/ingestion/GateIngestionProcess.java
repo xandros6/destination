@@ -17,8 +17,6 @@
 package it.geosolutions.geobatch.destination.ingestion;
 
 import it.geosolutions.geobatch.destination.common.InputObject;
-import it.geosolutions.geobatch.destination.common.utils.DbUtils;
-import it.geosolutions.geobatch.destination.common.utils.SequenceManager;
 import it.geosolutions.geobatch.destination.common.utils.TimeUtils;
 import it.geosolutions.geobatch.destination.ingestion.gate.model.ExportData;
 import it.geosolutions.geobatch.destination.ingestion.gate.model.Transit;
@@ -27,8 +25,6 @@ import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,9 +34,15 @@ import java.util.regex.Pattern;
 import javax.xml.bind.JAXB;
 
 import org.geotools.data.DataStore;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
-import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.factory.Hints;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,16 +116,6 @@ private static String PARTNER_CODE = "A";
 private Boolean ignorePks;
 
 /**
- * Sequence manager to generate transits PKs
- */
-private SequenceManager transitSequenceManager;
-
-/**
- * Database connection for the insert
- */
-private JDBCDataStore dataStore;
-
-/**
  * File with the data to be inserted
  */
 private File file = null;
@@ -132,6 +124,8 @@ private File file = null;
  * Date in the stored in the file name
  */
 private String date;
+
+private String outputType= "siig_gate_t_dato";
 
 /**
  * Parametrized constructor
@@ -147,13 +141,6 @@ public GateIngestionProcess(String typeName,
         MetadataIngestionHandler metadataHandler, DataStore dataStore, File file) {
 
     super(typeName, listenerForwarder, metadataHandler, dataStore);
-
-    // init datastore
-    if (dataStore instanceof JDBCDataStore) {
-        this.dataStore = (JDBCDataStore) dataStore;
-        transitSequenceManager = new SequenceManager(this.dataStore,
-                "transit_seq");
-    }
 
     // init from file to be inserted
     this.file = file;
@@ -334,7 +321,7 @@ private void updateProgress(float progress, String msg) {
 
 private int closeProcess(int process) throws IOException {
     if (process != -1) {
-        // close current process phase
+        // close current process phaseransit.getIdTransito().toString()
         metadataHandler.closeProcessPhase(process, "A");
         process = -1;
     }
@@ -342,61 +329,68 @@ private int closeProcess(int process) throws IOException {
 }
 
 /**
- * Creates a new transit in the transit table.
+ * Create a transit in the data store
  * 
- * @return id of the transit
- * @throws IOException if an exception occur when execute sql insert
+ * @param transit
+ * @return
+ * @throws Exception
  */
-public Long createTransit(Transit transit) throws IOException {
+public Long createTransit(Transit transit) throws Exception {
 
-    Transaction transaction = null;
-    Connection conn = null;
-    try {
-        transaction = new DefaultTransaction();
-        conn = dataStore.getConnection(transaction);
+    // prepare data
+    Timestamp timestamp = TimeUtils.getTimeStamp(transit.getDataRilevamento());
+    // null value should throw an exception
+    String arriveDate = timestamp != null ? timestamp + "" : null;
+    Long idLong = null;
 
-        // ignored pk (use generated) or not
-        Long id = (Boolean.TRUE.equals(ignorePks) ? transitSequenceManager
-                .retrieveValue() : transit.getIdTransito());
+    int idTematico;
+    if (ignorePks) {
+        idTematico = nextId();
+    } else {
+        idTematico = transit.getIdTransito().intValue();
+    }
+    ;
+    idLong = new Long(idTematico);
 
-        Timestamp timestamp = TimeUtils.getTimeStamp(transit
-                .getDataRilevamento());
+    // Create feature
+    SimpleFeatureSource featureSource = dataStore.getFeatureSource(outputType);
+    Transaction transaction = new DefaultTransaction();
 
-        // null value should throw an exception
-        String arriveDate = timestamp != null ? "'" + timestamp + "'" : null;
+    SimpleFeatureType featureType = featureSource.getSchema();
+    SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 
-        // sql insert into transit
-        String sql = "insert into siig_gate_t_dato(" + "id_dato, "
-                + "fk_gate, " + "data_rilevamento, " + "data_ricezione, "
-                + "flg_corsia, " + "direzione, " + "codice_kemler, "
-                + "codice_onu)" + " values(" + id + ", " + transit.getIdGate()
-                + ", " + arriveDate + ", '" + TimeUtils.getTodayTimestamp()
-                + "', " + transit.getCorsia() + ", '" + transit.getDirezione()
-                + "', '" + transit.getKemlerCode() + "', '"
-                + transit.getOnuCode() + "')";
+    // values
+    featureBuilder.add(idLong.toString());
+    featureBuilder.add(transit.getIdGate().toString());
+    featureBuilder.add(arriveDate);
+    featureBuilder.add(TimeUtils.getTodayTimestamp() + "");
+    featureBuilder.add(transit.getCorsia().toString());
+    featureBuilder.add(transit.getDirezione());
+    featureBuilder.add(transit.getKemlerCode());
+    featureBuilder.add(transit.getOnuCode());
 
-        // trace sql
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("SQL insert: " + sql);
-        }
+    SimpleFeature feature = featureBuilder.buildFeature(idLong.toString());
+    feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
 
-        DbUtils.executeSql(conn, transaction, sql, true);
-        return id;
-    } catch (SQLException e) {
-        throw new IOException(e);
-    } finally {
-        if (conn != null) {
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                throw new IOException(e);
-            }
-        }
-        if (transaction != null) {
+    if (featureSource instanceof SimpleFeatureStore) {
+        SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+
+        featureStore.setTransaction(transaction);
+        try {
+            featureStore.addFeatures(DataUtilities.collection(feature));
+            transaction.commit();
+
+        } catch (Exception problem) {
+            transaction.rollback();
+            throw new IOException(problem);
+        } finally {
             transaction.close();
         }
+    } else {
+        LOGGER.error("Couldn't save feature");
     }
 
+    return idLong;
 }
 
 /**
