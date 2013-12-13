@@ -37,7 +37,7 @@ public class Formula {
 	private boolean arcs = false;
 	private boolean targets = false;
 	
-	int[] humanTargets = new int[] {1,2,4,5,6,7};
+	int[] humanTargets = new int[] {1,2,4,5,6,7,8,9};
 	int[] notHumanTargets = new int[] {10,11,12,13,14,15,16};
 	
 	private String sql = "";

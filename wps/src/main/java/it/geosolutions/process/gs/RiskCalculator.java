@@ -567,8 +567,8 @@ public class RiskCalculator extends RiskCalculatorBase {
 	        	throw new ProcessException("Unable to load formula " + formula);
 	        }
 	        
-			if ((!formulaDescriptor.hasGrid() && level == 3)
-					|| (!formulaDescriptor.hasNoGrid() && level < 3)) {
+			if (((!formulaDescriptor.hasGrid() && level == 3)
+					|| (!formulaDescriptor.hasNoGrid() && level < 3)) && !extendedSchema) {
 	        	LOGGER.info("Formula not supported on this level, returning empty collection");				
 				return new EmptyFeatureCollection(ft);
 	        } else {

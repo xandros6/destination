@@ -325,7 +325,6 @@ public class FormulaUtils {
 		
 		try {
 			stmt = conn.prepareStatement(sql);
-			System.out.println(sql);
 			rs = stmt.executeQuery();	
 			Number risk = 0.0;
 			while(rs.next()) {
