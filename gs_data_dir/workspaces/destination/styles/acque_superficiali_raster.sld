@@ -24,14 +24,18 @@
           <Abstract>A raster with 100% opacity</Abstract>
           <MinScaleDenominator>50000</MinScaleDenominator>
           <RasterSymbolizer>
-              <Opacity>1.0</Opacity>        
+              <Opacity>1.0</Opacity>
+              <ChannelSelection>      
+              <GrayChannel>
+                        <SourceChannelName>1</SourceChannelName>
+                </GrayChannel>
+              </ChannelSelection>       
               <ColorMap type="values">
-                <ColorMapEntry color="#000000" quantity="0.0" label="" opacity="0"/>        
-                <ColorMapEntry color="#000000" quantity="1.0" label="" opacity="0"/>        
+                <ColorMapEntry color="#000000" quantity="0.0" label="" opacity="0"/>             
                 <ColorMapEntry color="#000000" quantity="2.0" label="" opacity="0"/>
                 <ColorMapEntry color="#000000" quantity="3.0" label="" opacity="0"/>        
                 <ColorMapEntry color="#000000" quantity="4.0" label="" opacity="0"/>        
-                <ColorMapEntry color="#9C8783" quantity="5.0" label="" opacity="1"/>        
+                <ColorMapEntry color="#9C8783" quantity="1.0" label="" opacity="1"/>        
                 <ColorMapEntry color="#000000" quantity="6.0" label="" opacity="0"/>        
               </ColorMap>
           </RasterSymbolizer>

@@ -18,8 +18,7 @@
             <Localized lang="en">Urbanized Zones</Localized>
             <Localized lang="fr">Zone Urbanizzate</Localized>
             <Localized lang="de">Zone Urbanizzate</Localized>          
-          </Title>        
-        
+          </Title>               
           <Name>rule1</Name>
           <Title>Opaque Raster</Title>
           <Abstract>A raster with 100% opacity</Abstract>
@@ -31,12 +30,10 @@
                         <SourceChannelName>1</SourceChannelName>
                 </GrayChannel>
               </ChannelSelection>      
-              <ColorMap type="intervals">
-                <ColorMapEntry color="#000000" quantity="-100.0" label="" opacity="0"/>                        
-                <ColorMapEntry color="#000000" quantity="0.5" label="" opacity="0"/>                        
-                <ColorMapEntry color="#1C1CD9" quantity="10000.0" label="" opacity="1"/>                             
-              </ColorMap>   
-              
+              <ColorMap type="values">
+                <ColorMapEntry color="#000000" quantity="0.0" label="" opacity="0"/>                                            
+                <ColorMapEntry color="#1C1CD9" quantity="1.0" label="" opacity="1"/>                             
+              </ColorMap>                 
           </RasterSymbolizer>
         </Rule>
       </FeatureTypeStyle>

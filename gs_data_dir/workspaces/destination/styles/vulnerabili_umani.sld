@@ -69,11 +69,10 @@
           <RasterSymbolizer>
             <Opacity>1.0</Opacity>
             <ColorMap type="intervals" extended="true">
-        <ColorMapEntry color="#FFFFFF" quantity="-300" label="label" opacity="0"/>
-        <ColorMapEntry color="#FF0000" quantity="0.00000000001" label="label" opacity="0"/>
-        <ColorMapEntry color="#00FF00" quantity="3" label="label" opacity="1"/>
-        <ColorMapEntry color="#FFFF00" quantity="10" label="label" opacity="1"/>
-        <ColorMapEntry color="#FF0000" quantity="1000" label="label" opacity="1"/>
+        <ColorMapEntry color="#FF0000" quantity="0.00000000001" label="Nessuna" opacity="0"/>
+        <ColorMapEntry color="#00FF00" quantity="${env('low',3)}" label="Bassa" opacity="1"/>
+        <ColorMapEntry color="#FFFF00" quantity="${env('medium',10)}" label="Media" opacity="1"/>
+        <ColorMapEntry color="#FF0000" quantity="${env('high',1000)}" label="Alta" opacity="1"/>
 </ColorMap>
           </RasterSymbolizer>
         </Rule>

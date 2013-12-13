@@ -30,10 +30,9 @@
                         <SourceChannelName>1</SourceChannelName>
                 </GrayChannel>
               </ChannelSelection>      
-              <ColorMap type="intervals">
-                <ColorMapEntry color="#000000" quantity="-100.0" label="" opacity="0"/>                        
-                <ColorMapEntry color="#000000" quantity="0.5" label="" opacity="0"/>                        
-                <ColorMapEntry color="#FFAA7F" quantity="100.0" label="" opacity="1"/>                             
+              <ColorMap type="values">
+                <ColorMapEntry color="#000000" quantity="0.0" label="" opacity="0"/>                                              
+                <ColorMapEntry color="#FFAA7F" quantity="1.0" label="" opacity="1"/>                             
               </ColorMap>
           </RasterSymbolizer>
         </Rule>

@@ -24,10 +24,15 @@
           <Abstract>A raster with 100% opacity</Abstract>
           <MinScaleDenominator>50000</MinScaleDenominator>
           <RasterSymbolizer>
-              <Opacity>1.0</Opacity>        
+             <Opacity>1.0</Opacity> 
+              <ChannelSelection>      
+              <GrayChannel>
+                 <SourceChannelName>1</SourceChannelName>
+                </GrayChannel>
+              </ChannelSelection> 
               <ColorMap type="values">
                 <ColorMapEntry color="#000000" quantity="0.0" label="" opacity="0"/>        
-                <ColorMapEntry color="#32735C" quantity="7.0" label="" opacity="1"/>
+                <ColorMapEntry color="#32735C" quantity="1.0" label="" opacity="1"/>
               </ColorMap>
           </RasterSymbolizer>
         </Rule>

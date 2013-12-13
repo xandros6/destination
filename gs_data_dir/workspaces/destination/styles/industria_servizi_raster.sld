@@ -30,8 +30,7 @@
                         <SourceChannelName>1</SourceChannelName>
                 </GrayChannel>
               </ChannelSelection>      
-              <ColorMap type="intervals">
-                <ColorMapEntry color="#000000" quantity="-100.0" label="" opacity="0"/>                        
+              <ColorMap type="intervals"> 
                <ColorMapEntry color="#000000" quantity="0.000000000001" label="" opacity="0"/>                                               
                 <ColorMapEntry color="#AAB310" quantity="10000.0" label="" opacity="1"/>                             
               </ColorMap>     

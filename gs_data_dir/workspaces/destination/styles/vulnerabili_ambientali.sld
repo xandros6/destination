@@ -69,9 +69,8 @@
           <RasterSymbolizer>
             <Opacity>1.0</Opacity>
             <ColorMap type="intervals" extended="true">
-        <ColorMapEntry color="#FFFFFF" quantity="-300" label="label" opacity="0"/>
-        <ColorMapEntry color="#FF0000" quantity="0.5" label="label" opacity="0"/>
-        <ColorMapEntry color="#FFFF00" quantity="600" label="label" opacity="0.7"/>
+        <ColorMapEntry color="#FF0000" quantity="0.5" label="Non vulnerabile" opacity="0"/>
+        <ColorMapEntry color="#FFFF00" quantity="600" label="Vulnerabile" opacity="0.7"/>
 </ColorMap>
           </RasterSymbolizer>
         </Rule>
