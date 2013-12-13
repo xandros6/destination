@@ -1,0 +1,16 @@
+<layer>
+  <name>strutture_sanitarie_rl</name>
+  <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7d1b</id>
+  <type>RASTER</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--529052f4:13d68495ec4:-1990</id>
+  </defaultStyle>
+  <resource class="coverage">
+    <id>CoverageInfoImpl-1c09ce8a:142dcbfbba4:-7d1c</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

@@ -1,0 +1,16 @@
+<layer>
+  <name>industria_servizi_rp</name>
+  <id>LayerInfoImpl--2b4125c7:142dbcaed5a:-7fe0</id>
+  <type>RASTER</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--529052f4:13d6830255c:-32c9</id>
+  </defaultStyle>
+  <resource class="coverage">
+    <id>CoverageInfoImpl--2b4125c7:142dbcaed5a:-7fe1</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

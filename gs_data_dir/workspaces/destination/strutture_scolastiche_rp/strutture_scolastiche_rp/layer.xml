@@ -1,0 +1,16 @@
+<layer>
+  <name>strutture_scolastiche_rp</name>
+  <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7cef</id>
+  <type>RASTER</type>
+  <defaultStyle>
+    <id>StyleInfoImpl--529052f4:13d68495ec4:6ff</id>
+  </defaultStyle>
+  <resource class="coverage">
+    <id>CoverageInfoImpl-1c09ce8a:142dcbfbba4:-7cf0</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

@@ -1,0 +1,12 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl--2b4125c7:142dbcaed5a:-7fdf</id>
+  <name>industria_servizi_ti</name>
+  <description>industria_servizi_ti</description>
+  <type>GeoTIFF</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:coverages/destination/industrie_servizi/industrie_servizi_ti.tif</url>
+</coverageStore>

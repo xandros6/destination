@@ -21,10 +21,10 @@
     </style>
   </styles>
   <bounds>
-    <minx>304046.5843159333</minx>
-    <maxx>780671.7860653808</maxx>
-    <miny>4874084.584332914</miny>
-    <maxy>5225667.020833609</maxy>
+    <minx>304048.91872737603</minx>
+    <maxx>900671.5313320523</maxx>
+    <miny>4874090.566204824</miny>
+    <maxy>5625667.172375287</maxy>
     <crs class="projected">EPSG:32632</crs>
   </bounds>
   <metadata>

@@ -1,0 +1,121 @@
+<coverage>
+  <id>CoverageInfoImpl-1c09ce8a:142dcbfbba4:-7d16</id>
+  <name>strutture_sanitarie_ti</name>
+  <nativeName>strutture_sanitarie_ti</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
+  </namespace>
+  <title>strutture_sanitarie_ti</title>
+  <description>Generated from GeoTIFF</description>
+  <keywords>
+    <string>WCS</string>
+    <string>GeoTIFF</string>
+    <string>strutture_sanitarie_ti</string>
+  </keywords>
+  <nativeCRS class="projected">PROJCS[&quot;WGS 84 / UTM zone 32N&quot;, 
+  GEOGCS[&quot;WGS 84&quot;, 
+    DATUM[&quot;World Geodetic System 1984&quot;, 
+      SPHEROID[&quot;WGS 84&quot;, 6378137.0, 298.257223563, AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]], 
+      AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]], 
+    PRIMEM[&quot;Greenwich&quot;, 0.0, AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]], 
+    UNIT[&quot;degree&quot;, 0.017453292519943295], 
+    AXIS[&quot;Geodetic longitude&quot;, EAST], 
+    AXIS[&quot;Geodetic latitude&quot;, NORTH], 
+    AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]], 
+  PROJECTION[&quot;Transverse_Mercator&quot;, AUTHORITY[&quot;EPSG&quot;,&quot;9807&quot;]], 
+  PARAMETER[&quot;central_meridian&quot;, 9.0], 
+  PARAMETER[&quot;latitude_of_origin&quot;, 0.0], 
+  PARAMETER[&quot;scale_factor&quot;, 0.9996], 
+  PARAMETER[&quot;false_easting&quot;, 500000.0], 
+  PARAMETER[&quot;false_northing&quot;, 0.0], 
+  UNIT[&quot;m&quot;, 1.0], 
+  AXIS[&quot;Easting&quot;, EAST], 
+  AXIS[&quot;Northing&quot;, NORTH], 
+  AUTHORITY[&quot;EPSG&quot;,&quot;32632&quot;]]</nativeCRS>
+  <srs>EPSG:32632</srs>
+  <nativeBoundingBox>
+    <minx>495203.84395204094</minx>
+    <maxx>501243.84395204094</maxx>
+    <miny>5076553.4168995945</miny>
+    <maxy>5079573.4168995945</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>8.938204899898269</minx>
+    <maxx>9.016026059586185</maxx>
+    <miny>45.84252842458586</miny>
+    <maxy>45.869725721512914</maxy>
+    <crs>GEOGCS[&quot;WGS84(DD)&quot;, 
+  DATUM[&quot;WGS84&quot;, 
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], 
+  PRIMEM[&quot;Greenwich&quot;, 0.0], 
+  UNIT[&quot;degree&quot;, 0.017453292519943295], 
+  AXIS[&quot;Geodetic longitude&quot;, EAST], 
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>REPROJECT_TO_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <metadata>
+    <entry key="cachingEnabled">false</entry>
+    <entry key="dirName">strutture_sanitarie_ti_strutture_sanitarie_ti</entry>
+  </metadata>
+  <store class="coverageStore">
+    <id>CoverageStoreInfoImpl-1c09ce8a:142dcbfbba4:-7d17</id>
+  </store>
+  <nativeFormat>GeoTIFF</nativeFormat>
+  <grid dimension="2">
+    <range>
+      <low>0 0</low>
+      <high>604 302</high>
+    </range>
+    <transform>
+      <scaleX>10.0</scaleX>
+      <scaleY>-10.0</scaleY>
+      <shearX>0.0</shearX>
+      <shearY>0.0</shearY>
+      <translateX>495208.84395204094</translateX>
+      <translateY>5079568.4168995945</translateY>
+    </transform>
+    <crs>EPSG:32632</crs>
+  </grid>
+  <supportedFormats>
+    <string>GEOTIFF</string>
+    <string>GIF</string>
+    <string>PNG</string>
+    <string>JPEG</string>
+    <string>TIFF</string>
+  </supportedFormats>
+  <interpolationMethods>
+    <string>bilinear</string>
+    <string>bicubic</string>
+  </interpolationMethods>
+  <dimensions>
+    <coverageDimension>
+      <name>GRAY_INDEX</name>
+      <description>GridSampleDimension[0.0,0.0]</description>
+      <range>
+        <min>0.0</min>
+        <max>0.0</max>
+      </range>
+      <nullValues>
+        <double>0.0</double>
+      </nullValues>
+    </coverageDimension>
+  </dimensions>
+  <requestSRS>
+    <string>EPSG:32632</string>
+  </requestSRS>
+  <responseSRS>
+    <string>EPSG:32632</string>
+  </responseSRS>
+  <parameters>
+    <entry>
+      <string>InputTransparentColor</string>
+      <string></string>
+    </entry>
+    <entry>
+      <string>SUGGESTED_TILE_SIZE</string>
+      <string>512,512</string>
+    </entry>
+  </parameters>
+</coverage>

@@ -1,0 +1,12 @@
+<coverageStore>
+  <id>CoverageStoreInfoImpl-1c09ce8a:142dcbfbba4:-7e7f</id>
+  <name>popolazione_turistica_rp</name>
+  <description>popolazione_turistica_rp</description>
+  <type>GeoTIFF</type>
+  <enabled>true</enabled>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <__default>false</__default>
+  <url>file:coverages/destination/popolazione_turistica/popolazione_turistica_rp.tif</url>
+</coverageStore>

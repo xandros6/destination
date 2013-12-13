@@ -1,0 +1,16 @@
+<layer>
+  <name>strutture_commerciali_rp</name>
+  <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7daa</id>
+  <type>RASTER</type>
+  <defaultStyle>
+    <id>StyleInfoImpl-24346e05:13d5e1f949a:3c50</id>
+  </defaultStyle>
+  <resource class="coverage">
+    <id>CoverageInfoImpl-1c09ce8a:142dcbfbba4:-7dab</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>
