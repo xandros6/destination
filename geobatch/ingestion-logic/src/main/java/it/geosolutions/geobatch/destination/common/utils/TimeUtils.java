@@ -35,6 +35,27 @@ public static final DateTimeFormatter DEFAULT_FORMATTER = org.joda.time.format.D
         .forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZoneUTC();
 
 /**
+ * Formatter for the day
+ */
+public static final DateTimeFormatter DAY_FORMATTER = org.joda.time.format.DateTimeFormat
+        .forPattern("yyyy-MM-dd").withZoneUTC();
+
+/**
+ * Check if the time start with the date of today
+ * 
+ * @param time in a string format starting with a DAY_FORMATTER
+ * @return
+ */
+public static boolean isToday(String time) {
+    DateTime now = new DateTime();
+    boolean isToday = false;
+    if (time.startsWith(now.toString(TimeUtils.DAY_FORMATTER))) {
+        isToday = true;
+    }
+    return isToday;
+}
+
+/**
  * Obtain a time stamp for a input sting with the default format
  * 
  * @param date
