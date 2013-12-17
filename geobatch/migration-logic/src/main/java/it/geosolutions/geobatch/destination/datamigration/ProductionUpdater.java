@@ -32,11 +32,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
 import org.geotools.data.Transaction;
+import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.filter.text.cql2.CQL;
@@ -94,7 +96,7 @@ public class ProductionUpdater extends InputObject{
 
 	public ProductionUpdater(String inputTypeName,
 			ProgressListenerForwarder listenerForwarder,
-			MetadataIngestionHandler metadataHandler, JDBCDataStore dataStore) {
+			MetadataIngestionHandler metadataHandler, DataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
 		// TODO Auto-generated constructor stub
 	}
@@ -217,8 +219,10 @@ public class ProductionUpdater extends InputObject{
 	public void executeTarget(UpdaterFeatures targetFeature) throws Exception {
 		LOGGER.info("Execute TARGET migration");
 		Map<String, Serializable> destinationDataStoreConfig = this.ds2dsConfiguration.getOutputFeature().getDataStore();
-		JDBCDataStore destinationDataStore = (JDBCDataStore) DataStoreFinder.getDataStore(destinationDataStoreConfig);
-		destinationDataStore.setExposePrimaryKeyColumns(true);
+		DataStore destinationDataStore = DataStoreFinder.getDataStore(destinationDataStoreConfig);
+		if(destinationDataStore instanceof JDBCDataStore){
+			((JDBCDataStore)destinationDataStore).setExposePrimaryKeyColumns(true);
+		}
 		if(filterByTarget) {
 			this.ds2dsConfiguration.setEcqlFilter("id_partner = " + partner + " AND id_bersaglio = " + targetType);
 		} else {
@@ -239,28 +243,32 @@ public class ProductionUpdater extends InputObject{
 				// Feature hasn't id_partner, join with the parent relation is needed to delete entry 
 				if(pr != null){
 
-					Connection connection = DriverManager.getConnection("jdbc:postgresql://"+destinationDataStoreConfig.get("host")+":"+destinationDataStoreConfig.get("port")+"/"+destinationDataStoreConfig.get("database"),destinationDataStoreConfig.get("user").toString(), destinationDataStoreConfig.get("passwd").toString());
+					Connection connection = getConnection(destinationDataStore,Transaction.AUTO_COMMIT);
+
+					//Connection connection = DriverManager.getConnection("jdbc:postgresql://"+destinationDataStoreConfig.get("host")+":"+destinationDataStoreConfig.get("port")+"/"+destinationDataStoreConfig.get("database"),destinationDataStoreConfig.get("user").toString(), destinationDataStoreConfig.get("passwd").toString());
 
 					DatabaseMetaData metaData = connection.getMetaData();
 
 					ResultSet foreignKeys = metaData.getImportedKeys(connection.getCatalog(), null, pr);
-
 					boolean fkFound = false;
 					String fkTableName = "";
 					String fkColumnName = "";
 					String pkTableName = "";
 					String pkColumnName = "";
+					if(foreignKeys != null){
+						foreignKeys.beforeFirst();					
 
-					//Retrieve information about FK
-					while (foreignKeys.next()) {
-						fkTableName = foreignKeys.getString("FKTABLE_NAME");
-						fkColumnName = foreignKeys.getString("FKCOLUMN_NAME");
-						pkTableName = foreignKeys.getString("PKTABLE_NAME");
-						pkColumnName = foreignKeys.getString("PKCOLUMN_NAME");
-						if(pkTableName.equals(fn) && fkTableName.equals(pr)){
-							fkFound = true;
-							break;
+						//Retrieve information about FK
+						while (foreignKeys.next()) {
+							fkTableName = foreignKeys.getString("FKTABLE_NAME");
+							fkColumnName = foreignKeys.getString("FKCOLUMN_NAME");
+							pkTableName = foreignKeys.getString("PKTABLE_NAME");
+							pkColumnName = foreignKeys.getString("PKCOLUMN_NAME");
+							if(pkTableName.equals(fn) && fkTableName.equals(pr)){
+								fkFound = true;
+								break;
 
+							}
 						}
 					}
 					connection.close();
@@ -323,35 +331,65 @@ public class ProductionUpdater extends InputObject{
 	public void executeArc(UpdaterFeatures arcFeature) throws Exception {
 		LOGGER.info("Execute ARC migration");
 		Map<String, Serializable> destinationDataStoreConfig = this.ds2dsConfiguration.getOutputFeature().getDataStore();
-		JDBCDataStore destinationDataStore = (JDBCDataStore) DataStoreFinder.getDataStore(destinationDataStoreConfig);
-		destinationDataStore.setExposePrimaryKeyColumns(true);
+		DataStore destinationDataStore = DataStoreFinder.getDataStore(destinationDataStoreConfig);
+		if(destinationDataStore instanceof JDBCDataStore){
+			((JDBCDataStore)destinationDataStore).setExposePrimaryKeyColumns(true);
+		}
 		this.ds2dsConfiguration.setEcqlFilter("fk_partner = " + partner);
 		/*
 		 * Delete all features
 		 */
 		if(removeFeatures) {
 			LOGGER.info("Cleaning output DS ...");
-			for(UpdaterFeature f : arcFeature.getFeatures()){
-
-				String fn = f.getFeatureName();
-				String pr = f.getFeatureParentRelation();
-				this.ds2dsConfiguration.setEcqlFilter("fk_partner = " + partner);
-				//Delete all using cascade on FK
-				if(pr == null){
-					Transaction transaction = new DefaultTransaction("removeFeature");
-					SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fn);
+			Transaction transaction = new DefaultTransaction("removeFeature");
+			try {
+				for(UpdaterFeature f : arcFeature.getFeatures()){
+					String fn = f.getFeatureName();
+					String pr = f.getFeatureParentRelation();
 					Filter filter = CQL.toFilter(this.ds2dsConfiguration.getEcqlFilter());
-					store.setTransaction(transaction);					
-					try {
+					//Delete all using cascade on FK
+					if(pr == null){
+						Query query = new Query(fn,filter);
+						FeatureReader<SimpleFeatureType, SimpleFeature> reader = destinationDataStore.getFeatureReader(query, transaction);
+						while (reader.hasNext()) {
+							SimpleFeature feature = reader.next();			
+							Connection connection = getConnection(destinationDataStore,transaction);
+							DatabaseMetaData metaData = connection.getMetaData();
+
+							ResultSet foreignKeys = metaData.getExportedKeys(connection.getCatalog(), null, fn);
+							if(foreignKeys != null){
+								foreignKeys.beforeFirst();
+								//Retrieve information about FK
+								while (foreignKeys.next()) {
+									String fkTableName = foreignKeys.getString("FKTABLE_NAME");
+									String fkColumnName = foreignKeys.getString("FKCOLUMN_NAME");
+									String pkTableName = foreignKeys.getString("PKTABLE_NAME");
+									String pkColumnName = foreignKeys.getString("PKCOLUMN_NAME");
+									if(pkTableName.equals(fn)){
+										//Delete on related table										
+										Filter relatedFilter = CQL.toFilter(fkColumnName+"="+feature.getAttribute(pkColumnName).toString());
+										//Delete features by IDs
+										SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fkTableName);
+										store.setTransaction(Transaction.AUTO_COMMIT);					
+										store.removeFeatures(relatedFilter);									
+									}
+								}
+							}
+							connection.close();
+						}
+						reader.close();
+						
+						SimpleFeatureStore store = (SimpleFeatureStore) destinationDataStore.getFeatureSource(fn);
+						store.setTransaction(transaction);					
 						store.removeFeatures(filter);
 						transaction.commit();
-					} catch (Exception eek) {
-						LOGGER.error(eek.getMessage(),eek);
-						transaction.rollback();
-					}finally{
-						transaction.close();
 					}
 				}
+			} catch (Exception eek) {
+				LOGGER.error(eek.getMessage(),eek);
+				transaction.rollback();
+			}finally{
+				transaction.close();
 			}
 		}
 

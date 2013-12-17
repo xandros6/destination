@@ -5,15 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import it.geosolutions.geobatch.destination.TestMetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-import java.util.Map;
 
-import org.apache.tools.ant.util.FileUtils;
-import org.geotools.data.DataUtilities;
 import org.geotools.data.Query;
 import org.geotools.data.memory.MemoryDataStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -30,7 +24,6 @@ public abstract class DestinationMemoryTest {
 	protected static final Logger LOGGER = LoggerFactory.getLogger(DestinationMemoryTest.class);
 
 	protected MemoryDataStore dataStore;
-	protected Map<String, SimpleFeatureType> model;
 	protected MetadataIngestionHandler metadataHandler;
 
 	static{
@@ -44,46 +37,16 @@ public abstract class DestinationMemoryTest {
 	protected abstract void checkData();
 
 	protected void initTestWithData(String[] strings,  MemoryDataStore inDataStore) throws IOException, SchemaException {
-		initTestDataStore(inDataStore);
-		loadTestData(strings);
+		dataStore = DestinationMemoryTestUtils.initTestWithData(strings, inDataStore);
 		initMetadata();		
 	}
 
 	protected void initTestWithData(String[] strings) throws IOException, SchemaException {
-		initTestDataStore(null);
-		loadTestData(strings);
-		initMetadata();		
-	}
-
-	private void initTestDataStore(MemoryDataStore inDataStore) throws IOException, SchemaException {
-		if(inDataStore != null){
-			dataStore = inDataStore;
-		}else{
-			dataStore = new MemoryDataStore();
-		}
-		model = loadTestModel();
-		for(SimpleFeatureType schema : model.values()) {
-			dataStore.createSchema(schema);
-		}
+		initTestWithData(strings,null);
 	}
 
 	private void initMetadata() {
 		metadataHandler = new TestMetadataIngestionHandler(dataStore);		
-	}
-
-
-	/**
-	 * 
-	 * @param dataStore
-	 * @param model
-	 * @param extraData
-	 * @throws IOException
-	 */
-	private void loadTestData(String[] extraData) throws IOException {
-		loadTestData(dataStore, model, "test_data");
-		for(String data : extraData) {
-			loadTestData(dataStore, model, data);
-		}
 	}
 
 	/**
@@ -92,8 +55,12 @@ public abstract class DestinationMemoryTest {
 	 * @throws IOException 
 	 */
 	protected void checkFeature(String typeName, int expectedSize) throws IOException {		
-		SimpleFeatureSource featureSource = dataStore.getFeatureSource(typeName);
-		SimpleFeatureType schema = dataStore.getSchema(typeName);
+		checkFeature(typeName, expectedSize, this.dataStore);
+	}
+
+	protected void checkFeature(String typeName, int expectedSize, MemoryDataStore inDataStore) throws IOException {		
+		SimpleFeatureSource featureSource = inDataStore.getFeatureSource(typeName);
+		SimpleFeatureType schema = inDataStore.getSchema(typeName);
 		assertNotNull(schema);
 		assertEquals(expectedSize, featureSource.getCount(new Query(typeName)));
 		SimpleFeatureIterator iterator = featureSource.getFeatures().features();
@@ -111,50 +78,4 @@ public abstract class DestinationMemoryTest {
 		assertEquals(new File(filePath).exists(), true);
 	}
 
-	/**
-	 * 
-	 * @param dataStore
-	 * @param model
-	 * @param name
-	 * @throws IOException
-	 */
-	private void loadTestData(MemoryDataStore dataStore,
-			Map<String, SimpleFeatureType> model, String name) throws IOException {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/" + name + ".txt")));
-			String line = null;
-			while((line = reader.readLine()) != null) {
-				String typeName = line.substring(0, line.indexOf('='));
-				String data = line.substring(line.indexOf('=') + 1);
-				SimpleFeature feature = DataUtilities.createFeature(model.get(typeName), data);
-				dataStore.addFeature(feature);
-			}
-		} finally {
-			FileUtils.close(reader);			
-		}
-	}
-
-	/**
-	 * 
-	 * @return
-	 * @throws IOException
-	 * @throws SchemaException
-	 */
-	protected Map<String, SimpleFeatureType> loadTestModel() throws IOException, SchemaException {
-		Map<String, SimpleFeatureType> model = new HashMap<String, SimpleFeatureType>();
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/test_model.txt")));
-			String line = null;
-			while((line = reader.readLine()) != null) {
-				String typeName = line.substring(0, line.indexOf('='));
-				String typeSpec = line.substring(line.indexOf('=') + 1);
-				model.put(typeName, DataUtilities.createType(typeName, typeSpec));
-			}
-		} finally {
-			FileUtils.close(reader);			
-		}
-		return model;
-	};
 }
