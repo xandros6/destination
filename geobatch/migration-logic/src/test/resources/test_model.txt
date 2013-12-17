@@ -68,7 +68,7 @@ siig_d_tipo_variabile=id_tipo_variabile:java.math.BigDecimal,tipo_variabile:Stri
 siig_d_tipo_veicolo=id_tipo_veicolo:java.math.BigDecimal,coeff_occupazione:java.math.BigDecimal,tipo_veicolo_it:String,tipo_veicolo_en:String,tipo_veicolo_de:String,tipo_veicolo_fr:String
 siig_d_tipologia_danno=id_tipologia_danno:java.math.BigDecimal,tipologia_danno:String,flg_umano:String
 siig_gate_geo_gate=id_gate:java.math.BigDecimal,descrizione:String,collocazione:String,geometria:Point:srid=32632,data_inizio_validita:java.sql.Date,data_fine_validita:java.sql.Date
-siig_gate_t_dato=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_rilevamento:java.sql.Timestamp,data_ricezione:java.sql.Timestamp,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String
+siig_gate_t_dato=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_rilevamento:java.sql.Timestamp,data_ricezione:java.sql.Date,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String
 siig_gate_t_dato_statistico=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_stat_inizio:java.sql.Date,data_stat_fine:java.sql.Date,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String,quantita:java.math.BigDecimal
 siig_gate_t_dato_storico=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_rilevamento:java.sql.Timestamp,data_ricezione:java.sql.Date,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String
 siig_geo_bers_calcrischio_pl=idgeo:java.math.BigDecimal,id_tematico_shape:java.math.BigDecimal,fk_partner:String,fk_bersaglio:java.math.BigDecimal,geometria:MultiPolygon:srid=32632
@@ -94,7 +94,7 @@ siig_mtd_t_bersaglio=id_bersaglio:java.math.BigDecimal,col_elab_standard:String,
 siig_mtd_t_formula=id_formula:java.math.BigDecimal,flg_visibile:java.math.BigDecimal,flg_i_grid:java.math.BigDecimal,ordine_visibilita:java.math.BigDecimal,descrizione_it:String,descrizione_en:String,descrizione_de:String,descrizione_fr:String,udm_it:String,udm_en:String,udm_de:String,udm_fr:String,formula:String,flg_i:java.math.BigDecimal,flg_m:java.math.BigDecimal,flg_g:java.math.BigDecimal,tema_low:Double,tema_medium:Double,tema_max:Double
 siig_mtd_t_parametro=id_parametro:java.math.BigDecimal,descrizione:String,flg_i:java.math.BigDecimal,flg_j:java.math.BigDecimal,flg_k:java.math.BigDecimal,flg_m:java.math.BigDecimal,punto_g:java.math.BigDecimal,flg_lieve:java.math.BigDecimal
 siig_r_arco_1_dissesto=id_geo_arco:java.math.BigDecimal,id_dissesto:String,fk_partner:String
-siig_r_arco_1_scen_tipobers=id_geo_arco:java.math.BigDecimal,id_bersaglio:java.math.BigDecimal,fk_partner:String,cff:Double
+siig_r_arco_1_scen_tipobers=id_geo_arco:java.math.BigDecimal,id_bersaglio:java.math.BigDecimal,cff:Double,fk_partner:String
 siig_r_arco_1_sostanza=id_geo_arco:java.math.BigDecimal,id_sostanza:java.math.BigDecimal,padr:java.math.BigDecimal,fk_partner:String
 siig_r_arco_2_dissesto=id_dissesto:String,id_geo_arco:java.math.BigDecimal,fk_partner:String
 siig_r_arco_2_scen_tipobers=id_geo_arco:java.math.BigDecimal,id_bersaglio:java.math.BigDecimal,cff:java.math.BigDecimal,fk_partner:String

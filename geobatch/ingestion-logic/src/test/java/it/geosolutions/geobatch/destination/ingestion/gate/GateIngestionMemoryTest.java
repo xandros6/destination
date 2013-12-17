@@ -167,8 +167,8 @@ public void testImportGatesProcess() {
  * @throws Exception 
  */
 private void createFakeGate() throws Exception {
-    // its numeric(5,0)
-    FAKE_GATE_ID = new Long(RANDOM.nextInt(100000));
+    // it's numeric(3,0)
+    FAKE_GATE_ID = new Long(RANDOM.nextInt(1000));
     // create test gate
     transitDao.createGate(FAKE_GATE_ID, FAKE_GATE_KEY);
 }
@@ -221,10 +221,10 @@ private void checkData(Long idTransit, Transit transit) throws Exception {
             // check dates
             Timestamp arriveDate = (Timestamp) feature.getProperty(
                     "data_rilevamento").getValue();
-            String receiptDate = (String) feature.getProperty("data_ricezione")
+            Timestamp receiptDate = (Timestamp) feature.getProperty("data_ricezione")
                     .getValue();
             if (TimeUtils.getTimeStamp(transit.getDataRilevamento()).getTime() == arriveDate
-                    .getTime() && TimeUtils.isToday(receiptDate)) {
+                    .getTime() && TimeUtils.isToday(receiptDate.toString())) {
                 found = true;
                 break;
             }
