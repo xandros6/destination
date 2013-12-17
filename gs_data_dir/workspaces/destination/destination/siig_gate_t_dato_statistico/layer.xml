@@ -1,0 +1,13 @@
+<layer>
+  <name>siig_gate_t_dato_statistico</name>
+  <id>LayerInfoImpl-3891ffed:142fa7cf660:-6652</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-3891ffed:142fa7cf660:-6653</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

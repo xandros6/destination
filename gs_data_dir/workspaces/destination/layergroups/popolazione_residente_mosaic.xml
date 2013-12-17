@@ -1,0 +1,45 @@
+<layerGroup>
+  <id>LayerGroupInfoImpl-2c86d3c4:142fc1f7eb5:-7ff0</id>
+  <name>popolazione_residente_mosaic</name>
+  <workspace>
+    <id>WorkspaceInfoImpl--570ae188:124761b8d78:-7ffb</id>
+  </workspace>
+  <layers>
+    <layer>
+      <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7eb7</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7eb4</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7eb1</id>
+    </layer>
+    <layer>
+      <id>LayerInfoImpl-1c09ce8a:142dcbfbba4:-7eae</id>
+    </layer>
+  </layers>
+  <styles>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-1d46</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-1d46</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-1d46</id>
+    </style>
+    <style>
+      <id>StyleInfoImpl-24346e05:13d598ba09f:-1d46</id>
+    </style>
+  </styles>
+  <bounds>
+    <minx>314722.1345454545</minx>
+    <maxx>762726.755417868</maxx>
+    <miny>4879418.296363637</miny>
+    <maxy>5219037.90218021</maxy>
+    <crs class="projected">EPSG:32632</crs>
+  </bounds>
+  <metadata>
+    <entry key="title">popolazione_residente_mosaic</entry>
+  </metadata>
+</layerGroup>

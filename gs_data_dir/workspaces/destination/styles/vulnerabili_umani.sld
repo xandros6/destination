@@ -67,6 +67,11 @@
           <Title>Opaque Raster</Title>
           <Abstract>A raster with 100% opacity</Abstract>
           <RasterSymbolizer>
+            <ChannelSelection>
+                <GrayChannel>
+                        <SourceChannelName>1</SourceChannelName>
+                </GrayChannel>
+              </ChannelSelection>
             <Opacity>1.0</Opacity>
             <ColorMap type="intervals" extended="true">
         <ColorMapEntry color="#FF0000" quantity="0.00000000001" label="Nessuna" opacity="0"/>
