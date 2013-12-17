@@ -89,7 +89,7 @@ public abstract class InputObject {
 	private SequenceManager sequenceManager;
 	
 	//
-	private String inputTypeName = "";
+	protected String inputTypeName = "";
 	protected ProgressListener listenerForwarder=null;
 	
 	private boolean valid = false;

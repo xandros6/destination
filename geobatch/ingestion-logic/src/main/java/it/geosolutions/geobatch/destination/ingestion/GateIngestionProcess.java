@@ -43,6 +43,7 @@ import org.geotools.factory.Hints;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,6 +179,7 @@ protected boolean parseTypeName(String inputTypeName) {
     if (m.matches()) {
         // file date identifier
         date = m.group(4);
+        this.inputTypeName = inputTypeName;
 
         return true;
     }
@@ -360,20 +362,50 @@ public Long createTransit(Transit transit) throws Exception {
     SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 
     // values
-    featureBuilder.add(idLong.toString());
-    featureBuilder.add(transit.getIdGate().toString());
-    featureBuilder.add(arriveDate);
-    featureBuilder.add(TimeUtils.getTodayTimestamp() + "");
-    featureBuilder.add(transit.getCorsia().toString());
-    featureBuilder.add(transit.getDirezione());
-    featureBuilder.add(transit.getKemlerCode());
-    featureBuilder.add(transit.getOnuCode());
+    for (AttributeDescriptor attDesc : featureType.getAttributeDescriptors()) {
+        // known columns
+        String name = attDesc.getName().getLocalPart();
+        if (name.equals("id_dato")) {
+            featureBuilder.add(idLong.toString());
+        } else if (name.equals("fk_gate")) {
+            featureBuilder.add(transit.getIdGate().toString());
+        } else if (name.equals("data_rilevamento")) {
+            featureBuilder.add(arriveDate);
+        } else if (name.equals("ora_fuso_orario")
+                || name.equals("minuto_fuso_orario")) {
+            featureBuilder.add(0);
+        } else if (name.equals("data_ricezione")) {
+            featureBuilder.add(TimeUtils.getTodayTimestamp());
+        } else if (name.equals("flg_corsia")) {
+            featureBuilder.add(transit.getCorsia().toString());
+        } else if (name.equals("direzione")) {
+            featureBuilder.add(transit.getDirezione());
+        } else if (name.equals("codice_kemler")) {
+            featureBuilder.add(transit.getKemlerCode());
+        } else if (name.equals("codice_onu")) {
+            featureBuilder.add(transit.getOnuCode());
+        }else{
+            // unknown column, try to insert as null.
+            featureBuilder.add(null);
+        }
+    }
 
     SimpleFeature feature = featureBuilder.buildFeature(idLong.toString());
     feature.getUserData().put(Hints.USE_PROVIDED_FID, true);
 
+    SimpleFeatureStore featureStore = null;
     if (featureSource instanceof SimpleFeatureStore) {
-        SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+        featureStore = (SimpleFeatureStore) featureSource;
+
+    } else if (featureSource.getDataStore() instanceof SimpleFeatureSource){
+        featureStore = (SimpleFeatureStore) featureSource.getDataStore(); 
+    }else{
+        String msg = "'" + featureSource.getClass().getSimpleName() + "' is an unknown format for the data source. Couldn't save feature";
+        LOGGER.error(msg);
+        throw new IOException(msg);
+    }
+    
+    if(featureStore != null){
 
         featureStore.setTransaction(transaction);
         try {
@@ -386,8 +418,6 @@ public Long createTransit(Transit transit) throws Exception {
         } finally {
             transaction.close();
         }
-    } else {
-        LOGGER.error("Couldn't save feature");
     }
 
     return idLong;
