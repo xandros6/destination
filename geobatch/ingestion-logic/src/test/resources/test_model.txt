@@ -69,7 +69,7 @@ siig_d_tipo_veicolo=id_tipo_veicolo:java.math.BigDecimal,coeff_occupazione:java.
 siig_d_tipologia_danno=id_tipologia_danno:java.math.BigDecimal,tipologia_danno:String,flg_umano:String
 siig_gate_geo_gate=id_gate:java.math.BigDecimal,descrizione:String,collocazione:String,geometria:Point:srid=32632,data_inizio_validita:java.sql.Date,data_fine_validita:java.sql.Date
 siig_gate_t_dato=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_rilevamento:java.sql.Timestamp,data_ricezione:java.sql.Timestamp,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String
-siig_gate_t_dato_statistico=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_stat_inizio:java.sql.Date,data_stat_fine:java.sql.Date,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String,quantita:java.math.BigDecimal
+siig_gate_t_dato_statistico=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_stat_inizio:java.sql.Timestamp,data_stat_fine:java.sql.Timestamp,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String,quantita:java.math.BigDecimal,fk_interval:java.math.BigDecimal
 siig_gate_t_dato_storico=id_dato:java.math.BigDecimal,fk_gate:java.math.BigDecimal,data_rilevamento:java.sql.Timestamp,data_ricezione:java.sql.Date,flg_corsia:java.math.BigDecimal,direzione:String,codice_kemler:String,codice_onu:String
 siig_geo_bers_calcrischio_pl=idgeo:java.math.BigDecimal,id_tematico_shape:java.math.BigDecimal,fk_partner:String,fk_bersaglio:java.math.BigDecimal,geometria:MultiPolygon:srid=32632
 siig_geo_bers_non_umano_ln=idgeo_bers_non_umano_ln:java.math.BigDecimal,geometria:MultiLineString:srid=32632,id_partner:String,id_bersaglio:java.math.BigDecimal

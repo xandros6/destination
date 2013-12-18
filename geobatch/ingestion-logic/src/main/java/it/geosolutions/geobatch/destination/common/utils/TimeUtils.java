@@ -75,4 +75,52 @@ public static String getTodayTimestamp() {
             .toString(DEFAULT_FORMATTER)))).toString();
 }
 
+/**
+ * @return start time (one day ago)
+ */
+public static DateTime getTodayStart() {
+    DateTime now = new DateTime();
+    return now.minusDays(1);
+}
+
+/**
+ * @return start time for today Timestamp
+ */
+public static Timestamp getTodayStartTime() {
+    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart()
+            .toString(DEFAULT_FORMATTER))));
+}
+
+/**
+ * @return start time of the day one month ago
+ */
+public static Timestamp getMonthStartTime() {
+    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().minusMonths(1)
+            .toString(DEFAULT_FORMATTER))));
+}
+
+/**
+ * @return start time of the day one year ago
+ */
+public static Timestamp getYearStartTime() {
+    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().minusYears(1)
+            .toString(DEFAULT_FORMATTER))));
+}
+
+/**
+ * @return start time tomorrow (0:00:00:00)
+ */
+public static Timestamp getTodayEndTime() {
+    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().plusDays(1)
+            .toString(DEFAULT_FORMATTER))));
+}
+
+/**
+ * @return start time for the day one week ago
+ */
+public static Timestamp getWeekStartTime() {
+    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().minusWeeks(1)
+            .toString(DEFAULT_FORMATTER))));
+}
+
 }
