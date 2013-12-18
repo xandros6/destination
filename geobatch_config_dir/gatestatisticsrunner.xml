@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowConfiguration>
+
+    <id>gatestatisticsrunner</id>
+    
+    <name>Gate statistics generation</name>
+    <description>
+    	Read gate transits located on source feature DB, 
+    	generate statistics for last day, last week, last month 
+    	and last year and save on output feature DB
+    </description>
+
+    <autorun>true</autorun>
+
+    <EventGeneratorConfiguration>
+        <serviceID>fsEventGeneratorService</serviceID>
+        <wildCard>*.*</wildCard>
+        <watchDirectory>gatestatistics/in</watchDirectory>
+        <osType>OS_UNDEFINED</osType>
+  		  <eventType>POLLING_EVENT</eventType>
+  		  <!-- Executed once an hour  -->
+  		  <interval>0 0 * * * ?</interval>
+    </EventGeneratorConfiguration>
+
+    <EventConsumerConfiguration>
+
+        <listenerId>ConsumerLogger0</listenerId>
+        <listenerId>Cumulator</listenerId>
+
+        <GateStatisticConfiguration>
+            <id>generate_statistics</id>
+            <name>Gate statistics generation</name>
+            <description>
+            	Read gate transits located on source feature DB, 
+            	generate statistics for last day, last week, last month 
+            	and last year and save on output feature DB
+            </description>
+            <listenerConfigurations/>
+            <failIgnored>false</failIgnored>
+            <purgeData>true</purgeData>
+      			<sourceFeature>
+      				<!-- Source feature it's used to read the gate transits -->
+      				<dataStore>
+      					<entry>
+      						<string>dbtype</string>
+      						<string>postgis</string>
+      					</entry>
+      					<entry>
+      						<string>host</string>
+      						<string>localhost</string>
+      					</entry>
+      					<entry>
+      						<string>port</string>
+      						<string>5432</string>
+      					</entry>
+      					<entry>
+      						<string>database</string>
+      						<string>destination_prod_test</string>
+      					</entry>
+      					<entry>
+      						<string>schema</string>
+      						<string>siig_p</string>
+      					</entry>
+      					<entry>
+      						<string>user</string>
+      						<string>siig_p</string>
+      					</entry>
+      					<entry>
+      						<string>passwd</string>
+      						<string>siig_p</string>
+      					</entry>
+      					<entry>
+      						<string>Expose primary keys</string>
+      						<string>true</string>
+      					</entry>
+      				</dataStore>
+      			</sourceFeature>
+            <outputFeature>
+				        <!-- Output feature it's used to write the statistics -->
+                <dataStore>
+                   <entry>
+                     <string>dbtype</string>
+                     <string>postgis</string>
+                   </entry>
+                   <entry>
+                     <string>host</string>
+                     <string>localhost</string>
+                   </entry>
+                   <entry>
+                     <string>port</string>
+                     <string>5432</string>
+                   </entry>
+                   <entry>
+                     <string>database</string>
+                     <string>destination_prod_test</string>
+                   </entry>
+                   <entry>
+                     <string>database</string>
+                     <string>destination_prod_test</string>
+                   </entry>
+                   <entry>
+                     <string>schema</string>
+                     <string>siig_p</string>
+                   </entry>
+                   <entry>
+                     <string>user</string>
+                     <string>siig_p</string>
+                   </entry>
+                   <entry>
+                     <string>passwd</string>
+                     <string>siig_p</string>
+                   </entry>
+                </dataStore>
+            </outputFeature>
+            <projectOnMappings>false</projectOnMappings>
+            <attributeMappings/>
+            <!-- Listeners -->
+            <listenerId>ConsumerLogger0</listenerId>
+            <listenerId>Cumulator</listenerId>
+        </GateStatisticConfiguration>
+
+    </EventConsumerConfiguration>
+
+    <ListenerConfigurations>
+        <LoggingProgressListener>
+            <serviceID>loggingListenerService</serviceID>
+            <id>ConsumerLogger0</id>
+            <loggerName>it.geosolutions.ConsLogger</loggerName>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
+        </LoggingProgressListener>
+        <CumulatingProgressListener>
+            <serviceID>cumulatingListenerService</serviceID>
+            <id>Cumulator</id>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
+        </CumulatingProgressListener>
+    </ListenerConfigurations>
+
+</FlowConfiguration>
