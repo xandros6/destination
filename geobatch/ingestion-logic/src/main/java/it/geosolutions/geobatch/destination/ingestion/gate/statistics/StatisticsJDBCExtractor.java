@@ -68,12 +68,12 @@ private static final String END_KEY = ":end";
  * SQL query to be launched for extract data
  */
 private static String JOIN_SQL = "select count(*) as quantita, fk_gate, "
-        + "flg_corsia, direzione, codice_kemler, codice_onu from siig_gate_t_dato "
+        + "flg_corsia, flg_direzione, codice_onu from siig_gate_t_dato "
         + "where data_rilevamento between '"
         + START_KEY
         + "' and '"
         + END_KEY
-        + "' group by fk_gate, flg_corsia, direzione, codice_kemler, codice_onu";
+        + "' group by fk_gate, flg_corsia, flg_direzione, codice_onu";
 
 /**
  * Create a JDBC statistics extractor
@@ -220,8 +220,7 @@ private List<StatisticsBean> getStatistics(Connection conn,
             bean.setQuantita(quantita);
             bean.setFk_gate((BigDecimal) rs.getObject(column++));
             bean.setFlg_corsia((BigDecimal) rs.getObject(column++));
-            bean.setDirezione((String) rs.getObject(column++));
-            bean.setCodice_kemler((String) rs.getObject(column++));
+            bean.setDirezione((BigDecimal) rs.getObject(column++));
             bean.setCodice_onu((String) rs.getObject(column++));
             bean.setData_stat_inizio(start);
             bean.setData_stat_fine(end);

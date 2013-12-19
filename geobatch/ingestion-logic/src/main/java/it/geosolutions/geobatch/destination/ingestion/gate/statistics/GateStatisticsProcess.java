@@ -181,7 +181,7 @@ protected boolean parseTypeName(String inputTypeName) {
 
 private boolean initFromNow() {
 
-    this.date = (new DateTime()).toString(TimeUtils.DAY_FORMATTER);
+    this.date = (new DateTime()).toString(TimeUtils.getDayFormatter());
     this.inputTypeName = "Stats_" + this.date;
 
     return true;
@@ -408,7 +408,7 @@ private int closeProcess(int process) throws IOException {
  */
 public Long createStatistic(BigDecimal fk_gate, int fk_interval,
         Timestamp data_stat_inizio, Timestamp data_stat_fine,
-        BigDecimal flg_corsia, String direzione, String codice_kemler,
+        BigDecimal flg_corsia, BigDecimal direzione, String codice_kemler,
         String codice_onu, BigDecimal quantita, Transaction transaction)
         throws Exception {
 
@@ -436,7 +436,7 @@ public Long createStatistic(BigDecimal fk_gate, int fk_interval,
             featureBuilder.add(data_stat_fine);
         } else if (name.equals("flg_corsia")) {
             featureBuilder.add(flg_corsia);
-        } else if (name.equals("direzione")) {
+        } else if (name.equals("flg_direzione")) {
             featureBuilder.add(direzione);
         } else if (name.equals("codice_kemler")) {
             featureBuilder.add(codice_kemler);

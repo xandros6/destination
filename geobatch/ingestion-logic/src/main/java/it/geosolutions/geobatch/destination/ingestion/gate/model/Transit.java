@@ -55,7 +55,7 @@ private String OnuCode;
 /**
  * @return the idGate
  */
-@XmlElement
+@XmlElement(name="GateId")
 public Long getIdGate() {
     return IdGate;
 }
@@ -70,7 +70,7 @@ public void setIdGate(Long idGate) {
 /**
  * @return the idTransito
  */
-@XmlElement(name = "IdTransito")
+@XmlElement(name = "TransitId")
 public Long getIdTransito() {
     return IdTransito;
 }
@@ -85,7 +85,7 @@ public void setIdTransito(Long idTransito) {
 /**
  * @return the dataRilevamento
  */
-@XmlElement
+@XmlElement(name="Timestamp")
 public String getDataRilevamento() {
     return DataRilevamento;
 }
@@ -100,7 +100,7 @@ public void setDataRilevamento(String dataRilevamento) {
 /**
  * @return the corsia
  */
-@XmlElement
+@XmlElement(name="Lane")
 public Integer getCorsia() {
     return Corsia;
 }
@@ -115,7 +115,7 @@ public void setCorsia(Integer corsia) {
 /**
  * @return the direzione
  */
-@XmlElement
+@XmlElement(name="Direction")
 public String getDirezione() {
     return Direzione;
 }
@@ -130,7 +130,7 @@ public void setDirezione(String direzione) {
 /**
  * @return the kemlerCode
  */
-@XmlElement
+@XmlElement(name="KemlerCode")
 public String getKemlerCode() {
     return KemlerCode;
 }
@@ -145,7 +145,7 @@ public void setKemlerCode(String kemlerCode) {
 /**
  * @return the onuCode
  */
-@XmlElement
+@XmlElement(name="OnuCode")
 public String getOnuCode() {
     return OnuCode;
 }

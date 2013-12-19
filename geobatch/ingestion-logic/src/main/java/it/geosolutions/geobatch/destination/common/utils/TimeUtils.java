@@ -19,6 +19,7 @@ package it.geosolutions.geobatch.destination.common.utils;
 import java.sql.Timestamp;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 
 /**
@@ -28,28 +29,88 @@ import org.joda.time.format.DateTimeFormatter;
  */
 public class TimeUtils {
 
-/**
- * Default formatter for the time
- */
-public static final DateTimeFormatter DEFAULT_FORMATTER = org.joda.time.format.DateTimeFormat
-        .forPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZoneUTC();
+// Date/ time parameters
+private static final int MILLISECONDS_PER_HOUR = 3600000;
+private static final int MILLISECONDS_PER_MINUTE = 60000;
+private static String defaultFormatter = "yyyy-MM-dd'T'HH:mm:ssZZ";
+private static String dayFormatter = "yyyy-MM-dd";
 
 /**
- * Formatter for the day
+ * Change if you prefer to use local UTC
  */
-public static final DateTimeFormatter DAY_FORMATTER = org.joda.time.format.DateTimeFormat
-        .forPattern("yyyy-MM-dd").withZoneUTC();
+private static boolean USE_UTC = true;
+
+/**
+ * @return default formatter for the time
+ */
+public static DateTimeFormatter getDefaultFormatter() {
+    return USE_UTC ? org.joda.time.format.DateTimeFormat.forPattern(
+            defaultFormatter).withZoneUTC()
+            : org.joda.time.format.DateTimeFormat.forPattern(defaultFormatter);
+}
+
+/**
+ * @return formatter for a day
+ */
+public static DateTimeFormatter getDayFormatter() {
+    return org.joda.time.format.DateTimeFormat.forPattern(dayFormatter);
+}
+
+/**
+ * Obtain hour offset of the zone
+ * 
+ * @param date to obtain it
+ * @return hour offset
+ */
+public static int getHour(DateTime date) {
+    DateTimeZone zone = date.getZone();
+    return getHour(zone);
+}
+
+/**
+ * Obtain minutes offset of the zone (need to be conbined with
+ * {@link TimeUtils#getHour(DateTime)})
+ * 
+ * @param date to obtain it
+ * @return minutes offset
+ */
+public static int getMinutes(DateTime date) {
+    DateTimeZone zone = date.getZone();
+    return getMinutes(zone);
+}
+
+/**
+ * Obtain hour offset of the zone
+ * 
+ * @param zone to obtain it
+ * @return hour offset
+ */
+public static int getHour(DateTimeZone zone) {
+    return (int) Math.floor(zone.getStandardOffset(0) / MILLISECONDS_PER_HOUR);
+}
+
+/**
+ * Obtain minutes offset of the zone (need to be conbined with
+ * {@link TimeUtils#getHour(DateTimeZone)})
+ * 
+ * @param zone to obtain it
+ * @return minutes offset
+ */
+public static int getMinutes(DateTimeZone zone) {
+    return (zone.getStandardOffset(0) - (getHour(zone) * MILLISECONDS_PER_HOUR))
+            * MILLISECONDS_PER_MINUTE;
+}
 
 /**
  * Check if the time start with the date of today
  * 
- * @param time in a string format starting with a DAY_FORMATTER
+ * @param time in a string format starting with a getDayFormatter()
  * @return
  */
 public static boolean isToday(String time) {
     DateTime now = new DateTime();
     boolean isToday = false;
-    if (time.startsWith(now.toString(TimeUtils.DAY_FORMATTER))) {
+    if (time.startsWith(now.toString(TimeUtils.getDayFormatter()))) {
         isToday = true;
     }
     return isToday;
@@ -62,7 +123,7 @@ public static boolean isToday(String time) {
  * @return
  */
 public static Timestamp getTimeStamp(String date) {
-    return date != null ? new Timestamp(DEFAULT_FORMATTER.parseMillis(date))
+    return date != null ? new Timestamp(getDefaultFormatter().parseMillis(date))
             : null;
 }
 
@@ -71,8 +132,8 @@ public static Timestamp getTimeStamp(String date) {
  */
 public static String getTodayTimestamp() {
     DateTime now = new DateTime();
-    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(now
-            .toString(DEFAULT_FORMATTER)))).toString();
+    return (new Timestamp(getDefaultFormatter().parseMillis(
+            now.toString(getDefaultFormatter())))).toString();
 }
 
 /**
@@ -87,40 +148,40 @@ public static DateTime getTodayStart() {
  * @return start time for today Timestamp
  */
 public static Timestamp getTodayStartTime() {
-    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart()
-            .toString(DEFAULT_FORMATTER))));
+    return (new Timestamp(getDefaultFormatter().parseMillis(
+            getTodayStart().toString(getDefaultFormatter()))));
 }
 
 /**
  * @return start time of the day one month ago
  */
 public static Timestamp getMonthStartTime() {
-    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().minusMonths(1)
-            .toString(DEFAULT_FORMATTER))));
+    return (new Timestamp(getDefaultFormatter().parseMillis(
+            getTodayStart().minusMonths(1).toString(getDefaultFormatter()))));
 }
 
 /**
  * @return start time of the day one year ago
  */
 public static Timestamp getYearStartTime() {
-    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().minusYears(1)
-            .toString(DEFAULT_FORMATTER))));
+    return (new Timestamp(getDefaultFormatter().parseMillis(
+            getTodayStart().minusYears(1).toString(getDefaultFormatter()))));
 }
 
 /**
  * @return start time tomorrow (0:00:00:00)
  */
 public static Timestamp getTodayEndTime() {
-    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().plusDays(1)
-            .toString(DEFAULT_FORMATTER))));
+    return (new Timestamp(getDefaultFormatter().parseMillis(
+            getTodayStart().plusDays(1).toString(getDefaultFormatter()))));
 }
 
 /**
  * @return start time for the day one week ago
  */
 public static Timestamp getWeekStartTime() {
-    return (new Timestamp(DEFAULT_FORMATTER.parseMillis(getTodayStart().minusWeeks(1)
-            .toString(DEFAULT_FORMATTER))));
+    return (new Timestamp(getDefaultFormatter().parseMillis(
+            getTodayStart().minusWeeks(1).toString(getDefaultFormatter()))));
 }
 
 }

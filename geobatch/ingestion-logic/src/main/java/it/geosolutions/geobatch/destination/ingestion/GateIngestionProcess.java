@@ -41,6 +41,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.factory.Hints;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.joda.time.DateTimeZone;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -94,7 +95,7 @@ private static final Integer DEFAULT_GATE_TYPE = NO_TARGET;
  * Pattern: [Server]_[date]_[time].xml
  */
 private static Pattern typeNameParts = Pattern
-        .compile("^([A-Z])([0-9]{2})[_-]([0-9]{8})[_-]([0-9]{6})$");
+        .compile("^([0-9]{2})[_-]([0-9]{8})[_-]([0-9]{6})$");
 
 /**
  * Used to clean fileName
@@ -178,7 +179,7 @@ protected boolean parseTypeName(String inputTypeName) {
 
     if (m.matches()) {
         // file date identifier
-        date = m.group(4);
+        date = m.group(3);
         this.inputTypeName = inputTypeName;
 
         return true;
@@ -341,6 +342,7 @@ public Long createTransit(Transit transit) throws Exception {
 
     // prepare data
     Timestamp timestamp = TimeUtils.getTimeStamp(transit.getDataRilevamento());
+    DateTimeZone zone = TimeUtils.getDefaultFormatter().parseDateTime(transit.getDataRilevamento()).getZone();
     // null value should throw an exception
     String arriveDate = timestamp != null ? timestamp + "" : null;
     Long idLong = null;
@@ -371,14 +373,15 @@ public Long createTransit(Transit transit) throws Exception {
             featureBuilder.add(transit.getIdGate().toString());
         } else if (name.equals("data_rilevamento")) {
             featureBuilder.add(arriveDate);
-        } else if (name.equals("ora_fuso_orario")
-                || name.equals("minuto_fuso_orario")) {
-            featureBuilder.add(0);
+        } else if (name.equals("ora_fuso_orario")){
+            featureBuilder.add(TimeUtils.getHour(zone));
+        }else if (name.equals("minuto_fuso_orario")) {
+            featureBuilder.add(TimeUtils.getMinutes(zone));
         } else if (name.equals("data_ricezione")) {
             featureBuilder.add(TimeUtils.getTodayTimestamp());
         } else if (name.equals("flg_corsia")) {
             featureBuilder.add(transit.getCorsia().toString());
-        } else if (name.equals("direzione")) {
+        } else if (name.equals("flg_direzione")) {
             featureBuilder.add(transit.getDirezione());
         } else if (name.equals("codice_kemler")) {
             featureBuilder.add(transit.getKemlerCode());

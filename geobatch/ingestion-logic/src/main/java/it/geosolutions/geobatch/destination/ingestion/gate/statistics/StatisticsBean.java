@@ -37,7 +37,7 @@ private int fk_interval;
 private Timestamp data_stat_inizio;
 private Timestamp data_stat_fine;
 private BigDecimal flg_corsia;
-private String direzione;
+private BigDecimal direzione;
 private String codice_kemler;
 private String codice_onu;
 private BigDecimal quantita;
@@ -115,14 +115,14 @@ public void setFlg_corsia(BigDecimal flg_corsia) {
 /**
  * @return the direzione
  */
-public String getDirezione() {
+public BigDecimal getDirezione() {
     return direzione;
 }
 
 /**
  * @param direzione the direzione to set
  */
-public void setDirezione(String direzione) {
+public void setDirezione(BigDecimal direzione) {
     this.direzione = direzione;
 }
 
