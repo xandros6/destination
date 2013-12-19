@@ -23,8 +23,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -48,20 +51,20 @@ public static String TEST_XML = ""
         + "<ExportData xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">"
         + "    <Transits>" 
         + "    <Transit>" 
-        + "      <IdGate>2004</IdGate>"
-        + "      <IdTransito>81831</IdTransito>"
-        + "      <DataRilevamento>2013-10-23T10:34:00Z</DataRilevamento>"
-        + "      <Corsia>0</Corsia>" 
-        + "      <Direzione>0</Direzione>"
+        + "      <GateId>2004</GateId>"
+        + "      <TransitId>81831</TransitId>"
+        + "      <Timestamp>2013-10-23T10:34:00+01:00</Timestamp>"
+        + "      <Lane>0</Lane>" 
+        + "      <Direction>0</Direction>"
         + "      <KemlerCode />" 
         + "      <OnuCode />" 
         + "    </Transit>"
         + "    <Transit>" 
-        + "      <IdGate>2004</IdGate>"
-        + "      <IdTransito>81832</IdTransito>"
-        + "      <DataRilevamento>2013-10-23T10:34:00Z</DataRilevamento>"
-        + "      <Corsia>0</Corsia>" 
-        + "      <Direzione>1</Direzione>"
+        + "      <GateId>2004</GateId>"
+        + "      <TransitId>81832</TransitId>"
+        + "      <Timestamp>2013-10-23T10:34:00+01:00</Timestamp>"
+        + "      <Lane>0</Lane>" 
+        + "      <Direction>1</Direction>"
         + "      <KemlerCode />" 
         + "      <OnuCode />" 
         + "    </Transit>"
@@ -91,14 +94,14 @@ public void testTransitMarshalUnmarshal() {
     Transit transit = new Transit();
     transit.setIdGate(new Long(2004));
     transit.setIdTransito(new Long(81831));
-    transit.setDataRilevamento("2013-10-23T10:34:00Z");
+    transit.setDataRilevamento("2013-10-23T10:34:00+01:00");
     transit.setCorsia(new Integer(0));
     transit.setDirezione("0");
     fromCode.getTransit().add(transit);
     transit = new Transit();
     transit.setIdGate(new Long(2004));
     transit.setIdTransito(new Long(81832));
-    transit.setDataRilevamento("2013-10-23T10:34:00Z");
+    transit.setDataRilevamento("2013-10-23T10:34:00+01:00");
     transit.setCorsia(new Integer(0));
     transit.setDirezione("1");
     fromCode.getTransit().add(transit);
@@ -125,6 +128,51 @@ public void testTransitMarshalUnmarshal() {
                     transitFromCode.getKemlerCode());
             check(transitFromXml.getOnuCode(), transitFromCode.getOnuCode());
         }
+    } catch (JAXBException e) {
+        // fail
+        e.printStackTrace();
+        fail("Error on marshal or unmarshal");
+    }
+}
+
+/**
+ * Generate sql code for insert kemler and onu codes
+ */
+@Test
+public void testGenerateInsert() {
+    try {
+        ExportData ed = (ExportData) unmarshaller.unmarshal(new File("src/test/resources/00_20131218_141116.xml"));
+
+        Transits fromXml = ed.getTransits().get(0);
+        
+        String kemlerT = "insert into siig_d_kemler (codice_kemler) values (':kemler');";
+        String onuT = "insert into siig_d_onu (codice_onu, codice_kemler) values (':onu', ':kemler');";
+
+
+        Map<String, String> insertK = new HashMap<String, String>();
+        Map<String, String> insertC = new HashMap<String, String>();
+        for (int i = 0; i < fromXml.getTransit().size(); i++) {
+            String kemler = fromXml.getTransit().get(i).getKemlerCode();
+            String onu = fromXml.getTransit().get(i).getOnuCode();
+            insertK.put(kemler, kemlerT.replace(":kemler", kemler));
+            insertC.put(onu, onuT.replace(":kemler", kemler).replace(":onu", onu));
+        }
+        
+        String insertAll = "";
+        insertAll +="-- Kemler code missed data";
+        for(String kemler: insertK.keySet()){
+            insertAll += "\n" + insertK.get(kemler);
+        }
+        insertAll += "\n"; 
+        insertAll += "-- Onu code missed data (we suppose if one transit have onu and kemler code, the relation exists between those codes)";
+        for(String onu: insertC.keySet()){
+            insertAll += "\n" + insertC.get(onu);
+        }
+        // show sql code in console
+        System.out.println("### GENERATED SQL CODE  ###");
+        System.out.println(insertAll);
+        System.out.println("### EoF SQL CODE  ###");
+        
     } catch (JAXBException e) {
         // fail
         e.printStackTrace();
