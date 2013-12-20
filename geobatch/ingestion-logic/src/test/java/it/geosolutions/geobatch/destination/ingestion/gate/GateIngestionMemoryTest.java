@@ -294,7 +294,7 @@ private ExportData generateTestData(long idGate, int transitNumber) {
 
         // Time it's different each time
         dt = new DateTime();
-        transit.setDataRilevamento(dt.toString(TimeUtils.DEFAULT_FORMATTER));
+        transit.setDataRilevamento(dt.toString(TimeUtils.getDefaultFormatter()));
 
         // direction
         transit.setDirezione(inverse ? "1" : "0");

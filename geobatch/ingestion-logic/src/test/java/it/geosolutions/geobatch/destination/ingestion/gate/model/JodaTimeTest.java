@@ -22,6 +22,7 @@ package it.geosolutions.geobatch.destination.ingestion.gate.model;
 import static org.junit.Assert.assertEquals;
 import it.geosolutions.geobatch.destination.common.utils.TimeUtils;
 
+import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 /**
@@ -36,9 +37,37 @@ public class JodaTimeTest {
  */
 @Test
 public void testJodaTime() {
-    String stringDate = "2013-10-23T10:34:00Z";
-    long millis = TimeUtils.DEFAULT_FORMATTER.parseMillis(stringDate);
-    assertEquals(stringDate, TimeUtils.DEFAULT_FORMATTER.print(millis));
+    String stringDate = "2013-12-18T13:26:09+00:00";
+    long millis = TimeUtils.getDefaultFormatter().parseMillis(stringDate);
+    DateTimeZone zone = TimeUtils.getDefaultFormatter().parseDateTime(stringDate).getZone();
+    assertEquals(stringDate, TimeUtils.getDefaultFormatter().withZone(zone).print(millis));
+    stringDate = "2013-12-18T13:20:45+00:00";
+    zone = TimeUtils.getDefaultFormatter().parseDateTime(stringDate).getZone();
+    millis = TimeUtils.getDefaultFormatter().parseMillis(stringDate);
+    assertEquals(stringDate, TimeUtils.getDefaultFormatter().withZone(zone).print(millis));
+}
+
+
+/**
+ * Test zones
+ */
+@Test
+public void testJodaZones() {
+    // now it's activated UTC zone
+    String stringDate = "2013-12-18T13:26:09+02:00";
+    DateTimeZone zone = TimeUtils.getDefaultFormatter().parseDateTime(stringDate).getZone();
+    assertEquals(TimeUtils.getHour(zone), 0);
+    assertEquals(TimeUtils.getMinutes(zone), 0);
+    /* if disable UTC zone, you need to fix:
+    String stringDate = "2013-12-18T13:26:09+02:00";
+    DateTimeZone zone = TimeUtils.getDefaultFormatter().parseDateTime(stringDate).getZone();
+    assertEquals(TimeUtils.getHour(zone), 2);
+    assertEquals(TimeUtils.getMinutes(zone), 0);
+    stringDate = "2013-12-18T13:26:09+02:30";
+    zone = TimeUtils.getDefaultFormatter().parseDateTime(stringDate).getZone();
+    assertEquals(TimeUtils.getHour(zone), 2);
+    assertEquals(TimeUtils.getMinutes(zone), 30);
+    */
 }
 
 }
