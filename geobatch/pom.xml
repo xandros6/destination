@@ -240,6 +240,11 @@
               <classifier>classes</classifier>
               <version>${gb.version}</version>
             </dependency>
+            <dependency>
+                <groupId>it.geosolutions.geobatch</groupId>
+                <artifactId>gb-action-ftp</artifactId>
+                <version>${gb.version}</version>
+            </dependency>
             
             <!-- =========================================================== -->
             <!-- GEOTOOOLS -->
