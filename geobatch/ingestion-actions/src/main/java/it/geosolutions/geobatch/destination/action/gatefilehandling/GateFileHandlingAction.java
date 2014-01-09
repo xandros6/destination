@@ -25,27 +25,28 @@ import it.geosolutions.filesystemmonitor.monitor.FileSystemEvent;
 import it.geosolutions.filesystemmonitor.monitor.FileSystemEventType;
 import it.geosolutions.geobatch.actions.ds2ds.util.FeatureConfigurationUtil;
 import it.geosolutions.geobatch.annotations.Action;
+import it.geosolutions.geobatch.destination.common.utils.RemoteBrowserProtocol;
+import it.geosolutions.geobatch.destination.common.utils.RemoteBrowserUtils;
 import it.geosolutions.geobatch.destination.ingestion.GateIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 import it.geosolutions.geobatch.flow.event.action.BaseAction;
-import it.geosolutions.geobatch.ftp.client.FTPHelperBare;
-import it.geosolutions.geobatch.ftp.client.configuration.FTPActionConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.EventObject;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.regex.Pattern;
 
 import org.geotools.data.DataStore;
 import org.geotools.jdbc.JDBCDataStore;
 
 import com.enterprisedt.net.ftp.FTPConnectMode;
-import com.enterprisedt.net.ftp.FTPFile;
-import com.enterprisedt.net.ftp.FTPTransferType;
-import com.enterprisedt.net.ftp.WriteMode;
+import com.enterprisedt.net.ftp.FTPException;
 
 /**
  * GeoBatch gate ingestion remote file handling action
@@ -54,11 +55,6 @@ import com.enterprisedt.net.ftp.WriteMode;
  */
 @Action(configurationClass = GateFileHandlingConfiguration.class)
 public class GateFileHandlingAction extends BaseAction<EventObject> {
-
-/**
- * Temporal directory
- */
-private static String TMP_DIR = System.getProperty("java.io.tmpdir");
 
 /**
  * File separator
@@ -183,99 +179,173 @@ public void doProcess(GateFileHandlingConfiguration cfg,
 
     try {
 
-        // Read configuration
-        FTPActionConfiguration ftpActionConfiguration = cfg
-                .getFtpConfiguration();
-        String ftpserverHost = ftpActionConfiguration.getFtpserverHost();
-        String ftpserverUSR = ftpActionConfiguration.getFtpserverUSR();
-        String ftpserverPWD = ftpActionConfiguration.getFtpserverPWD();
-        int ftpserverPort = ftpActionConfiguration.getFtpserverPort();
-        final FTPConnectMode connectMode = ftpActionConfiguration
-                .getConnectMode().toString()
+        // Input directory is the temporal directory (for file download)
+        String inputDir = configuration.getInputPath();
+
+        // Remote server configuration
+        String remotePath = cfg.getInputRemotePath();
+        RemoteBrowserProtocol serverProtocol = configuration
+                .getRemoteBrowserConfiguration().getServerProtocol();
+        String serverHost = configuration.getRemoteBrowserConfiguration()
+                .getFtpserverHost();
+        String serverUser = configuration.getRemoteBrowserConfiguration()
+                .getFtpserverUSR();
+        String serverPWD = configuration.getRemoteBrowserConfiguration()
+                .getFtpserverPWD();
+        int serverPort = configuration.getRemoteBrowserConfiguration()
+                .getFtpserverPort();
+        int timeout = configuration.getRemoteBrowserConfiguration()
+                .getTimeout();
+        final FTPConnectMode connectMode = configuration
+                .getRemoteBrowserConfiguration().toString()
                 .equalsIgnoreCase(FTPConnectMode.ACTIVE.toString()) ? FTPConnectMode.ACTIVE
                 : FTPConnectMode.PASV;
-        final int timeout = ftpActionConfiguration.getTimeout();
 
-        // Input directory is the temporal directory (for file download)
-        String inputDir = TMP_DIR;
+        // Remote server result configuration
+        RemoteBrowserProtocol serverResultProtocol = null;
+        String serverResultHost = null;
+        String serverResultUser = null;
+        String serverResultPWD = null;
+        int serverResultPort = 0;
+        int resultTimeout = 0;
+        FTPConnectMode resultConnectMode = null;
+        if (configuration.getRemoteResultBrowserConfiguration() != null
+                && !configuration.isStoreLocal()) {
+            serverResultHost = configuration
+                    .getRemoteResultBrowserConfiguration().getFtpserverHost();
+            serverResultUser = configuration
+                    .getRemoteResultBrowserConfiguration().getFtpserverUSR();
+            serverResultPWD = configuration
+                    .getRemoteResultBrowserConfiguration().getFtpserverPWD();
+            serverResultPort = configuration
+                    .getRemoteResultBrowserConfiguration().getFtpserverPort();
+            resultTimeout = configuration.getRemoteResultBrowserConfiguration()
+                    .getTimeout();
+            resultConnectMode = configuration
+                    .getRemoteResultBrowserConfiguration().toString()
+                    .equalsIgnoreCase(FTPConnectMode.ACTIVE.toString()) ? FTPConnectMode.ACTIVE
+                    : FTPConnectMode.PASV;
+        }
 
-        // Base remote directories from configuration
-        String dirName = cfg.getBaseRemotePath();
-        String remotePath = cfg.getInputRemotePath();
+        // File pattern
+        Pattern pattern = Pattern.compile(configuration.getFilePattern());
 
-        FTPFile[] files = FTPHelperBare.dirDetails(ftpserverHost, dirName
-                + SEPARATOR + remotePath, SEPARATOR, ftpserverUSR, ftpserverPWD,
-                ftpserverPort, FTPTransferType.BINARY, WriteMode.OVERWRITE,
-                connectMode, timeout);
+        // obtain filenames
+        List<String> fileNames = RemoteBrowserUtils.ls(serverProtocol,
+                serverUser, serverPWD, serverHost, serverPort, remotePath,
+                connectMode, timeout, pattern);
 
         // For each file on the remote directory
-        for (FTPFile file : files) {
+        for (String fileName : fileNames) {
+
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Processing file " + file.getName());
+                LOGGER.info("Processing file " + fileName);
             }
 
-            // Download the file
-            FTPHelperBare.downloadFile(ftpserverHost, inputDir, dirName
-                    + SEPARATOR + remotePath, file.getName(), ftpserverUSR,
-                    ftpserverPWD, ftpserverPort, FTPTransferType.BINARY,
-                    WriteMode.OVERWRITE, connectMode, timeout);
-            File inputFile = new File(inputDir + SEPARATOR + file.getName());
-
-            // process the file
-            if (inputFile.exists()) {
-                // delete downloaded file
-                FTPHelperBare.deleteFileOrDirectory(ftpserverHost,
-                        file.getName(), false,
-                        dirName + SEPARATOR + remotePath, ftpserverUSR,
-                        ftpserverPWD, ftpserverPort, connectMode, timeout);
-                
-                boolean error = true;
-                
-                try{
-                    // Import gate data
-                    GateIngestionProcess computation = new GateIngestionProcess(
-                            // type name read on file name
-                            "", listenerForwarder, metadataHandler, dataStore,
-                            inputFile);
-                    Map<String, Object> procResult = computation.doProcess(cfg
-                            .getIgnorePks());
-                    
-                    // is correct?
-                    if (procResult != null
-                            && !procResult.isEmpty()
-                            && procResult.get(GateIngestionProcess.ERROR_COUNT) != null
-                            && procResult.get(GateIngestionProcess.ERROR_COUNT)
-                                    .equals(0)) {
-                        error = false;
-                    }
-                }catch (Exception e){
-                    if(LOGGER.isErrorEnabled()){
-                        LOGGER.error("Error processing "+file.getName(), e);
-                    }
-                }
-
-                // Post process.
-                if (!error) {
-                    // success: put on success remote dir
-                    FTPHelperBare.putBinaryFileTo(ftpserverHost,
-                            inputFile.getAbsolutePath(), dirName + SEPARATOR
-                                    + cfg.getSuccesRemotePath(), ftpserverUSR,
-                            ftpserverPWD, ftpserverPort, WriteMode.OVERWRITE,
-                            connectMode, timeout);
+            // check if exists
+            boolean exists = false;
+            if (configuration.isCheckIfExists()) {
+                if (configuration.isStoreLocal()) {
+                    exists = checkIfExists(inputDir, fileName)
+                            | checkIfExists(configuration.getSuccesPath(),
+                                    fileName)
+                            | checkIfExists(configuration.getFailPath(),
+                                    fileName);
                 } else {
-                    // fail: put on fail remote dir
-                    FTPHelperBare.putBinaryFileTo(ftpserverHost,
-                            inputFile.getAbsolutePath(), dirName + SEPARATOR
-                                    + cfg.getFailRemotePath(), ftpserverUSR,
-                            ftpserverPWD, ftpserverPort, WriteMode.OVERWRITE,
-                            connectMode, timeout);
+                    exists = checkIfExists(serverResultProtocol,
+                            serverResultUser, serverResultHost,
+                            serverResultPWD, serverResultPort, inputDir,
+                            fileName, resultConnectMode, resultTimeout)
+                            | checkIfExists(serverResultProtocol,
+                                    serverResultUser, serverResultHost,
+                                    serverResultPWD, serverResultPort,
+                                    configuration.getSuccesPath(), fileName,
+                                    resultConnectMode, resultTimeout)
+                            | checkIfExists(serverResultProtocol,
+                                    serverResultUser, serverResultHost,
+                                    serverResultPWD, serverResultPort,
+                                    configuration.getFailPath(), fileName,
+                                    resultConnectMode, resultTimeout);
                 }
+            }
 
-                // clean downloaded file
-                inputFile.delete();
+            // only download and handle if was not be already handled
+            if (!exists) {
+                // Download the file
+                File inputFile = RemoteBrowserUtils.downloadFile(
+                        serverProtocol, serverUser, serverPWD, serverHost,
+                        serverPort, remotePath + SEPARATOR + fileName, inputDir
+                                + SEPARATOR + fileName, timeout);
 
-            } else if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Error downloading " + file.getName());
+                // process the file
+                if (inputFile.exists()) {
+                    if (configuration.isDeleteDownloadedFiles()) {
+                        // delete downloaded file
+                        RemoteBrowserUtils.deleteFile(serverProtocol,
+                                serverUser, serverPWD, serverHost, serverPort,
+                                timeout, remotePath, fileName, connectMode);
+                    }
+
+                    boolean error = true;
+
+                    try {
+                        // Import gate data
+                        GateIngestionProcess computation = new GateIngestionProcess(
+                                // type name read on file name
+                                "", listenerForwarder, metadataHandler,
+                                dataStore, inputFile);
+                        Map<String, Object> procResult = computation
+                                .doProcess(cfg.getIgnorePks());
+
+                        // is correct?
+                        if (procResult != null
+                                && !procResult.isEmpty()
+                                && procResult
+                                        .get(GateIngestionProcess.ERROR_COUNT) != null
+                                && procResult.get(
+                                        GateIngestionProcess.ERROR_COUNT)
+                                        .equals(0)) {
+                            error = false;
+                        }
+                    } catch (Exception e) {
+                        if (LOGGER.isErrorEnabled()) {
+                            LOGGER.error("Error processing " + fileName, e);
+                        }
+                    }
+
+                    // Post process.
+                    String targetPath = null;
+                    if (!error) {
+                        // success: put on success remote dir
+                        targetPath = configuration.getSuccesPath();
+                    } else {
+                        // fail: put on fail remote dir
+                        targetPath = configuration.getFailPath();
+                    }
+
+                    // result could be local or remote
+                    if (configuration.isStoreLocal()) {
+                        // move the the target path
+                        inputFile.renameTo(new File(targetPath + SEPARATOR
+                                + inputFile.getName()));
+                    } else {
+                        // upload file
+                        RemoteBrowserUtils.putFile(serverResultProtocol,
+                                serverResultUser, serverResultHost,
+                                serverResultPWD, serverResultPort, targetPath
+                                        + SEPARATOR + inputFile.getName(),
+                                inputFile.getAbsolutePath(), resultConnectMode,
+                                resultTimeout);
+
+                        // clean downloaded file in the input directory
+                        inputFile.delete();
+                    }
+
+                } else if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Error downloading " + fileName);
+                }
+            }else if (LOGGER.isInfoEnabled()){
+                LOGGER.info("File "+fileName + " ignored because was processed after this execution");
             }
         }
 
@@ -287,6 +357,44 @@ public void doProcess(GateFileHandlingConfiguration cfg,
         throw new ActionException(this, "Error in importing gates", ex);
     }
 
+}
+
+/**
+ * Check if exists a file on a remote
+ * 
+ * @param serverProtocol
+ * @param serverUser
+ * @param serverHost
+ * @param serverPWD
+ * @param serverPort
+ * @param path
+ * @param fileName
+ * @param connectMode
+ * @param timeout
+ * @return
+ * @throws IOException
+ * @throws FTPException
+ * @throws ParseException
+ */
+private boolean checkIfExists(RemoteBrowserProtocol serverProtocol,
+        String serverUser, String serverHost, String serverPWD, int serverPort,
+        String path, String fileName, FTPConnectMode connectMode, int timeout)
+        throws IOException, FTPException, ParseException {
+    return RemoteBrowserUtils.checkIfExists(serverProtocol, serverUser,
+            serverHost, serverPWD, serverPort, path, fileName, connectMode,
+            timeout);
+}
+
+/**
+ * Check if a file exists
+ * 
+ * @param inputDir
+ * @param fileName
+ * @return
+ */
+private boolean checkIfExists(String inputDir, String fileName) {
+    File file = new File(inputDir + SEPARATOR + fileName);
+    return file.exists();
 }
 
 }

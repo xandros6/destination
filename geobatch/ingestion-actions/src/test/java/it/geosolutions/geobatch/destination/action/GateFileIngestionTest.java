@@ -24,9 +24,12 @@ package it.geosolutions.geobatch.destination.action;
 import static org.junit.Assert.assertTrue;
 import it.geosolutions.geobatch.destination.action.gatefilehandling.GateFileHandlingAction;
 import it.geosolutions.geobatch.destination.action.gatefilehandling.GateFileHandlingConfiguration;
-import it.geosolutions.geobatch.ftp.client.FTPHelperBare;
-import it.geosolutions.geobatch.ftp.client.configuration.FTPActionConfiguration;
+import it.geosolutions.geobatch.destination.common.utils.RemoteBrowserProtocol;
+import it.geosolutions.geobatch.destination.common.utils.RemoteBrowserUtils;
 import it.geosolutions.geobatch.ftp.client.configuration.FTPActionConfiguration.FTPConnectMode;
+import it.geosolutions.geobatch.remoteBrowser.configuration.RemoteBrowserConfiguration;
+
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,10 +40,6 @@ import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
-
-import com.enterprisedt.net.ftp.FTPFile;
-import com.enterprisedt.net.ftp.FTPTransferType;
-import com.enterprisedt.net.ftp.WriteMode;
 
 /**
  * JUnit test for {@link GateFileHandlingAction} action
@@ -65,6 +64,11 @@ private GateFileHandlingConfiguration config;
 private int fakeFtpPort = 10580;
 
 /**
+ * Temporal directory
+ */
+private static String TMP_DIR = System.getProperty("java.io.tmpdir");
+
+/**
  * Prepare test for remote FTP file browsing
  * 
  * @throws Exception
@@ -75,8 +79,9 @@ public void setup() throws Exception {
     // fake FTP server
     fakeFtpServer = new FakeFtpServer();
     fakeFtpServer.setServerControlPort(fakeFtpPort);
-    fakeFtpServer.addUserAccount(new UserAccount("user", "password", "/tmp"));
+    fakeFtpServer.addUserAccount(new UserAccount("user", "password", "/"));
     FileSystem fileSystem = new UnixFakeFileSystem();
+    fileSystem.add(new DirectoryEntry("/tmp"));
     fileSystem.add(new DirectoryEntry("/tmp/SIIG"));
     fileSystem.add(new DirectoryEntry("/tmp/SIIG/Acquisiti"));
     fileSystem.add(new DirectoryEntry("/tmp/SIIG/Elaborati"));
@@ -90,19 +95,22 @@ public void setup() throws Exception {
 
     // file handling config
     config = new GateFileHandlingConfiguration(null, null, null);
-    config.setBaseRemotePath("SIIG");
-    config.setInputRemotePath("Acquisiti");
-    config.setSuccesRemotePath("Elaborati");
-    config.setFailRemotePath("Scarti");
-    FTPActionConfiguration ftpConfig = new FTPActionConfiguration(null, null,
-            null);
-    ftpConfig.setFtpserverHost("localhost");
-    ftpConfig.setFtpserverUSR("user");
-    ftpConfig.setFtpserverPWD("password");
-    ftpConfig.setTimeout(100);
-    ftpConfig.setConnectMode(FTPConnectMode.ACTIVE);
-    ftpConfig.setFtpserverPort(fakeFtpPort);
-    config.setFtpConfiguration(ftpConfig);
+    config.setInputRemotePath("/tmp/SIIG/Acquisiti");
+    config.setSuccesPath("/tmp/SIIG/Elaborati");
+    config.setFailPath("/tmp/SIIG/Scarti");
+    config.setInputPath(TMP_DIR);
+    config.setDeleteDownloadedFiles(true);
+    config.setStoreLocal(false);
+    RemoteBrowserConfiguration remoteBrowserConfiguration = new RemoteBrowserConfiguration(null, null, null);
+    remoteBrowserConfiguration.setFtpserverHost("localhost");
+    remoteBrowserConfiguration.setFtpserverPort(fakeFtpPort);
+    remoteBrowserConfiguration.setServerProtocol(RemoteBrowserProtocol.ftp);
+    remoteBrowserConfiguration.setFtpserverPWD("password");
+    remoteBrowserConfiguration.setFtpserverUSR("user");
+    remoteBrowserConfiguration.setTimeout(5000);
+    remoteBrowserConfiguration.setConnectMode(FTPConnectMode.ACTIVE);
+    config.setRemoteBrowserConfiguration(remoteBrowserConfiguration);
+    config.setRemoteResultBrowserConfiguration(remoteBrowserConfiguration);
     config.setIgnorePks(Boolean.TRUE);
 }
 
@@ -117,47 +125,32 @@ public void testTwoErrors() throws Exception {
     GateFileHandlingAction gateFileHandlingAction = new GateFileHandlingAction(
             config);
     gateFileHandlingAction.doProcess(config, null, null);
-    //
-    final com.enterprisedt.net.ftp.FTPConnectMode connectMode = config
-            .getFtpConfiguration()
-            .getConnectMode()
-            .toString()
-            .equalsIgnoreCase(
-                    com.enterprisedt.net.ftp.FTPConnectMode.ACTIVE.toString()) ? com.enterprisedt.net.ftp.FTPConnectMode.ACTIVE
+
+    // Remote server configuration configuration
+    String inputPath = config.getInputRemotePath();
+    String successPath = config.getSuccesPath();
+    String failPath = config.getFailPath();
+    RemoteBrowserProtocol serverProtocol = config.getRemoteBrowserConfiguration().getServerProtocol();
+    String serverHost = config.getRemoteBrowserConfiguration().getFtpserverHost();
+    String serverUser = config.getRemoteBrowserConfiguration().getFtpserverUSR();
+    String serverPWD = config.getRemoteBrowserConfiguration().getFtpserverPWD();
+    int serverPort = config.getRemoteBrowserConfiguration().getFtpserverPort();
+    int timeout = config.getRemoteBrowserConfiguration().getTimeout();
+    final com.enterprisedt.net.ftp.FTPConnectMode connectMode = config.getRemoteBrowserConfiguration().toString()
+            .equalsIgnoreCase(FTPConnectMode.ACTIVE.toString()) ? com.enterprisedt.net.ftp.FTPConnectMode.ACTIVE
             : com.enterprisedt.net.ftp.FTPConnectMode.PASV;
 
     // files must be on fail directory
-    FTPFile[] files = FTPHelperBare.dirDetails(config.getFtpConfiguration()
-            .getFtpserverHost(),
-            config.getBaseRemotePath() + "/" + config.getFailRemotePath(), "/",
-            config.getFtpConfiguration().getFtpserverUSR(), config
-                    .getFtpConfiguration().getFtpserverPWD(), config
-                    .getFtpConfiguration().getFtpserverPort(),
-            FTPTransferType.BINARY, WriteMode.OVERWRITE, connectMode, config
-                    .getFtpConfiguration().getTimeout());
-    assertTrue(files.length == 2);
+    List<String> remoteLs = RemoteBrowserUtils.ls(serverProtocol, serverUser, serverPWD, serverHost, serverPort, failPath, connectMode, timeout);
+    assertTrue(remoteLs.size() == 2);
 
     // success dir must be empty
-    files = FTPHelperBare.dirDetails(config.getFtpConfiguration()
-            .getFtpserverHost(),
-            config.getBaseRemotePath() + "/" + config.getSuccesRemotePath(),
-            "/", config.getFtpConfiguration().getFtpserverUSR(), config
-                    .getFtpConfiguration().getFtpserverPWD(), config
-                    .getFtpConfiguration().getFtpserverPort(),
-            FTPTransferType.BINARY, WriteMode.OVERWRITE, connectMode, config
-                    .getFtpConfiguration().getTimeout());
-    assertTrue(files.length == 0);
+    remoteLs = RemoteBrowserUtils.ls(serverProtocol, serverUser, serverPWD, serverHost, serverPort, successPath, connectMode, timeout);
+    assertTrue(remoteLs.size() == 0);
 
     // input dir must be empty
-    files = FTPHelperBare.dirDetails(config.getFtpConfiguration()
-            .getFtpserverHost(),
-            config.getBaseRemotePath() + "/" + config.getInputRemotePath(),
-            "/", config.getFtpConfiguration().getFtpserverUSR(), config
-                    .getFtpConfiguration().getFtpserverPWD(), config
-                    .getFtpConfiguration().getFtpserverPort(),
-            FTPTransferType.BINARY, WriteMode.OVERWRITE, connectMode, config
-                    .getFtpConfiguration().getTimeout());
-    assertTrue(files.length == 0);
+    remoteLs = RemoteBrowserUtils.ls(serverProtocol, serverUser, serverPWD, serverHost, serverPort, inputPath, connectMode, timeout);
+    assertTrue(remoteLs.size() == 0);
 }
 
 /**

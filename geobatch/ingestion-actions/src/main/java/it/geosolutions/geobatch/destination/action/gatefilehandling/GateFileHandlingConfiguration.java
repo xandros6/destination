@@ -22,7 +22,7 @@
 package it.geosolutions.geobatch.destination.action.gatefilehandling;
 
 import it.geosolutions.geobatch.destination.action.gateingestion.GateIngestionConfiguration;
-import it.geosolutions.geobatch.ftp.client.configuration.FTPActionConfiguration;
+import it.geosolutions.geobatch.remoteBrowser.configuration.RemoteBrowserConfiguration;
 
 /**
  * Gate file handling configuration. Not use input ds (input data it's read from xml).
@@ -33,59 +33,116 @@ import it.geosolutions.geobatch.ftp.client.configuration.FTPActionConfiguration;
 public class GateFileHandlingConfiguration extends GateIngestionConfiguration {
 
 /**
- * Configuration for the FTP connection
+ * Configuration for the remote connection for the files to be ingested
  */
-private FTPActionConfiguration ftpConfiguration;
+private RemoteBrowserConfiguration remoteBrowserConfiguration;
 
 /**
- * Base path for the remote operations
+ * Configuration for the remote connection for success or fail executions
  */
-private String baseRemotePath;
+private RemoteBrowserConfiguration remoteResultBrowserConfiguration;
 
 /**
- * Input remote directory
+ * Pattern for files to be handled
+ */
+private String filePattern;
+
+/**
+ * Flag to don't retry already handled files (by name). Default it's true
+ */
+private boolean checkIfExists = true;
+
+/**
+ * Flag to save on local directory or not. Default it's true. 
+ * When false, use {@link GateFileHandlingConfiguration#remoteResultBrowserConfiguration} to store the results
+ */
+private boolean storeLocal = true;
+
+/**
+ * Flag to delete files on the remote server after download it. Default it's false
+ */
+private boolean deleteDownloadedFiles = false;
+
+/**
+ * Base path for the remote input files
  */
 private String inputRemotePath;
 
 /**
+ * Input directory
+ */
+private String inputPath;
+
+/**
  * Output for done files
  */
-private String succesRemotePath;
+private String succesPath;
 
 /**
  * Output for fail files
  */
-private String failRemotePath;
+private String failPath;
 
 public GateFileHandlingConfiguration(String id, String name, String description) {
     super(id, name, description);
 }
 
 /**
- * @return the ftpConfiguration
+ * @return the remoteBrowserConfiguration
  */
-public FTPActionConfiguration getFtpConfiguration() {
-    return ftpConfiguration;
+public RemoteBrowserConfiguration getRemoteBrowserConfiguration() {
+    return remoteBrowserConfiguration;
 }
 
 /**
- * @param ftpConfiguration the ftpConfiguration to set
+ * @param remoteBrowserConfiguration the remoteBrowserConfiguration to set
  */
-public void setFtpConfiguration(FTPActionConfiguration ftpConfiguration) {
-    this.ftpConfiguration = ftpConfiguration;
-}
-/**
- * @return the baseRemotePath
- */
-public String getBaseRemotePath() {
-    return baseRemotePath;
+public void setRemoteBrowserConfiguration(
+        RemoteBrowserConfiguration remoteBrowserConfiguration) {
+    this.remoteBrowserConfiguration = remoteBrowserConfiguration;
 }
 
 /**
- * @param baseRemotePath the baseRemotePath to set
+ * @return the remoteResultBrowserConfiguration
  */
-public void setBaseRemotePath(String baseRemotePath) {
-    this.baseRemotePath = baseRemotePath;
+public RemoteBrowserConfiguration getRemoteResultBrowserConfiguration() {
+    return remoteResultBrowserConfiguration;
+}
+
+/**
+ * @param remoteResultBrowserConfiguration the remoteResultBrowserConfiguration to set
+ */
+public void setRemoteResultBrowserConfiguration(
+        RemoteBrowserConfiguration remoteResultBrowserConfiguration) {
+    this.remoteResultBrowserConfiguration = remoteResultBrowserConfiguration;
+}
+
+/**
+ * @return the storeLocal
+ */
+public boolean isStoreLocal() {
+    return storeLocal;
+}
+
+/**
+ * @param storeLocal the storeLocal to set
+ */
+public void setStoreLocal(boolean storeLocal) {
+    this.storeLocal = storeLocal;
+}
+
+/**
+ * @return the deleteDownloadedFiles
+ */
+public boolean isDeleteDownloadedFiles() {
+    return deleteDownloadedFiles;
+}
+
+/**
+ * @param deleteDownloadedFiles the deleteDownloadedFiles to set
+ */
+public void setDeleteDownloadedFiles(boolean deleteDownloadedFiles) {
+    this.deleteDownloadedFiles = deleteDownloadedFiles;
 }
 
 /**
@@ -103,31 +160,73 @@ public void setInputRemotePath(String inputRemotePath) {
 }
 
 /**
- * @return the succesRemotePath
+ * @return the inputPath
  */
-public String getSuccesRemotePath() {
-    return succesRemotePath;
+public String getInputPath() {
+    return inputPath;
 }
 
 /**
- * @param succesRemotePath the succesRemotePath to set
+ * @param inputPath the inputPath to set
  */
-public void setSuccesRemotePath(String succesRemotePath) {
-    this.succesRemotePath = succesRemotePath;
+public void setInputPath(String inputPath) {
+    this.inputPath = inputPath;
 }
 
 /**
- * @return the failRemotePath
+ * @return the succesPath
  */
-public String getFailRemotePath() {
-    return failRemotePath;
+public String getSuccesPath() {
+    return succesPath;
 }
 
 /**
- * @param failRemotePath the failRemotePath to set
+ * @param succesPath the succesPath to set
  */
-public void setFailRemotePath(String failRemotePath) {
-    this.failRemotePath = failRemotePath;
+public void setSuccesPath(String succesPath) {
+    this.succesPath = succesPath;
+}
+
+/**
+ * @return the failPath
+ */
+public String getFailPath() {
+    return failPath;
+}
+
+/**
+ * @param failPath the failPath to set
+ */
+public void setFailPath(String failPath) {
+    this.failPath = failPath;
+}
+
+/**
+ * @return the filePattern
+ */
+public String getFilePattern() {
+    return filePattern;
+}
+
+/**
+ * @param filePattern the filePattern to set
+ */
+public void setFilePattern(String filePattern) {
+    this.filePattern = filePattern;
+}
+
+/**
+ * @return the checkIfExists
+ */
+public boolean isCheckIfExists() {
+    return checkIfExists;
+}
+
+/**
+ * @param checkIfExists the checkIfExists to set
+ */
+public void setCheckIfExists(boolean checkIfExists) {
+    this.checkIfExists = checkIfExists;
 }
 
 }
