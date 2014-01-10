@@ -1,0 +1,13 @@
+<layer>
+  <name>gate_stats</name>
+  <id>LayerInfoImpl-494d4449:1430b223cc9:6d49</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl-494d4449:1430b223cc9:6d48</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>

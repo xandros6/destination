@@ -1,0 +1,53 @@
+<featureType>
+  <id>FeatureTypeInfoImpl-494d4449:1430b5e9007:-7923</id>
+  <name>gate_data</name>
+  <nativeName>gate_data</nativeName>
+  <namespace>
+    <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
+  </namespace>
+  <title>gate_data</title>
+  <keywords>
+    <string>gate_data</string>
+    <string>features</string>
+  </keywords>
+  <srs>EPSG:32632</srs>
+  <nativeBoundingBox>
+    <minx>-1.0</minx>
+    <maxx>0.0</maxx>
+    <miny>-1.0</miny>
+    <maxy>0.0</maxy>
+  </nativeBoundingBox>
+  <latLonBoundingBox>
+    <minx>4.511247156296258</minx>
+    <maxx>4.51125611529294</maxx>
+    <miny>-9.0193758094E-6</miny>
+    <maxy>0.0</maxy>
+    <crs>GEOGCS[&quot;WGS84(DD)&quot;, &#xd;
+  DATUM[&quot;WGS84&quot;, &#xd;
+    SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]], &#xd;
+  PRIMEM[&quot;Greenwich&quot;, 0.0], &#xd;
+  UNIT[&quot;degree&quot;, 0.017453292519943295], &#xd;
+  AXIS[&quot;Geodetic longitude&quot;, EAST], &#xd;
+  AXIS[&quot;Geodetic latitude&quot;, NORTH]]</crs>
+  </latLonBoundingBox>
+  <projectionPolicy>FORCE_DECLARED</projectionPolicy>
+  <enabled>true</enabled>
+  <metadata>
+    <entry key="JDBC_VIRTUAL_TABLE">
+      <virtualTable>
+        <name>gate_data</name>
+        <sql>SELECT id_dato, fk_gate, siig_gate_d_direzione.descrizione as flg_direzione, data_rilevamento, ora_fuso_orario, minuto_fuso_orario, data_ricezione, flg_corsia, coalesce(descrizione_onu,siig_d_onu.codice_onu) as codice_onu, coalesce(descrizione_kemler,siig_d_kemler.codice_kemler) as codice_kemler, data_trasmissione &#xd;
+FROM siig_gate_t_dato&#xd;
+left outer join siig_gate_d_direzione on siig_gate_t_dato.flg_direzione = siig_gate_d_direzione.flg_direzione and siig_gate_t_dato.fk_gate = siig_gate_d_direzione.id_gate&#xd;
+left outer join siig_d_onu on siig_gate_t_dato.codice_onu = siig_d_onu.codice_onu&#xd;
+left outer join siig_d_kemler on siig_d_onu.codice_kemler = siig_d_kemler.codice_kemler</sql>
+        <keyColumn>id_dato</keyColumn>
+      </virtualTable>
+    </entry>
+  </metadata>
+  <store class="dataStore">
+    <id>DataStoreInfoImpl--3970ff67:13c00cf828a:-7fef</id>
+  </store>
+  <maxFeatures>0</maxFeatures>
+  <numDecimals>0</numDecimals>
+</featureType>

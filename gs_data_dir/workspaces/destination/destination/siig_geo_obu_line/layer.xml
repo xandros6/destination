@@ -1,12 +1,12 @@
 <layer>
-  <name>siig_gate_geo_gate</name>
-  <id>LayerInfoImpl-494d4449:1430b223cc9:6ff</id>
+  <name>siig_geo_obu_line</name>
+  <id>LayerInfoImpl-494d4449:1430b975dc5:1536</id>
   <type>VECTOR</type>
   <defaultStyle>
-    <id>StyleInfoImpl-3891ffed:142fb4696dd:-e59</id>
+    <id>StyleInfoImpl-494d4449:1430b5e9007:175c</id>
   </defaultStyle>
   <resource class="featureType">
-    <id>FeatureTypeInfoImpl-494d4449:1430b223cc9:6fe</id>
+    <id>FeatureTypeInfoImpl-494d4449:1430b975dc5:1535</id>
   </resource>
   <enabled>true</enabled>
   <attribution>

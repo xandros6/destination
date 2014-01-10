@@ -1,13 +1,13 @@
 <featureType>
-  <id>FeatureTypeInfoImpl-3891ffed:142fa7cf660:-6653</id>
-  <name>siig_gate_t_dato_statistico</name>
-  <nativeName>siig_gate_t_dato_statistico</nativeName>
+  <id>FeatureTypeInfoImpl--6ad30174:14304dc33b7:-19ab</id>
+  <name>siig_d_obu_tipo</name>
+  <nativeName>siig_d_obu_tipo</nativeName>
   <namespace>
     <id>NamespaceInfoImpl--570ae188:124761b8d78:-7ffc</id>
   </namespace>
-  <title>siig_gate_t_dato_statistico</title>
+  <title>siig_d_obu_tipo</title>
   <keywords>
-    <string>siig_gate_t_dato_statistico</string>
+    <string>siig_d_obu_tipo</string>
     <string>features</string>
   </keywords>
   <srs>EPSG:4326</srs>
@@ -32,7 +32,6 @@
   </latLonBoundingBox>
   <projectionPolicy>FORCE_DECLARED</projectionPolicy>
   <enabled>true</enabled>
-  <advertised>true</advertised>
   <store class="dataStore">
     <id>DataStoreInfoImpl--3970ff67:13c00cf828a:-7fef</id>
   </store>

@@ -1,0 +1,13 @@
+<layer>
+  <name>siig_d_obu_tipo</name>
+  <id>LayerInfoImpl--6ad30174:14304dc33b7:-19aa</id>
+  <type>VECTOR</type>
+  <resource class="featureType">
+    <id>FeatureTypeInfoImpl--6ad30174:14304dc33b7:-19ab</id>
+  </resource>
+  <enabled>true</enabled>
+  <attribution>
+    <logoWidth>0</logoWidth>
+    <logoHeight>0</logoHeight>
+  </attribution>
+</layer>
