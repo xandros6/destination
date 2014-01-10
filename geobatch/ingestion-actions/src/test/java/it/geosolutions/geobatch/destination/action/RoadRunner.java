@@ -18,6 +18,7 @@ package it.geosolutions.geobatch.destination.action;
 
 import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
+import it.geosolutions.geobatch.destination.ingestion.OriginalArcsIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.TargetIngestionProcess;
 import it.geosolutions.geobatch.destination.streetuser.StreetUserComputation;
 import it.geosolutions.geobatch.destination.vulnerability.RiskComputation;
@@ -53,7 +54,7 @@ public class RoadRunner{
         datastoreParams.put("schema", "siig_p");
         datastoreParams.put("passwd", "siig_p");
         datastoreParams.put("dbtype", "postgis");
-        datastoreParams.put("host", "84.33.2.23");
+        datastoreParams.put("host", "192.168.1.31");
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
@@ -64,11 +65,13 @@ public class RoadRunner{
         	
         	//String inputFeature = "RL_C_Grafo_20130918";
         	//String inputFeature = "AO_C_Grafo_20130704";
-        	String inputFeature = "AO_C_Grafo_20131119";
+        	String inputFeature = "RP_C_Grafo_20131212_ORIG";
         	
         	dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);	        
 	        metadataHandler = new MetadataIngestionHandler(dataStore);
-	        
+	        OriginalArcsIngestionProcess arcIngestion = new OriginalArcsIngestionProcess(inputFeature,
+	                new ProgressListenerForwarder(null), metadataHandler, dataStore, -1, -1);
+	        arcIngestion.importArcs(null, false);
 	        /*ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(inputFeature,
 	                new ProgressListenerForwarder(null), metadataHandler, dataStore);
 	        

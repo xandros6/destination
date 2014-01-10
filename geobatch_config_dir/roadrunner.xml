@@ -195,6 +195,36 @@
             <listenerId>Cumulator</listenerId>
         </VulnerabilityConfiguration>
 
+        <StreetUserConfiguration>
+            <id>streetuser_1</id>
+            <name>Street users computation level 1</name>
+            <description>Street users computation level 1</description>
+            <aggregationLevel>1</aggregationLevel>
+            <!-- Listeners -->
+            <listenerId>ConsumerLogger0</listenerId>
+            <listenerId>Cumulator</listenerId>
+        </StreetUserConfiguration>
+        
+        <StreetUserConfiguration>
+            <id>streetuser_2</id>
+            <name>Street users computation level 2</name>
+            <description>Street users computation level 2</description>
+            <aggregationLevel>2</aggregationLevel>
+            <!-- Listeners -->
+            <listenerId>ConsumerLogger0</listenerId>
+            <listenerId>Cumulator</listenerId>
+        </StreetUserConfiguration>
+
+        <StreetUserConfiguration>
+            <id>streetuser_3</id>
+            <name>Street users computation level 3</name>
+            <description>Street users computation level 3</description>
+            <aggregationLevel>3</aggregationLevel>
+            <!-- Listeners -->
+            <listenerId>ConsumerLogger0</listenerId>
+            <listenerId>Cumulator</listenerId>
+        </StreetUserConfiguration>
+        
         <RiskConfiguration>
             <id>risk_1</id>
             <name>Risk level 1</name>
@@ -259,35 +289,7 @@
             <listenerId>Cumulator</listenerId>
         </RiskConfiguration>
         
-        <StreetUserConfiguration>
-            <id>streetuser_1</id>
-            <name>Street users computation level 1</name>
-            <description>Street users computation level 1</description>
-            <aggregationLevel>1</aggregationLevel>
-            <!-- Listeners -->
-            <listenerId>ConsumerLogger0</listenerId>
-            <listenerId>Cumulator</listenerId>
-        </StreetUserConfiguration>
         
-        <StreetUserConfiguration>
-            <id>streetuser_2</id>
-            <name>Street users computation level 2</name>
-            <description>Street users computation level 2</description>
-            <aggregationLevel>2</aggregationLevel>
-            <!-- Listeners -->
-            <listenerId>ConsumerLogger0</listenerId>
-            <listenerId>Cumulator</listenerId>
-        </StreetUserConfiguration>
-
-        <StreetUserConfiguration>
-            <id>streetuser_3</id>
-            <name>Street users computation level 3</name>
-            <description>Street users computation level 3</description>
-            <aggregationLevel>3</aggregationLevel>
-            <!-- Listeners -->
-            <listenerId>ConsumerLogger0</listenerId>
-            <listenerId>Cumulator</listenerId>
-        </StreetUserConfiguration>
 
     </EventConsumerConfiguration>
 

@@ -26,6 +26,7 @@ import it.geosolutions.geobatch.annotations.Action;
 import it.geosolutions.geobatch.destination.action.DestinationBaseAction;
 import it.geosolutions.geobatch.destination.ingestion.ArcsIngestionProcess;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
+import it.geosolutions.geobatch.destination.ingestion.OriginalArcsIngestionProcess;
 import it.geosolutions.geobatch.flow.event.action.ActionException;
 
 import java.io.File;
@@ -47,13 +48,20 @@ public class ArcIngestionAction extends DestinationBaseAction<ArcIngestionConfig
 			MetadataIngestionHandler metadataHandler, File file) throws ActionException {
 
 		try {
-
-			ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(
-					featureCfg.getTypeName(), listenerForwarder,
-					metadataHandler, dataStore);
-
-			arcIngestion.importArcs(null, cfg.getAggregationLevel(),
-					cfg.isOnGrid(), cfg.isDropInput(), cfg.getClosePhase());
+			if(cfg.isSegmentation()) {
+				OriginalArcsIngestionProcess arcIngestion = new OriginalArcsIngestionProcess(
+						featureCfg.getTypeName(), listenerForwarder,
+						metadataHandler, dataStore, -1, -1);
+				arcIngestion.importArcs(null, cfg.isDropInput());
+				
+			} else {
+				ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(
+						featureCfg.getTypeName(), listenerForwarder,
+						metadataHandler, dataStore);
+	
+				arcIngestion.importArcs(null, cfg.getAggregationLevel(),
+						cfg.isOnGrid(), cfg.isDropInput(), cfg.getClosePhase());
+			}
 		} catch (IOException ex) {
 			// TODO: what shall we do here??
 			// log and rethrow for the moment, but a rollback should be

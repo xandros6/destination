@@ -182,7 +182,7 @@ public abstract class InputObject {
 		}
 	}
 	
-	protected void reset() {
+	protected void reset() throws IOException {
 		inputReader = null;
 		inputQuery = null;	
 		inputIterator = null;

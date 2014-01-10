@@ -14,6 +14,7 @@ import org.geotools.data.DataStoreFinder;
 import org.geotools.data.memory.MemoryDataStore;
 import org.junit.Before;
 import org.junit.Test;
+import org.opengis.feature.simple.SimpleFeature;
 
 public class MigrationTest  extends DestinationMemoryTest{
 
@@ -21,7 +22,7 @@ public class MigrationTest  extends DestinationMemoryTest{
 	private MemoryDataStore outputDatastore;
 
 	@Override
-	protected void checkData() {
+	protected void checkData(SimpleFeature feature) {
 		// TODO Auto-generated method stub
 	}
 

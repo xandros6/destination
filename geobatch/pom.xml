@@ -90,6 +90,22 @@
                 <artifactId>gb-destination-ingestion</artifactId>
                 <version>${destination.version}</version>
             </dependency>
+            
+            <dependency>
+                <groupId>it.geosolutions.destination.geobatch</groupId>
+                <artifactId>gb-destination-ingestion</artifactId>
+                <version>${destination.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            
+            <!--dependency>
+                <groupId>it.geosolutions.destination.geobatch</groupId>
+                <artifactId>gb-destination-ingestion</artifactId>
+                <version>${destination.version}</version>
+                <classifier>tests</classifier>
+                <scope>test</scope>
+            </dependency-->
 
             <dependency>
                 <groupId>it.geosolutions.destination.geobatch</groupId>

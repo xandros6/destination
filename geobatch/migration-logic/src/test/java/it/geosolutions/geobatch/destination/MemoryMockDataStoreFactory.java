@@ -1,6 +1,7 @@
 package it.geosolutions.geobatch.destination;
 
 import it.geosolutions.geobatch.destination.commons.DestinationMemoryTestUtils;
+import it.geosolutions.geobatch.destination.commons.MemoryMockDataStore;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Map;
 
 import org.geotools.data.AbstractDataStoreFactory;
 import org.geotools.data.DataStore;
+import org.geotools.data.memory.MemoryDataStore;
 
 public class MemoryMockDataStoreFactory extends AbstractDataStoreFactory implements org.geotools.data.DataStoreFactorySpi{
 
@@ -17,7 +19,7 @@ public class MemoryMockDataStoreFactory extends AbstractDataStoreFactory impleme
 	public static final Param DBNAME = new Param("name", String.class, "Name", true);
 	public static final Param DBDATASFILE = new Param("dbdatasfiles", String.class, "CSV db data files", false);
 
-	private static final Map<String,MigrationTestMemoryMockDataStore> memoryStores = new HashMap<String, MigrationTestMemoryMockDataStore>();
+	private static final Map<String,MemoryDataStore> memoryStores = new HashMap<String, MemoryDataStore>();
 
 	@Override
 	public DataStore createDataStore(Map<String, Serializable> params)
@@ -25,7 +27,7 @@ public class MemoryMockDataStoreFactory extends AbstractDataStoreFactory impleme
 		// build the store
 		String dbName = (String)DBNAME.lookUp(params);
 		if(!memoryStores.containsKey(dbName)){
-			MigrationTestMemoryMockDataStore store = new MigrationTestMemoryMockDataStore();
+			MemoryDataStore store = new MigrationTestMemoryMockDataStore();
 			String[] dbdatasfiles = DBDATASFILE.lookUp(params)!=null ? ((String)(DBDATASFILE.lookUp(params))).split(",") : new String[0];
 			DestinationMemoryTestUtils.initTestWithData(dbdatasfiles, store);
 			memoryStores.put(dbName, store);

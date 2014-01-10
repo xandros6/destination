@@ -46,7 +46,15 @@ public class DataExtractor {
         datastoreParams.put("Expose primary keys", "true");
         datastoreParams.put("user", "siig_p");
         datastoreParams.put("database", "destination_staging");
+        
         String[] typeNames = new String[] {
+        		"siig_geo_pl_pter"
+        		/*
+        		"siig_d_patrimonialita_strada",
+        		"siig_t_incidentalita",
+        		"siig_d_categoria_strada"
+        		
+        		
         		"siig_geo_grid",
         		"siig_d_bene_culturale",
         		"siig_d_classe_adr",
@@ -81,7 +89,7 @@ public class DataExtractor {
         		"siig_t_bersaglio",
         		"siig_t_scenario",
         		"siig_t_sostanza",
-        		"siig_t_variabile"
+        		"siig_t_variabile"*/
         };
         
         JDBCDataStore dataStore = null;

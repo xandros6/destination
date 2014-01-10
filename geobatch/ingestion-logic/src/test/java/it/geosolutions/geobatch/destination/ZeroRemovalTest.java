@@ -47,7 +47,7 @@ public class ZeroRemovalTest extends DestinationMemoryTest{
 		ZeroRemovalComputation zeroRemoval = createProcess("RP_C_ZURB_20130613");
 		zeroRemoval.removeZeros(null, 1, null);	
 		checkFeature("siig_geo_ln_arco_1", 12);
-		checkData();
+		checkAllData();
 	}
 
 	/**
@@ -59,9 +59,13 @@ public class ZeroRemovalTest extends DestinationMemoryTest{
 				metadataHandler, dataStore);
 		return process;
 	}
-
+	
 	@Override
-	protected void checkData() {
+	protected void checkData(SimpleFeature feature) {
+		
+	}
+	
+	protected void checkAllData() {
 		List<SimpleFeature> features = FeatureLoaderUtils.loadFeatures(dataStore, "siig_geo_ln_arco_1");
 		Double nr_incidenti_sum = 0d;
 		Double nr_incidenti_elab_sum = 0d;

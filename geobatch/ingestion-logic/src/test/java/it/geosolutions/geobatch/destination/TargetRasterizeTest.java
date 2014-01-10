@@ -19,6 +19,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
@@ -127,7 +128,7 @@ public class TargetRasterizeTest extends DestinationMemoryTest{
 	}
 
 	@Override
-	protected void checkData() {
+	protected void checkData(SimpleFeature feature) {
 		// TODO Auto-generated method stub
 		
 	}

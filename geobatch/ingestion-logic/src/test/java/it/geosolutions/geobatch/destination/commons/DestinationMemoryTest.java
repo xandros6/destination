@@ -34,7 +34,7 @@ public abstract class DestinationMemoryTest {
 		}
 	}
 
-	protected abstract void checkData();
+	protected abstract void checkData(SimpleFeature feature);
 
 	protected void initTestWithData(String[] strings,  MemoryDataStore inDataStore) throws IOException, SchemaException {
 		dataStore = DestinationMemoryTestUtils.initTestWithData(strings, inDataStore);
@@ -68,6 +68,7 @@ public abstract class DestinationMemoryTest {
 			while(iterator.hasNext()) {
 				SimpleFeature feature = iterator.next();
 				assertNotNull(feature);
+				checkData(feature);
 			}
 		} finally {
 			iterator.close();

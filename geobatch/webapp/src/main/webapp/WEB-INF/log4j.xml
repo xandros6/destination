@@ -5,7 +5,7 @@
 	threshold="null" debug="false">
 
 	<appender name="rolling" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${webapp.root}/logs/geobatch.log" />
+		<param name="File" value="${geobatch.webapp.root}/logs/geobatch.log" />
 		<!-- <param name="File" value="${catalina.base}/logs/geobatch.log" /> -->
 		<param name="DatePattern" value="yyyy-MM-dd" />
 		<layout class="org.apache.log4j.PatternLayout">

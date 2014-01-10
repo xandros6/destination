@@ -38,6 +38,13 @@
 			<groupId>it.geosolutions.destination.geobatch</groupId>
 			<artifactId>gb-destination-ingestion</artifactId>
 		</dependency>
+        
+        <!--dependency>
+			<groupId>it.geosolutions.destination.geobatch</groupId>
+			<artifactId>gb-destination-ingestion</artifactId>
+            <classifier>tests</classifier>
+            <scope>test</scope>
+		</dependency-->
 
 		<!-- =========================================================== -->
 		<!-- GeoBatch -->
@@ -110,6 +117,13 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
+		</dependency>
+        
+        <dependency>
+			<groupId>it.geosolutions.destination.geobatch</groupId>
+			<artifactId>gb-destination-ingestion</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
 		</dependency>
 
 		<dependency>

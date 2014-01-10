@@ -23,6 +23,7 @@ import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opengis.feature.simple.SimpleFeature;
 
 /**
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
@@ -50,7 +51,7 @@ public class RiskTest extends DestinationMemoryTest{
 	}
 
 	@Override
-	protected void checkData() {
+	protected void checkData(SimpleFeature feature) {
 
 	}
 

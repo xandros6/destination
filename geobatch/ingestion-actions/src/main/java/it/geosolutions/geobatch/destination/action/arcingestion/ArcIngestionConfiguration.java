@@ -28,10 +28,11 @@ import it.geosolutions.geobatch.configuration.event.action.ActionConfiguration;
  */
 public class ArcIngestionConfiguration extends ActionConfiguration {	
 
-    private int aggregationLevel;
+    private int aggregationLevel = 1;
     private boolean onGrid = false;
     private boolean dropInput = false;
     private String closePhase = null;
+    private boolean segmentation = false;
 
 	public ArcIngestionConfiguration(String id, String name, String description) {
 		super(id, name, description);
@@ -68,8 +69,15 @@ public class ArcIngestionConfiguration extends ActionConfiguration {
     public void setClosePhase(String closePhase) {
         this.closePhase = closePhase;
     }
+    
+    public boolean isSegmentation() {
+		return segmentation;
+	}
+	public void setSegmentation(boolean segmentation) {
+		this.segmentation = segmentation;
+	}
 
-    @Override
+	@Override
     public ArcIngestionConfiguration clone() {
         final ArcIngestionConfiguration configuration = (ArcIngestionConfiguration) super.clone();
         
