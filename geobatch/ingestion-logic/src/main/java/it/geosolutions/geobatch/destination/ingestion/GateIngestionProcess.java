@@ -27,7 +27,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -130,6 +132,26 @@ private String date;
 private String outputType= "siig_gate_t_dato";
 
 /**
+ * Key to save ids stored of ingested gates
+ */
+public static String IDS = "IDS";
+
+/**
+ * Key to save error count
+ */
+public static String ERROR_COUNT = "ERROR_COUNT";
+
+/**
+ * Key to save processed count
+ */
+public static String PROCESSED_COUNT = "PROCESSED_COUNT";
+
+/**
+ * Key to save total count
+ */
+public static String TOTAL_COUNT = "TOTAL_COUNT";
+
+/**
  * Parametrized constructor
  * 
  * @param typeName
@@ -145,12 +167,7 @@ public GateIngestionProcess(String typeName,
     super(typeName, listenerForwarder, metadataHandler, dataStore);
 
     // init from file to be inserted
-    this.file = file;
-    String fileName = this.file != null ? this.file.getName() : null;
-    if (fileName != null && fileName.contains(DOT)) {
-        fileName = fileName.substring(0, fileName.lastIndexOf(DOT));
-    }
-    parseTypeName(fileName);
+    this.setFile(file);
 }
 
 /**
@@ -193,9 +210,26 @@ protected boolean parseTypeName(String inputTypeName) {
  * @param ignorePks Flag to indicates that should ignore pks in the xml file and
  *        create a new one with a sequence manager
  * @throws IOException
+ * 
+ * @return list of ids inserted on database
  */
+@SuppressWarnings("unchecked")
 public List<Long> importGates(boolean ignorePks) throws IOException {
+    return (List<Long>) doProcess(ignorePks).get(IDS);
+}
 
+/**
+ * Imports the gate data from the exported file to database.
+ * 
+ * @param ignorePks Flag to indicates that should ignore pks in the xml file and
+ *        create a new one with a sequence manager
+ * @throws IOException
+ * 
+ * @return resume of the operation in a map
+ */
+public Map<String, Object> doProcess(boolean ignorePks) throws IOException {
+    
+    Map<String, Object> result = new HashMap<String, Object>();
     List<Long> ids = new ArrayList<Long>();
     reset();
     this.ignorePks = ignorePks;
@@ -308,12 +342,20 @@ public List<Long> importGates(boolean ignorePks) throws IOException {
             }
 
         }
+        
+        // save counts
+        result.put(ERROR_COUNT, errors);
+        result.put(PROCESSED_COUNT, processed);
+        result.put(TOTAL_COUNT, total);
 
         // close current process phase
         process = closeProcess(process);
     }
 
-    return ids;
+    // save ids
+    result.put(IDS, ids);
+    
+    return result;
 }
 
 private void updateProgress(float progress, String msg) {
@@ -431,6 +473,19 @@ public Long createTransit(Transit transit) throws Exception {
  */
 protected boolean isValid() throws IOException {
     return file != null && dataStore != null;
+}
+
+/**
+ * @param file the file to set
+ */
+public void setFile(File file) {
+    // init from file to be inserted
+    this.file = file;
+    String fileName = this.file != null ? this.file.getName() : null;
+    if (fileName != null && fileName.contains(DOT)) {
+        fileName = fileName.substring(0, fileName.lastIndexOf(DOT));
+    }
+    parseTypeName(fileName);
 }
 
 }
