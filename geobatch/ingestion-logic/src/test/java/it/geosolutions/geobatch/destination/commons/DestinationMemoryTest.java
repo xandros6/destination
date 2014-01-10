@@ -2,7 +2,7 @@ package it.geosolutions.geobatch.destination.commons;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import it.geosolutions.geobatch.destination.TestMetadataIngestionHandler;
+import it.geosolutions.geobatch.destination.MockMetadataIngestionHandler;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
 
 import java.io.File;
@@ -46,7 +46,7 @@ public abstract class DestinationMemoryTest {
 	}
 
 	private void initMetadata() {
-		metadataHandler = new TestMetadataIngestionHandler(dataStore);		
+		metadataHandler = new MockMetadataIngestionHandler(dataStore);		
 	}
 
 	/**

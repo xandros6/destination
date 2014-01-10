@@ -18,6 +18,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.w3c.dom.Document;
@@ -46,6 +47,7 @@ public class TargetRasterizeTest extends DestinationMemoryTest{
 		transformer.transform(source, result);
 	}
 
+	@Ignore
 	@Test
 	public void rasterizeBNU(){
 		try {
@@ -85,7 +87,8 @@ public class TargetRasterizeTest extends DestinationMemoryTest{
 			Assert.assertFalse(true);
 		}
 	}
-
+	
+	@Ignore
 	@Test
 	public void rasterizeBU(){
 		try {
@@ -129,7 +132,6 @@ public class TargetRasterizeTest extends DestinationMemoryTest{
 
 	@Override
 	protected void checkData(SimpleFeature feature) {
-		// TODO Auto-generated method stub
 		
 	}
 

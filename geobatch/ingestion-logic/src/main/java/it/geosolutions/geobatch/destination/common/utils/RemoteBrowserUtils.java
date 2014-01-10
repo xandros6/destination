@@ -162,8 +162,8 @@ public static void deleteFile(RemoteBrowserProtocol protocol, String user,
  * @return path without starter '/', for example: 'path/to/file'
  */
 private static String cleanRoot(String path) {
-    if (path.startsWith(SEPARATOR)) {
-        return path.replaceFirst(SEPARATOR, "");
+    if (path.startsWith("/")) {
+        return path.replaceFirst("/", "");
     } else {
         return path;
     }
@@ -351,7 +351,7 @@ public static void putFile(RemoteBrowserProtocol protocol, String username,
     if (RemoteBrowserProtocol.ftp.equals(protocol)) {
         // FTP put
         String remotePath = remotefile.substring(0,
-                remotefile.lastIndexOf(SEPARATOR));
+                remotefile.lastIndexOf("/"));
         FTPHelperBare.putBinaryFileTo(host, localfile, cleanRoot(remotePath),
                 username, password, port, WriteMode.OVERWRITE, connectMode,
                 5000);

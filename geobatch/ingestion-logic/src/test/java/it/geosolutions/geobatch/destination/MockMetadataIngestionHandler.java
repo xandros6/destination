@@ -26,12 +26,12 @@ import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
  * @author "Mauro Bartolomeoli - mauro.bartolomeoli@geo-solutions.it"
  *
  */
-public class TestMetadataIngestionHandler extends MetadataIngestionHandler {
+public class MockMetadataIngestionHandler extends MetadataIngestionHandler {
 
-	/**
+		/**
 	 * @param dataStore
 	 */
-	public TestMetadataIngestionHandler(DataStore dataStore) {
+	public MockMetadataIngestionHandler(DataStore dataStore) {
 		super(dataStore);
 	}
 

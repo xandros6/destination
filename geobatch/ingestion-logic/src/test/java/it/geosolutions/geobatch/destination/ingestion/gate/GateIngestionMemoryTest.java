@@ -33,6 +33,7 @@ import it.geosolutions.geobatch.flow.event.ProgressListenerForwarder;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -213,16 +214,14 @@ public class GateIngestionMemoryTest extends DestinationMemoryTest {
 	                .equals(idTransit.toString())
 	                && feature.getProperty("flg_corsia").getValue().toString()
 	                        .equals(transit.getCorsia().toString())
-	                && feature.getProperty("direzione").getValue().toString()
-	                        .equals(transit.getDirezione())
-	                && feature.getProperty("codice_kemler").getValue().toString()
-	                        .equals(transit.getKemlerCode())
+	                && feature.getProperty("flg_direzione").getValue().toString()
+	                        .equals(transit.getDirezione())	               
 	                && feature.getProperty("codice_onu").getValue().toString()
 	                        .equals(transit.getOnuCode())) {
 	            // check dates
 	            Timestamp arriveDate = (Timestamp) feature.getProperty(
 	                    "data_rilevamento").getValue();
-	            Timestamp receiptDate = (Timestamp) feature.getProperty("data_ricezione")
+	            String receiptDate = (String) feature.getProperty("data_ricezione")
 	                    .getValue();
 	            if (TimeUtils.getTimeStamp(transit.getDataRilevamento()).getTime() == arriveDate
 	                    .getTime() && TimeUtils.isToday(receiptDate.toString())) {
