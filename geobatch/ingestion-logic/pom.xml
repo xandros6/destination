@@ -54,6 +54,11 @@
 			<version>${gb.version}</version>
 		</dependency>
 
+        <dependency>
+            <groupId>it.geosolutions.geobatch</groupId>
+            <artifactId>gb-action-ftp</artifactId>
+        </dependency>
+
 		<!-- =========================================================== -->
 		<!-- GeoTools -->
 		<!-- =========================================================== -->
@@ -158,7 +163,6 @@
             <artifactId>joda-time</artifactId>
         </dependency>
 
-
 		<!-- =========================================================== -->
 		<!-- TEST -->
 		<!-- =========================================================== -->
@@ -195,6 +199,14 @@
 			<version>0.4.6</version>
 			<scope>test</scope>
 		 </dependency>
+
+        <dependency>
+	        <groupId>org.mockftpserver</groupId>
+	        <artifactId>MockFtpServer</artifactId>
+	        <version>2.4</version>
+	        <scope>test</scope>
+	    </dependency>
+		            
 	</dependencies>
 
 	<build>
