@@ -93,12 +93,12 @@
             <serviceID>loggingListenerService</serviceID>
             <id>ConsumerLogger0</id>
             <loggerName>it.geosolutions.ConsLogger</loggerName>
-            <!--appendToListenerForwarder>true</appendToListenerForwarder-->
+            <appendToListenerForwarder>true</appendToListenerForwarder>
         </LoggingProgressListener>
         <CumulatingProgressListener>
             <serviceID>cumulatingListenerService</serviceID>
             <id>Cumulator</id>
-            <!--appendToListenerForwarder>true</appendToListenerForwarder-->
+            <appendToListenerForwarder>true</appendToListenerForwarder>
         </CumulatingProgressListener>
     </ListenerConfigurations>
 

@@ -38,7 +38,7 @@
                    </entry>
                    <entry>
                      <string>host</string>
-                     <string>localhost</string>
+                     <string>192.168.1.31</string>
                    </entry>
                    <entry>
                      <string>port</string>

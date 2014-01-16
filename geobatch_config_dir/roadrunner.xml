@@ -38,7 +38,7 @@
                    </entry>
                    <entry>
                      <string>host</string>
-                     <string>localhost</string>
+                     <string>192.168.1.31</string>
                    </entry>
                    <entry>
                      <string>port</string>
@@ -82,6 +82,7 @@
             <aggregationLevel>1</aggregationLevel>
             <onGrid>false</onGrid>
             <dropInput>false</dropInput>
+            <newProcess>true</newProcess>
             <!-- Listeners -->
             <listenerId>ConsumerLogger0</listenerId>
             <listenerId>Cumulator</listenerId>
