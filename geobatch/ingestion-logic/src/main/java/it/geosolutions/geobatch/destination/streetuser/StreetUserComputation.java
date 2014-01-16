@@ -54,10 +54,15 @@ public class StreetUserComputation extends InputObject {
 	//private static SimpleFeatureType siig_r_scen_vuln_X = null;
 
 	private static Pattern TYPE_NAME_PARTS = Pattern
-			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");
+			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})(_ORIG)?$");
 
 	public StreetUserComputation(String inputTypeName, ProgressListenerForwarder listenerForwarder, MetadataIngestionHandler metadataHandler, DataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
+	}
+	
+	@Override
+	protected String getInputTypeName(String inputTypeName) {
+		return inputTypeName.replace("_ORIG", "");
 	}
 
 	public int getPartner() {

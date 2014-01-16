@@ -174,7 +174,7 @@ protected void doProcess(Ds2dsConfiguration cfg,
     try {
         GateStatisticsProcess computation = new GateStatisticsProcess(
         // type name read on file name
-                "", listenerForwarder, metadataHandler, dataStore, file, inputDataStore);
+        		getInputTypeName(file), listenerForwarder, metadataHandler, dataStore, file, inputDataStore);
 
         computation.generateStatistics(configuration.isPurgeData());
 
@@ -186,6 +186,18 @@ protected void doProcess(Ds2dsConfiguration cfg,
         throw new ActionException(this, "Error generating gate statistics", ex);
     }
 
+}
+
+/**
+ * @param file
+ * @return
+ */
+private String getInputTypeName(File file) {
+	String fileName = file != null ? file.getName() : null;
+    if (fileName != null && fileName.contains(".")) {
+        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+    }
+    return fileName;
 }
 
 }

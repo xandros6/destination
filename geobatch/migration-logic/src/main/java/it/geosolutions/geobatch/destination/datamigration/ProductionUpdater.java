@@ -56,7 +56,7 @@ public class ProductionUpdater extends InputObject{
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(ProductionUpdater.class);
 
-	private static Pattern TYPE_NAME_PARTS_ARCS = Pattern.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");
+	private static Pattern TYPE_NAME_PARTS_ARCS = Pattern.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})(_ORIG)?$");
 	private static Pattern TYPE_NAME_PARTS_TARGETS  = Pattern.compile("^([A-Z]{2})[_-]([A-Z]{2,3})[_-]([A-Z]+)([_-][C|I])?[_-]([0-9]{8})[_-]([0-9]{2})$");
 	private static Properties targetTypes = new Properties();
 

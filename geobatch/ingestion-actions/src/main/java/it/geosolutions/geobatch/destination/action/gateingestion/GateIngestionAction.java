@@ -163,7 +163,7 @@ protected void doProcess(GateIngestionConfiguration cfg,
     try {
         GateIngestionProcess computation = new GateIngestionProcess(
         // type name read on file name
-                "", listenerForwarder, metadataHandler, dataStore, file);
+                getInputTypeName(file), listenerForwarder, metadataHandler, dataStore, file);
 
         computation.importGates(cfg.getIgnorePks());
 
@@ -176,5 +176,17 @@ protected void doProcess(GateIngestionConfiguration cfg,
     }
 
 }
+
+	/**
+	 * @param file
+	 * @return
+	 */
+	private String getInputTypeName(File file) {
+		String fileName = file != null ? file.getName() : null;
+	    if (fileName != null && fileName.contains(".")) {
+	        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+	    }
+	    return fileName;
+	}
 
 }

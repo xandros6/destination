@@ -65,19 +65,19 @@ public class RoadRunner{
         	
         	//String inputFeature = "RL_C_Grafo_20130918";
         	//String inputFeature = "AO_C_Grafo_20130704";
-        	String inputFeature = "RP_C_Grafo_20131212_ORIG";
+        	String inputFeature = "RP_C_Grafo_20140101_ORIG";
         	
         	dataStore = (JDBCDataStore)DataStoreFinder.getDataStore(datastoreParams);	        
 	        metadataHandler = new MetadataIngestionHandler(dataStore);
-	        OriginalArcsIngestionProcess arcIngestion = new OriginalArcsIngestionProcess(inputFeature,
+	        /*OriginalArcsIngestionProcess arcIngestion = new OriginalArcsIngestionProcess(inputFeature,
 	                new ProgressListenerForwarder(null), metadataHandler, dataStore, -1, -1);
-	        arcIngestion.importArcs(null, false);
-	        /*ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(inputFeature,
+	        arcIngestion.importArcs(null, false);*/
+	        ArcsIngestionProcess arcIngestion = new ArcsIngestionProcess(inputFeature,
 	                new ProgressListenerForwarder(null), metadataHandler, dataStore);
 	        
-	        arcIngestion.importArcs(null, 1, false, false, null);
+	        arcIngestion.importArcs(null, 1, false, false, true, null);
 	        
-	        arcIngestion.importArcs(null, 2, false, false, null);
+	        /*arcIngestion.importArcs(null, 2, false, false, null);
 	        arcIngestion.importArcs(null, 3, false, false, null);
 	        arcIngestion.importArcs(null, 3, true, false, "A");
 

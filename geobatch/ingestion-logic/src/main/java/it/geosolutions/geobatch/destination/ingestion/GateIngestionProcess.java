@@ -481,11 +481,8 @@ protected boolean isValid() throws IOException {
 public void setFile(File file) {
     // init from file to be inserted
     this.file = file;
-    String fileName = this.file != null ? this.file.getName() : null;
-    if (fileName != null && fileName.contains(DOT)) {
-        fileName = fileName.substring(0, fileName.lastIndexOf(DOT));
-    }
-    parseTypeName(fileName);
+    
+    //parseTypeName(fileName);
 }
 
 }

@@ -256,9 +256,6 @@ public class RasterMigration {
                     throw new IllegalArgumentException("Input file not found");
                 }
             }
-        } else {
-            // If the input file is not a target an exception is thrown
-            throw new IllegalArgumentException("Input file is not a Target File");
         }
     }
 

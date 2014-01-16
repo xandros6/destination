@@ -21,6 +21,8 @@
  */
 package it.geosolutions.geobatch.destination.action.arcingestion;
 
+import it.geosolutions.filesystemmonitor.monitor.FileSystemEvent;
+import it.geosolutions.filesystemmonitor.monitor.FileSystemEventType;
 import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
 import it.geosolutions.geobatch.annotations.Action;
 import it.geosolutions.geobatch.destination.action.DestinationBaseAction;
@@ -31,6 +33,7 @@ import it.geosolutions.geobatch.flow.event.action.ActionException;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.EventObject;
 
 import org.geotools.jdbc.JDBCDataStore;
 
@@ -60,7 +63,7 @@ public class ArcIngestionAction extends DestinationBaseAction<ArcIngestionConfig
 						metadataHandler, dataStore);
 	
 				arcIngestion.importArcs(null, cfg.getAggregationLevel(),
-						cfg.isOnGrid(), cfg.isDropInput(), cfg.getClosePhase());
+						cfg.isOnGrid(), cfg.isDropInput(), cfg.isNewProcess(), cfg.getClosePhase());
 			}
 		} catch (IOException ex) {
 			// TODO: what shall we do here??
@@ -70,5 +73,5 @@ public class ArcIngestionAction extends DestinationBaseAction<ArcIngestionConfig
 			throw new ActionException(this, "Error in importing arcs", ex);
 		}
 	}
-
+	
 }

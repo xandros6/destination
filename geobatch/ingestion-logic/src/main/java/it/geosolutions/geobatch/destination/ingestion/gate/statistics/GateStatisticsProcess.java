@@ -149,11 +149,7 @@ public GateStatisticsProcess(String typeName,
 
     // init from file to be inserted
     this.file = file;
-    String fileName = this.file != null ? this.file.getName() : null;
-    if (fileName != null && fileName.contains(DOT)) {
-        fileName = fileName.substring(0, fileName.lastIndexOf(DOT));
-    }
-    parseTypeName(fileName);
+    
 
     // init extractor and sequence manager
     this.statisticsExtractor = new StatisticsJDBCExtractor(

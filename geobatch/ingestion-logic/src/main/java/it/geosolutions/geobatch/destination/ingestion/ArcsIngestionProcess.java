@@ -60,7 +60,7 @@ public class ArcsIngestionProcess extends InputObject {
 	private final static Logger LOGGER = LoggerFactory.getLogger(ArcsIngestionProcess.class);
 		
 	private static Pattern typeNameParts = Pattern
-			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");
+			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})(_ORIG)?$");
 	
 	private int partner;
 	private String codicePartner;
@@ -128,6 +128,11 @@ public class ArcsIngestionProcess extends InputObject {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);		
 	}
 	
+	@Override
+	protected String getInputTypeName(String inputTypeName) {
+		return inputTypeName.replace("_ORIG", "");
+	}
+	
 	/**
 	 * Parse input feature typeName and extract useful information from it. 
 	 */
@@ -175,7 +180,7 @@ public class ArcsIngestionProcess extends InputObject {
 	 * @throws IOException
 	 */
 	public void importArcs(CoordinateReferenceSystem crs, int aggregationLevel,
-			boolean onGrid, boolean dropInput, String closePhase)
+			boolean onGrid, boolean dropInput, boolean newProcess, String closePhase)
 			throws IOException {
 		reset();
 		if(isValid()) {								
@@ -193,7 +198,7 @@ public class ArcsIngestionProcess extends InputObject {
 			try {												
 								
 				// create or retrieve metadata for ingestion
-				if(aggregationLevel == 1) {
+				if(newProcess) {
 					// new process
 					process = createProcess();
 					// write log for the imported file
@@ -941,7 +946,7 @@ public class ArcsIngestionProcess extends InputObject {
 		
 		SimpleFeatureBuilder featureBuilder = dissestoObject.getBuilder();
 		
-		String[] pterrs = inputFeature.getAttribute("PTERR") == null ? null : inputFeature.getAttribute("PTERR").toString().split("\\|");					
+		String[] pterrs = inputFeature.getAttribute("PTERR") == null ? new String[] {} : inputFeature.getAttribute("PTERR").toString().split("\\|");					
 		
 		for(int count=0; count < pterrs.length; count++) {
 			try {

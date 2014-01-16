@@ -33,6 +33,7 @@ public class ArcIngestionConfiguration extends ActionConfiguration {
     private boolean dropInput = false;
     private String closePhase = null;
     private boolean segmentation = false;
+    private boolean newProcess = false;
 
 	public ArcIngestionConfiguration(String id, String name, String description) {
 		super(id, name, description);
@@ -75,6 +76,20 @@ public class ArcIngestionConfiguration extends ActionConfiguration {
 	}
 	public void setSegmentation(boolean segmentation) {
 		this.segmentation = segmentation;
+	}
+	
+	/**
+	 * @return the newProcess
+	 */
+	public boolean isNewProcess() {
+		return newProcess;
+	}
+
+	/**
+	 * @param newProcess the newProcess to set
+	 */
+	public void setNewProcess(boolean newProcess) {
+		this.newProcess = newProcess;
 	}
 
 	@Override

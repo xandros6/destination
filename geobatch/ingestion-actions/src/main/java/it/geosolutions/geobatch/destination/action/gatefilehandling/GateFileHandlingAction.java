@@ -292,7 +292,7 @@ public void doProcess(GateFileHandlingConfiguration cfg,
                         // Import gate data
                         GateIngestionProcess computation = new GateIngestionProcess(
                                 // type name read on file name
-                                "", listenerForwarder, metadataHandler,
+                        		getInputTypeName(inputFile), listenerForwarder, metadataHandler,
                                 dataStore, inputFile);
                         Map<String, Object> procResult = computation
                                 .doProcess(cfg.getIgnorePks());
@@ -357,6 +357,18 @@ public void doProcess(GateFileHandlingConfiguration cfg,
         throw new ActionException(this, "Error in importing gates", ex);
     }
 
+}
+
+/**
+ * @param file
+ * @return
+ */
+private String getInputTypeName(File file) {
+	String fileName = file != null ? file.getName() : null;
+    if (fileName != null && fileName.contains(".")) {
+        fileName = fileName.substring(0, fileName.lastIndexOf("."));
+    }
+    return fileName;
 }
 
 /**

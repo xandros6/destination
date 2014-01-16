@@ -90,6 +90,7 @@ public abstract class InputObject {
 	
 	//
 	protected String inputTypeName = "";
+	protected String originalInputTypeName = "";
 	protected ProgressListener listenerForwarder=null;
 	
 	private boolean valid = false;
@@ -113,14 +114,17 @@ public abstract class InputObject {
 			MetadataIngestionHandler metadataHandler,
 			DataStore dataStore) {
 		super();
-		this.inputTypeName = inputTypeName;
+		this.originalInputTypeName = inputTypeName;
+		this.inputTypeName = getInputTypeName(inputTypeName);
 		this.listenerForwarder = listener;
 		this.dataStore = dataStore;
 		this.metadataHandler = metadataHandler;
 		this.valid = this.parseTypeName(inputTypeName);
 	}
 	
-	
+	protected String getInputTypeName(String inputTypeName) {
+		return inputTypeName;
+	}
 	
 	/**
 	 * @param sequenceManager the sequenceManager to set
@@ -292,9 +296,9 @@ public abstract class InputObject {
 	 * @throws IOException 
 	 */
 	protected MetadataIngestionHandler.Process getProcessData() throws IOException {
-		if(metadataHandler != null){
-		return metadataHandler.getProcessData(inputTypeName);
-	}
+		if (metadataHandler != null) {
+			return metadataHandler.getProcessData(originalInputTypeName);
+		}
 		return null;
 	}
 			
@@ -341,7 +345,7 @@ public abstract class InputObject {
 	protected int logFile(int processo, int bersaglio, int partner, String codicePartner, String date, boolean update) throws IOException {
 		if(metadataHandler != null){
 			return metadataHandler.logFile(processo, bersaglio,
-					partner, codicePartner, inputTypeName, date, update);
+					partner, codicePartner, originalInputTypeName, date, update);
 		}
 		return 0;
 	}

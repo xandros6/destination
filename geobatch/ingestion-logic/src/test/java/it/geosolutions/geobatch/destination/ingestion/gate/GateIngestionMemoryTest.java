@@ -128,7 +128,7 @@ public class GateIngestionMemoryTest extends DestinationMemoryTest {
 	
 	        // Prepare process
 	        file = getTestFile(FAKE_GATE_ID, numberOrTransits);
-	        GateIngestionProcess gateIngestion = new GateIngestionProcess("",
+	        GateIngestionProcess gateIngestion = new GateIngestionProcess("A00_20131016-180030",
 	                new ProgressListenerForwarder(null), metadataHandler,
 	                dataStore, file);
 	

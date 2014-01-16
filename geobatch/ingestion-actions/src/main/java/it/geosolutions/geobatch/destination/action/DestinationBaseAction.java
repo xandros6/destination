@@ -108,8 +108,7 @@ public abstract class DestinationBaseAction<T extends ActionConfiguration> exten
 							dataStore, metadataHandler, file);
 
 					// pass the feature config to the next action
-					ret.add(new FileSystemEvent(((FileSystemEvent) event)
-							.getSource(), FileSystemEventType.FILE_ADDED));
+					ret.add(createOutputEvent(event));
 				} finally {
 					ds.dispose();
 				}
@@ -121,6 +120,15 @@ public abstract class DestinationBaseAction<T extends ActionConfiguration> exten
 			throw new ActionException(this, t.getMessage(), t);
 		}
     }
+
+	/**
+	 * @param event
+	 * @return
+	 */
+	protected FileSystemEvent createOutputEvent(EventObject event) {
+		return new FileSystemEvent(((FileSystemEvent) event)
+				.getSource(), FileSystemEventType.FILE_ADDED);
+	}
 
     private FeatureConfiguration unwrapFeatureConfig(EventObject event) throws ActionException {
         if (event instanceof FileSystemEvent) {

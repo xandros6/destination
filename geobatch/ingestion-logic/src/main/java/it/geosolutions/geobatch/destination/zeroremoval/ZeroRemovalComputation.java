@@ -83,7 +83,7 @@ public class ZeroRemovalComputation extends InputObject {
 	private final static Logger LOGGER = LoggerFactory.getLogger(ZeroRemovalComputation.class);
 
 	private static Pattern TYPE_NAME_PARTS = Pattern
-			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})$");
+			.compile("^([A-Z]{2})_([A-Z]{1})_([A-Za-z]+)_([0-9]{8})(_ORIG)?$");
 
 	public static String GEO_TYPE_NAME = "siig_geo_ln_arco_X";
 	//private static final String NR_INCIDENTI = "nr_incidenti";
@@ -112,6 +112,11 @@ public class ZeroRemovalComputation extends InputObject {
 			MetadataIngestionHandler metadataHandler, DataStore dataStore) {
 		super(inputTypeName, listenerForwarder, metadataHandler, dataStore);
 		this.kInc = kIncr;
+	}
+	
+	@Override
+	protected String getInputTypeName(String inputTypeName) {
+		return inputTypeName.replace("_ORIG", "");
 	}
 
 	/**

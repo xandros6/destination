@@ -19,6 +19,7 @@ package it.geosolutions.geobatch.destination;
 import it.geosolutions.geobatch.actions.ds2ds.Ds2dsConfiguration;
 import it.geosolutions.geobatch.actions.ds2ds.dao.FeatureConfiguration;
 import it.geosolutions.geobatch.destination.datamigration.ProductionUpdater;
+import it.geosolutions.geobatch.destination.datamigration.RasterMigration;
 import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures;
 import it.geosolutions.geobatch.destination.datamigration.UpdaterFeatures.UpdaterFeature;
 import it.geosolutions.geobatch.destination.ingestion.MetadataIngestionHandler;
@@ -49,6 +50,7 @@ public class MigrationRunner {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		/*
 		Map<String, Serializable> datastoreParams = new HashMap<String, Serializable>();
         datastoreParams.put("port", 5432);
         datastoreParams.put("schema", "siig_p");
@@ -86,11 +88,11 @@ public class MigrationRunner {
 			LOGGER.error(e1.getMessage(), e1);
 		} catch (FactoryException e1) {
 			LOGGER.error(e1.getMessage(), e1);
-		}
+		}*/
         JDBCDataStore dataStore = null;        
         MetadataIngestionHandler metadataHandler = null;
         try {
-        	
+        	/*
         	String inputFeature = "BZ_BNU-AAGR_C_20130904_02";
         	//String inputFeature = "AO_C_Grafo_20130704";
         	
@@ -124,38 +126,11 @@ public class MigrationRunner {
 	        
 	        cfg.setAttributeMappings(attributeMappings);
 	        //updater.executeTarget(targetFeature);
-	        updater.executeArc(arcFeature);
-	        /*arcIngestion.importArcs(null, 3, false, false, null);
-	        arcIngestion.importArcs(null, 3, true, false, "A");
-	        
-			ZeroRemovalComputation zeroComputation = new ZeroRemovalComputation(
-					inputFeature, new ProgressListenerForwarder(null),
-					metadataHandler, dataStore);
-	        
-	        
-	        zeroComputation.removeZeros(null, 1, null);
-	        zeroComputation.removeZeros(null, 2, null);
-	        zeroComputation.removeZeros(null, 3, null);
-	        
-	        JAI.getDefaultInstance().getTileCache().setMemoryCapacity(1024*1024*1024);
-	        
-	        VulnerabilityComputation vulnerability = new VulnerabilityComputation(inputFeature, 
-	        		new ProgressListenerForwarder(null), metadataHandler, dataStore);
-	        
-	        vulnerability.computeVulnerability(null, 1, "PURGE_INSERT", null);
-	        vulnerability.computeVulnerability(null, 2, "PURGE_INSERT", null);
-	        vulnerability.computeVulnerability(null, 3, "PURGE_INSERT", null);
-			
-	        RiskComputation riskComputation = new RiskComputation(
-	        		inputFeature,
-					new ProgressListenerForwarder(null),
-					metadataHandler, dataStore);
-	    	
-	        
-	        
-	        riskComputation.prefetchRiskAtLevel(3, 1, 1, 26, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", null);
-	        riskComputation.prefetchRiskAtLevel(3, 2, 1, 26, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", null);
-	        riskComputation.prefetchRiskAtLevel(3, 3, 1, 29, 100, "1,2,3,4,5,6,7,8,9,10", "1,2,3,4,5,6,7,8,9,10,11", "0,1", "1,2,3,4,5", "fp_scen_centrale", "PURGE_INSERT", "B");*/
+	        //updater.executeArc(arcFeature);	        
+	        */
+	        RasterMigration rasterMig = new RasterMigration("ALL", "D:\\Develop\\destination\\rasters_out", "D:\\Develop\\destination\\rasters_prod", null);
+	        // Copying file
+	        rasterMig.execute();
 	        
         } catch(Exception e) {
         	LOGGER.error(e.getMessage());

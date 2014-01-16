@@ -46,7 +46,7 @@ public class RoadArcTest extends DestinationMemoryTest{
 	public void testLevel1() throws IOException {
 		ArcsIngestionProcess arcIngestion = createProcess();
 
-		arcIngestion.importArcs(null, 1, false, false, null);
+		arcIngestion.importArcs(null, 1, false, false, true, null);
 
 		checkFeature("siig_geo_ln_arco_1", 3);
 		checkFeature("siig_r_tipovei_geoarco1", 6);
@@ -59,7 +59,7 @@ public class RoadArcTest extends DestinationMemoryTest{
 	public void testLevel2() throws IOException {
 		ArcsIngestionProcess arcIngestion = createProcess();
 
-		arcIngestion.importArcs(null, 2, false, false, null);
+		arcIngestion.importArcs(null, 2, false, false, false, null);
 
 		checkFeature("siig_geo_ln_arco_2", 2);
 		checkFeature("siig_r_tipovei_geoarco2", 4);
@@ -72,7 +72,7 @@ public class RoadArcTest extends DestinationMemoryTest{
 	public void testLevel3() throws IOException {
 		ArcsIngestionProcess arcIngestion = createProcess();
 
-		arcIngestion.importArcs(null, 3, false, false, null);
+		arcIngestion.importArcs(null, 3, false, false, false, null);
 
 		checkFeature("siig_geo_ln_arco_3", 1);
 		checkFeature("siig_r_tipovei_geoarco3", 2);
@@ -85,7 +85,7 @@ public class RoadArcTest extends DestinationMemoryTest{
 	public void testGridLevel3() throws IOException {
 		ArcsIngestionProcess arcIngestion = createProcess();
 
-		arcIngestion.importArcs(null, 3, true, false, null);
+		arcIngestion.importArcs(null, 3, true, false, false, null);
 
 		checkFeature("siig_geo_pl_arco_3", 1);
 		checkFeature("siig_r_tipovei_geoarco3", 0);
