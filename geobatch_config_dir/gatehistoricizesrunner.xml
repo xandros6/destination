@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlowConfiguration>
+
+    <id>gatehistoricizesrunner</id>
+    <description>DataStore to DataStore configuration flow</description>
+    <name>ds2ds flow</name>
+
+    <autorun>true</autorun>
+
+    <EventGeneratorConfiguration>
+        <serviceID>fsEventGeneratorService</serviceID>
+        <wildCard>*.*</wildCard>
+        <watchDirectory>gatehistoricizesrunner/in</watchDirectory>
+        <osType>OS_UNDEFINED</osType>
+  		<eventType>POLLING_EVENT</eventType>
+  		Fire at 2:17am on the last day of every month
+  		<interval>0 17 2 L * ?</interval>
+    </EventGeneratorConfiguration>
+
+	 <EventConsumerConfiguration>
+        <id>ds2ds</id>
+        <description>ds2ds</description>
+        <name>ds2ds</name>               
+        <performBackup>false</performBackup>
+		<preserveInput>true</preserveInput>
+		<GateHistoricizesConfiguration>				
+				<id>gatehistoricizesrunner</id>    
+				<name>Gate historicizes process</name>
+				<description>
+					Read feature data from siig_gate_t_dato and move it to siig_gate_t_dato_storico for only record before time from now spcified using ECQL filter
+				</description>
+				
+				<listenerConfigurations/>
+				<failIgnored>false</failIgnored>
+				<purgeData>false</purgeData>
+				<moveData>true</moveData>
+				<beforeYear>0</beforeYear>
+				<beforeMonth>1</beforeMonth>
+				<beforeDay>0</beforeDay>
+				<sourceFeature>
+					<typeName>siig_gate_t_dato</typeName>
+					<dataStore>
+						<entry>
+							<string>dbtype</string>
+							<string>postgis</string>
+						</entry>
+						<entry>
+							<string>host</string>
+							<string>127.0.0.1</string>
+						</entry>
+						<entry>
+							<string>port</string>
+							<string>5432</string>
+						</entry>
+						<entry>
+							<string>database</string>
+							<string>destination_staging_origin</string>
+						</entry>
+						<entry>
+							<string>schema</string>
+							<string>siig_p</string>
+						</entry>
+						<entry>
+							<string>user</string>
+							<string>siig_p</string>
+						</entry>
+						<entry>
+							<string>passwd</string>
+							<string>siig_p</string>
+						</entry>
+						<entry>
+							<string>Expose primary keys</string>
+							<string>true</string>
+						</entry>
+					</dataStore>
+				</sourceFeature>
+				
+				<outputFeature>
+					<typeName>siig_gate_t_dato_storico</typeName>
+					<dataStore>
+					   <entry>
+						 <string>dbtype</string>
+						 <string>postgis</string>
+					   </entry>
+					   <entry>
+						 <string>host</string>
+						 <string>127.0.0.1</string>
+					   </entry>
+					   <entry>
+						 <string>port</string>
+						 <string>5432</string>
+					   </entry>
+					   <entry>
+						 <string>database</string>
+						 <string>destination_staging_origin</string>
+					   </entry>                   
+					   <entry>
+						 <string>schema</string>
+						 <string>siig_p</string>
+					   </entry>
+					   <entry>
+						 <string>user</string>
+						 <string>siig_p</string>
+					   </entry>
+					   <entry>
+						 <string>passwd</string>
+						 <string>siig_p</string>
+					   </entry>
+					</dataStore>
+				</outputFeature>
+				
+				<projectOnMappings>false</projectOnMappings>
+				<attributeMappings/>
+				<!-- Listeners -->
+				<listenerId>ConsumerLogger0</listenerId>
+				<listenerId>Cumulator</listenerId>
+		</GateHistoricizesConfiguration>
+	
+	</EventConsumerConfiguration>
+
+    <ListenerConfigurations>
+        <LoggingProgressListener>
+            <serviceID>loggingListenerService</serviceID>
+            <id>ConsumerLogger0</id>
+            <loggerName>it.geosolutions.ConsLogger</loggerName>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
+        </LoggingProgressListener>
+        <CumulatingProgressListener>
+            <serviceID>cumulatingListenerService</serviceID>
+            <id>Cumulator</id>
+            <appendToListenerForwarder>true</appendToListenerForwarder>
+        </CumulatingProgressListener>
+    </ListenerConfigurations>
+
+</FlowConfiguration>
